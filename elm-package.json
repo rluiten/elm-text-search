@@ -1,0 +1,22 @@
+{
+    "version": "1.0.0",
+    "summary": "Elm port of library lunr, full text search indexer",
+    "repository": "https://github.com/rluiten/lunr.git",
+    "license": "BSD3",
+    "source-directories": [
+        "src",
+        "examples"
+    ],
+    "exposed-modules": [
+        "Lunr",
+        "Tokenizer",
+        "StopWordFilter"
+    ],
+    "dependencies": {
+        "elm-lang/core": "3.0.0 <= v < 4.0.0",
+        "rluiten/sparsevector": "1.0.0 <= v < 2.0.0",
+        "rluiten/stemmer": "1.0.0 <= v < 2.0.0",
+        "rluiten/trie": "1.0.0 <= v < 2.0.0"
+    },
+    "elm-version": "0.16.0 <= v < 0.17.0"
+}
