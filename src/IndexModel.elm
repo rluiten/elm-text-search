@@ -2,13 +2,11 @@ module IndexModel where
 
 {-| Define the Index Model
 
-Copyright (c) 2016 Robin Luiten
-
-
 @docs Index
 @docs IndexSimpleConfig
 @docs IndexConfig
 
+Copyright (c) 2016 Robin Luiten
 -}
 
 import Dict exposing (Dict)
@@ -68,7 +66,11 @@ The internal data model of Index
 
 -}
 type Index doc =
-    Index
+    Index (IndexRecord doc)
+
+
+{-| The Record model in an Index. -}
+type alias IndexRecord doc =
       { indexVersion : String
 
       , indexType : String
@@ -77,13 +79,13 @@ type Index doc =
       , transformFactories : List (TransformFactory doc)
       , filterFactories : List (FilterFactory doc)
 
-      , transforms : Maybe (List TransformFunc)
-      , filters : Maybe (List FilterFunc)
-
       , documentStore : Dict String (Set String)
       , corpusTokens : Set String
-      , corpusTokensIndex : Dict String Int
       , tokenStore : Trie Float
+
+      , corpusTokensIndex : Dict String Int
+      , transforms : Maybe (List TransformFunc)
+      , filters : Maybe (List FilterFunc)
       , idfCache : Dict String Float
       }
 
@@ -91,10 +93,13 @@ type Index doc =
 {-| Simple index config with default token processing.
 
 Simple still requires configuring the fields for your document type.
+
+At Index level SimpleConfig includes `indexType`.
+
+At Lunrelm level SimpleConfig does not require `indexType`.
 -}
-type alias SimpleConfig doc a =
-    { a
-    | indexType : String
+type alias SimpleConfig doc =
+    { indexType : String
     , ref : (doc -> String)
     , fields : List (doc -> String, Float)
     }
@@ -105,11 +110,24 @@ type alias SimpleConfig doc a =
 If a configuration does not match an index being loaded
 you will get an Err Result returned.
 -}
-type alias Config doc a =
-    { a
-    | indexType : String
+type alias Config doc =
+    { indexType : String
     , ref : doc -> String
     , fields : List (doc -> String, Float)
     , transformFactories : List (TransformFactory doc)
     , filterFactories : List (FilterFactory doc)
     }
+
+
+{-| Just the fields encoded for an Index.
+
+This can't be a `CodecIndexRecord a` because the
+decoder appeared to object.
+-}
+type alias CodecIndexRecord =
+      { indexVersion : String
+      , indexType : String
+      , documentStore : Dict String (Set String)
+      , corpusTokens : Set String
+      , tokenStore : Trie Float
+      }

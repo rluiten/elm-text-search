@@ -5,9 +5,10 @@ Copyright (c) 2016 Robin Luiten
 This is a full text indexing engine inspired by lunr.js and written in Elm language.
 See http://lunrjs.com/ for lunr.js
 
-This version works but can not save or load indexes yet. So it may not be of much value yet.
+While Lunerlm has a good selection of tests this library is not battle tested and may contain some performance issues that need
+addressing still.
 
-Several packages were created for this project to use as follows
+Several packages were created for this project and published seperately for this package to depend on.
 
 * trie
  * http://package.elm-lang.org/packages/rluiten/trie/latest
@@ -16,36 +17,14 @@ Several packages were created for this project to use as follows
 * sparsevector
  * http://package.elm-lang.org/packages/rluiten/sparsevector/latest
 
-## Issues
 
-* Performance is has not been tested there may be some rough spots.
-* Save and Load of an index is not yet implemented.
 
 ### Parts of lunr.js were left out
 
 * This does not have an event system.
 * Its internal data structure is not compatible.
 
-### Behaviours
-
-* add doc returns Err if empty document reference field
-* remove doc returns Err if empty document reference field
-* search returns Err if query is empty
-
-#### Behaviours under consideration
-
-* should add return Err if all doc fields
- * YES at moment
-* should add return Err if doc already in index
- * YES at moment
-* should remove return Err if doc not in index
- * YES at moment
-* should search return Err if query is non empty
-but after token processing there is nothing left to
-search with
- * YES at moment
-
-#### Bugs discovered doing port of lunr.js to Lunrelm
+### Notes captured along way writing this.
 
 * lunr.js
  * tokenStore.remove does not decrement length, but it doesnt use length really only save/load

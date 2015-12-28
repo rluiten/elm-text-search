@@ -6,6 +6,7 @@ module IndexUtils
     , applyFilter
     , idf
     , refExists
+    , buildOrderIndex
     ) where
 
 {-| Index Utilities
@@ -18,6 +19,7 @@ module IndexUtils
 @docs applyFilter
 @docs idf
 @docs refExists
+@docs buildOrderIndex
 
 Copyright (c) 2016 Robin Luiten
 -}
@@ -25,9 +27,11 @@ Copyright (c) 2016 Robin Luiten
 import Dict exposing (Dict)
 import Maybe exposing (andThen, withDefault)
 import Trie exposing (Trie)
-import Set
+import Set exposing (Set)
 
 import IndexModel exposing (Index(Index), FuncFactory, FilterFactory)
+-- import IndexUtils
+-- import StopWordFilter
 import TokenProcessors
 
 
@@ -65,6 +69,7 @@ applyTransform index strings =
       (u1index, transformList) = getOrSetTransformList index
     in
       (u1index, List.map (applyTransformList transformList) strings)
+
 
 {-
 Would prefer to past just accessors (eg .transforms) to
@@ -218,3 +223,14 @@ calcIdf (Index irec) token =
 {-| Return True if document reference is indexed. -}
 refExists : String -> Index doc -> Bool
 refExists docRef (Index irec) = Dict.member docRef irec.documentStore
+
+
+{-| Build an index of string to index from Set where key is
+Set word and value is ordered index of word in Set.
+-}
+buildOrderIndex : Set String -> Dict String Int
+buildOrderIndex tokenSet =
+  let
+    withIndex = List.indexedMap (,) (Set.toList tokenSet)
+  in
+    List.foldr (\(i, v) d -> Dict.insert v i d) Dict.empty withIndex

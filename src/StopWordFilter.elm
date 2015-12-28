@@ -6,11 +6,12 @@ contained in the list are not stored in the index.
 This is intended to be used in the Lunrelm token processing pipeline.
 
 ### Things to know about stop word lists.
-* Input tokens to create stop word filters should be english words, if you
+* Input tokens to create stop word filters should be full words, if you
 dont know the transform steps for index or if you use the list with different
 sets of transforms.
 * If you know the exact transform process of your Index you can prerun the
-transform process to generate your word list.
+transform process to generate your word list, which in theory might
+make it a little more efficient.
 * It is more efficient to merge all your stop words into a single
 stop word filter.
 
@@ -167,7 +168,7 @@ createDefaultFilterFunc index =
 
 
 {-| Create stop word list filter suitable for Lunrelm, this versions
-extends the default word list with the extra word.
+extends the default word list with the extra words provided.
 -}
 createFilterFuncWith : List String -> FilterFactory doc
 createFilterFuncWith extraWords index =
@@ -175,6 +176,9 @@ createFilterFuncWith extraWords index =
 
 
 {-| Create stop word filter for provided list of tokens suitable for Lunrelm.
+
+** This creates a stop world filter purely from your own word list, understand
+what you are doing and consequences if you use this. **
 
 The FilterFunc created returns True to allow words into index.
 So words found in the stopWordList return False

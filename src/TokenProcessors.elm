@@ -7,8 +7,6 @@ module TokenProcessors
 
 {-| TokenProcessors for strings.
 
-Copyright (c) 2016 Robin Luiten
-
 ## Create a tokenizer
 
 @docs tokenizer
@@ -19,6 +17,7 @@ Copyright (c) 2016 Robin Luiten
 
 @docs trimmer
 
+Copyright (c) 2016 Robin Luiten
 -}
 
 import Regex exposing

@@ -19,7 +19,6 @@ tests =
       , searchErr1 ()
       , searchErr2 ()
       , searchErr3 ()
-      -- -- , search6 ()
       , idfCache1 ()
       , idfCache2 ()
       , addErr1 ()
@@ -230,12 +229,12 @@ idfCacheStateTestMessage (Index irec) =
 
 
 removeErr1 _ =
-      test "Remove a doc with ref not in index returns Err." <|
-        assertEqual (Err "Error document is not in index.") <|
-          Index.remove (safeIndex index2) (doc3 ())
+    test "Remove a doc with ref not in index returns Err." <|
+      assertEqual (Err "Error document is not in index.") <|
+        Index.remove (safeIndex index2) (doc3 ())
 
 
 removeErr2 _ =
-      test "Remove a doc with Err field empty is an error." <|
-        assertEqual (Err "Error document has an empty unique id (ref).") <|
-          Index.remove (safeIndex index2) (doc5 ())
+    test "Remove a doc with Err field empty is an error." <|
+      assertEqual (Err "Error document has an empty unique id (ref).") <|
+        Index.remove (safeIndex index2) (doc5 ())
