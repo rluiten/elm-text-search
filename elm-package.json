@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
-    "summary": "Elm port of library lunr, full text search indexer",
-    "repository": "https://github.com/rluiten/lunr.git",
+    "summary": "Full text index engine in Elm language inspired by lunr.js.",
+    "repository": "https://github.com/rluiten/lunrelm.git",
     "license": "BSD3",
     "source-directories": [
         "src",
