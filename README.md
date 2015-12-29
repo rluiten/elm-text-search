@@ -5,7 +5,7 @@ Copyright (c) 2016 Robin Luiten
 This is a full text indexing engine inspired by lunr.js and written in Elm language.
 See http://lunrjs.com/ for lunr.js
 
-While Lunerlm has a good selection of tests this library is not battle tested and may contain some performance issues that need
+While ElmTextSearch has a good selection of tests this library is not battle tested and may contain some performance issues that need
 addressing still.
 
 Several packages were created for this project and published seperately for this package to depend on.

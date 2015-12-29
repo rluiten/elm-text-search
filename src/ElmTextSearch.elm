@@ -38,7 +38,7 @@ https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
 @docs Config
 @docs SimpleConfig
 
-## Save and Load a Lunerlm Index
+## Save and Load an Index
 
 * You can save an index using [`ElmTextSearch.Json.Encoder.encoder`](ElmTextSearch.Json.Encoder#encoder)
 * You can load a saved index using
