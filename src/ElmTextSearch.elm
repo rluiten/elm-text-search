@@ -1,6 +1,6 @@
 module ElmTextSearch
     ( Index
-    , ElmTextSearchSimpleConfig
+    , SimpleConfig
     , Config
     , new
     , newWith
@@ -36,7 +36,7 @@ https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
 ## Types
 @docs Index
 @docs Config
-@docs ElmTextSearchSimpleConfig
+@docs SimpleConfig
 
 ## Save and Load a Lunerlm Index
 
@@ -79,10 +79,10 @@ import TokenProcessors
 type alias Index doc = Index.Index doc
 
 
-{-| A ElmTextSearchSimpleConfig is the least amount of
+{-| A SimpleConfig is the least amount of
 configuration data required to create an Index.
 -}
-type alias ElmTextSearchSimpleConfig doc =
+type alias SimpleConfig doc =
     { ref : (doc -> String)
     , fields : List (doc -> String, Float)
     }
@@ -92,8 +92,8 @@ type alias ElmTextSearchSimpleConfig doc =
 type alias Config doc = IndexModel.Config doc
 
 
-{- convert ElmTextSearch.ElmTextSearchSimpleConfig to IndexModel.SimpleConfig -}
-getIndexSimpleConfig : ElmTextSearchSimpleConfig doc -> IndexModel.SimpleConfig doc
+{- convert ElmTextSearch.SimpleConfig to IndexModel.SimpleConfig -}
+getIndexSimpleConfig : SimpleConfig doc -> IndexModel.SimpleConfig doc
 getIndexSimpleConfig {ref, fields} =
     { indexType = IndexDefaults.elmTextSearchIndexType
     , ref = ref
@@ -126,7 +126,7 @@ createNewIndexExample =
     }
 ```
 
-The `ElmTextSearchSimpleConfig` parameter to new is
+The `SimpleConfig` parameter to new is
 * ref
  * The unique document reference will be extracted from each
    document using `.cid`.
@@ -141,7 +141,7 @@ The `ElmTextSearchSimpleConfig` parameter to new is
     of matching documents returned.
 
 -}
-new : ElmTextSearchSimpleConfig doc -> Index doc
+new : SimpleConfig doc -> Index doc
 new simpleConfig =
     Index.new (getIndexSimpleConfig simpleConfig)
 
@@ -314,7 +314,7 @@ supplied basic configurations.
 
 See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
-fromString : ElmTextSearchSimpleConfig doc -> String -> Result String (Index doc)
+fromString : SimpleConfig doc -> String -> Result String (Index doc)
 fromString simpleConfig inputString =
     IndexLoad.loadIndex
       (getIndexSimpleConfig simpleConfig)
@@ -325,7 +325,7 @@ fromString simpleConfig inputString =
 
 See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
-fromValue : ElmTextSearchSimpleConfig doc -> Decode.Value -> Result String (Index doc)
+fromValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
 fromValue simpleConfigs inputString =
     Err "load is not implemented"
 

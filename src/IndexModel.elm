@@ -93,7 +93,7 @@ type alias IndexRecord doc =
 {-| Simple index config with default token processing.
 
 Simple still requires configuring the fields for your document type.
-See [`ElmTextSearch.ElmTextSearchSimpleConfig`](ElmTextSearch#ElmTextSearchSimpleConfig)
+See [`ElmTextSearch.SimpleConfig`](ElmTextSearch#SimpleConfig)
 for explantions of `ref` and `fields` fields.
 
 * ElmTextSearch.SimpleConfig does not include `indexType`.

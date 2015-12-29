@@ -17,7 +17,7 @@ type alias ExampleDocType =
 
 
 {-| Create an index with default configuration.
-See ElmTextSearch.ElmTextSearchSimpleConfig documentation for parameter information.
+See ElmTextSearch.SimpleConfig documentation for parameter information.
 -}
 createNewIndexExample : ElmTextSearch.Index ExampleDocType
 createNewIndexExample =
