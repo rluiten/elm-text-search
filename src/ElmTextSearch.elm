@@ -333,10 +333,10 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 -}
 fromValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
 fromValue simpleConfig inputValue =
-    -- Err "not implemented yet"
     IndexLoad.loadIndexValue
       (getIndexSimpleConfig simpleConfig)
       inputValue
+
 
 {-| Create an Index from a String which has a stored Index in it.
 
