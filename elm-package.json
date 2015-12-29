@@ -1,5 +1,5 @@
 {
-    "version": "1.0.2",
+    "version": "1.0.3",
     "summary": "Full text index engine in Elm language inspired by lunr.js.",
     "repository": "https://github.com/rluiten/elm-text-search.git",
     "license": "BSD3",

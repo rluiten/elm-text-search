@@ -79,8 +79,8 @@ import TokenProcessors
 type alias Index doc = Index.Index doc
 
 
-{-| A SimpleConfig is the least amount of
-configuration data required to create an Index.
+{-| A SimpleConfig is the least amount of configuration data
+required to create an Index.
 -}
 type alias SimpleConfig doc =
     { ref : (doc -> String)
@@ -88,11 +88,12 @@ type alias SimpleConfig doc =
     }
 
 
-{-| A Config is used to create an Index. -}
+{-| A Config is required to create an Index. -}
 type alias Config doc = IndexModel.Config doc
 
 
-{- convert ElmTextSearch.SimpleConfig to IndexModel.SimpleConfig -}
+{- convert ElmTextSearch.SimpleConfig to IndexModel.SimpleConfig
+-}
 getIndexSimpleConfig : SimpleConfig doc -> IndexModel.SimpleConfig doc
 getIndexSimpleConfig {ref, fields} =
     { indexType = IndexDefaults.elmTextSearchIndexType
@@ -139,7 +140,6 @@ The `SimpleConfig` parameter to new is
    more than if found in the `.body` field (boost value 1.0).
   * The document match score determines the order of the list
     of matching documents returned.
-
 -}
 new : SimpleConfig doc -> Index doc
 new simpleConfig =
@@ -181,7 +181,6 @@ createNewWithIndexExample =
     , filterFactories = [ createMyStopWordFilter ]
     }
 ```
-
 -}
 newWith : Config doc -> Index doc
 newWith = Index.newWith
@@ -207,7 +206,9 @@ Conditions that cause a result Err with message.
 * Error adding document that allready exists.
 -}
 add : doc -> Index doc -> Result String (Index doc)
-add = Index.add
+add =
+    Index.add
+
 
 {-| Remove a document from an index.
 
@@ -228,7 +229,8 @@ Conditions that cause a result Err with message.
 * Error document is not in index.
 -}
 remove : doc -> Index doc -> Result String (Index doc)
-remove = Index.remove
+remove =
+    Index.remove
 
 
 {-| Update a document in an index.
@@ -248,10 +250,10 @@ Starting with the ElmTextSearch.new example above this updates a document.
 Conditions that cause an error result are those for
 [`ElmTextSearch.remove`](ElmTextSearch#remove) and
 [`ElmTextSearch.add`](ElmTextSearch#add).
-
 -}
 update : doc -> Index doc -> Result String (Index doc)
-update = Index.update
+update =
+    Index.update
 
 
 {-| Search an index with query.
@@ -291,7 +293,8 @@ search :
        String
     -> Index doc
     -> Result String (Index doc, List (String, Float))
-search = Index.search
+search =
+      Index.search
 
 
 {-| Store an index to a Value.
@@ -329,9 +332,11 @@ fromString simpleConfig inputString =
 See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
 fromValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
-fromValue simpleConfigs inputString =
-    Err "load is not implemented"
-
+fromValue simpleConfig inputValue =
+    -- Err "not implemented yet"
+    IndexLoad.loadIndexValue
+      (getIndexSimpleConfig simpleConfig)
+      inputValue
 
 {-| Create an Index from a String which has a stored Index in it.
 
@@ -351,7 +356,6 @@ The following Err results may be returned.
  * It contains the loaded version index type which comes from input.
 * "Error cannot load Index. Version supported is 1.0.0. Version tried to load is 1.0.1."
  * It includes both expected and loaded versions which may vary.
-
 -}
 fromStringWith : List (Config doc) -> String -> Result String (Index doc)
 fromStringWith =
