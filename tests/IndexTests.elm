@@ -77,19 +77,19 @@ safeSearchList result = snd (safeSearch result)
 
 
 index1 : () -> IndexResult
-index1 _ = Index.add (index0) (doc1 ())
+index1 _ = Index.add (doc1 ()) index0
 
 
 index2 : () -> IndexResult
-index2 _ = Index.add (safeIndex index1) (doc2 ())
+index2 _ = Index.add (doc2 ()) (safeIndex index1)
 
 
 index2_banana : () -> IndexAndListResult
-index2_banana _ = Index.search (safeIndex index2) "banana"
+index2_banana _ = Index.search "banana"  (safeIndex index2)
 
 
 index3 : () -> IndexResult
-index3 _ = Index.add (safeIndex index2) (doc3 ())
+index3 _ = Index.add (doc3 ()) (safeIndex index2)
 
 
 doc1 : () -> MyDoc
@@ -155,7 +155,7 @@ searchTest (name, input, expect, index) =
     test ("search \"" ++ input ++ "\" " ++ name) <|
       assertEqual expect <|
         let
-          result = Index.search index input
+          result = Index.search input index
         in
           case result of
             Ok (index, docs) -> (List.map fst docs)
@@ -165,25 +165,25 @@ searchTest (name, input, expect, index) =
 searchErr1 _ =
     test "empty query returns Err" <|
       assertEqual (Err "Error query is empty.") <|
-        Index.search (safeIndex index2) ""
+        Index.search "" (safeIndex index2)
 
 
 searchErr2 _ =
     test "query full of stop words (filtered out words) returns Err" <|
       assertEqual (Err "Error after tokenisation there are no terms to search for.") <|
-        Index.search (safeIndex index2) "if and but "
+        Index.search "if and but " (safeIndex index2)
 
 
 searchErr3 _ =
     test "no document returns Err" <|
       assertEqual (Err "Error there are no documents in index to search.") <|
-        Index.search index0 "hello world"
+        Index.search "hello world" index0
 
 
 idfCache1 _ =
     test "idfCache is cleared after a successful remove document." <|
       assertEqual (Ok "IDF Cache Empty")
-        ( (Index.remove (safeSearchIndex index2_banana) (doc1 ()))
+        ( (Index.remove (doc1 ()) (safeSearchIndex index2_banana))
           |> thenAnd (\u2index2 -> (idfCacheStateTestMessage u2index2))
         )
 
@@ -191,7 +191,7 @@ idfCache1 _ =
 idfCache2 _ =
     test "idfCache is cleared after a successful add document." <|
       assertEqual (Ok "IDF Cache Empty")
-        ( (Index.add (safeSearchIndex index2_banana) (doc3 ()))
+        ( (Index.add (doc3 ()) (safeSearchIndex index2_banana))
           |> thenAnd (\u2index2 -> (idfCacheStateTestMessage u2index2))
         )
 
@@ -199,19 +199,19 @@ idfCache2 _ =
 addErr1 _ =
     test "Add a doc with has all index fields empty returns Err" <|
       assertEqual (Err "Error after tokenisation there are no terms to index.") <|
-        Index.add index0 (doc4 ())
+        Index.add (doc4 ()) index0
 
 
 addErr2 _ =
     test "Add a doc with Err field empty returns Err" <|
       assertEqual (Err "Error document has an empty unique id (ref).") <|
-        Index.add index0 (doc5 ())
+        Index.add (doc5 ()) index0
 
 
 addErr3 _ =
     test "Add a doc allready in index returns Err" <|
       assertEqual (Err "Error adding document that allready exists.") <|
-        Index.add (safeIndex index2) (doc1 ())
+        Index.add (doc1 ()) (safeIndex index2)
 
 
 documentStoreStateTestMessage index =
@@ -231,10 +231,10 @@ idfCacheStateTestMessage (Index irec) =
 removeErr1 _ =
     test "Remove a doc with ref not in index returns Err." <|
       assertEqual (Err "Error document is not in index.") <|
-        Index.remove (safeIndex index2) (doc3 ())
+        Index.remove (doc3 ()) (safeIndex index2)
 
 
 removeErr2 _ =
     test "Remove a doc with Err field empty is an error." <|
       assertEqual (Err "Error document has an empty unique id (ref).") <|
-        Index.remove (safeIndex index2) (doc5 ())
+        Index.remove (doc5 ()) (safeIndex index2)

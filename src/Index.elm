@@ -80,8 +80,8 @@ newWith {indexType, ref, fields, transformFactories, filterFactories} =
 
 See ElmTextSearch documentation for `add` to see error conditions.
 -}
-add : Index doc -> doc -> Result String (Index doc)
-add (Index irec as index) doc =
+add : doc -> Index doc -> Result String (Index doc)
+add doc (Index irec as index) =
     let
       docRef = irec.ref doc
     in
@@ -103,7 +103,7 @@ add (Index irec as index) doc =
           if Set.isEmpty docTokens then
             Err "Error after tokenisation there are no terms to index."
           else
-            Ok (addDoc docRef u3index fieldsTokens docTokens)
+            Ok (addDoc docRef fieldsTokens docTokens u3index)
 
 
 {- reducer to extract tokens from each field of doc -}
@@ -120,8 +120,8 @@ getWordsForField doc getField (index, fieldsLists) =
 
 
 {- Add the document to the index. -}
-addDoc : String -> Index doc -> List (Set String) -> Set String -> Index doc
-addDoc docRef (Index irec as index) fieldsTokens docTokens =
+addDoc : String -> List (Set String) -> Set String -> Index doc -> Index doc
+addDoc docRef fieldsTokens docTokens (Index irec as index) =
     let
       addTokenScore (token, score) trie =
         Trie.add (docRef, score) token trie
@@ -135,9 +135,11 @@ addDoc docRef (Index irec as index) fieldsTokens docTokens =
       updatedCorpusTokens = Set.union irec.corpusTokens docTokens
       -- can the cost of this be reduced ?
       updatedCorpusTokensIndex = IndexUtils.buildOrderIndex updatedCorpusTokens
-      score = scoreToken fieldTokensAndBoosts
       -- tokenAndScores : List (String, Float)
-      tokenAndScores = List.map score (Set.toList docTokens)
+      tokenAndScores =
+        List.map
+          (scoreToken fieldTokensAndBoosts)
+          (Set.toList docTokens)
       updatedTokenStore = List.foldr addTokenScore irec.tokenStore tokenAndScores
     in
       Index
@@ -187,11 +189,11 @@ reprocessing tokens for all documents to recreate corpusTokens.
  * This may skew the results over time after many removes but not badly.
  * It appears lunr.js operates this way as well for remove.
 -}
-remove : Index doc -> doc -> Result String (Index doc)
-remove (Index irec as index) doc =
+remove : doc -> Index doc -> Result String (Index doc)
+remove doc (Index irec as index) =
     let
       docRef = irec.ref doc -- can error without docid as well.
-    in -- TODO return Err if doc not in index.
+    in
       if String.isEmpty docRef then
         Err "Error document has an empty unique id (ref)."
       else if not (IndexUtils.refExists docRef index) then
@@ -226,19 +228,19 @@ removeDoc docRef (Index irec as index) docTokens =
 
 See ElmTextSearch documentation for `add` and `remove` to see error result conditions.
 -}
-update : Index doc -> doc -> Result String (Index doc)
-update index doc =
-    (remove index doc)
+update : doc -> Index doc -> Result String (Index doc)
+update doc index =
+    (remove doc index)
       `Result.andThen`
-      (\u1index -> add index doc)
+      (\u1index -> add doc index)
 
 
 {-| Search index with query.
 
 See ElmTextSearch documentation for `search` to see error result conditions.
 -}
-search : Index doc -> String -> Result String (Index doc, List (String, Float))
-search index query =
+search : String -> Index doc -> Result String (Index doc, List (String, Float))
+search query index =
     let
       (Index i1irec as i1index, tokens) = IndexUtils.getTokens index query
       hasToken token = Trie.has token i1irec.tokenStore
@@ -253,15 +255,15 @@ search index query =
       else if List.isEmpty tokens || not (List.any hasToken tokens) then
         Ok (i1index, [])
       else
-        Ok (searchTokens i1index tokens)
+        Ok (searchTokens tokens i1index)
 
 
 {- Return list of document ref's with score, ordered by score descending. -}
 searchTokens :
-       Index doc
-    -> List String
+       List String
+    -> Index doc
     -> (Index doc, List (String, Float))
-searchTokens (Index irec as index) tokens =
+searchTokens tokens (Index irec as index) =
     let
       fieldBoosts = List.sum (List.map snd irec.fields)
       -- _ = Debug.log("searchTokens") (tokens, fieldBoosts)

@@ -35,12 +35,12 @@ resultUpdatedMyIndexAfterAdd :
     Result String (ElmTextSearch.Index ExampleDocType)
 resultUpdatedMyIndexAfterAdd =
     ElmTextSearch.add
-      createNewIndexExample
       { cid = "id1"
       , title = "First Title"
       , author = "Some Author"
       , body = "Words in this example document with explanations."
       }
+      createNewIndexExample
 
 
 {-| Search the index.
@@ -56,9 +56,7 @@ resultSearchIndex :
 resultSearchIndex =
     resultUpdatedMyIndexAfterAdd
       `Result.andThen`
-      (\index ->
-        ElmTextSearch.search index "explanations"
-      )
+      (ElmTextSearch.search "explanations")
 
 
 {-| Display search result. -}

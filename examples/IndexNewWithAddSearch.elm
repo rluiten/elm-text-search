@@ -58,15 +58,16 @@ createNewWithIndexExample =
 
 
 {-| Adding a document to the index. -}
-addDocToIndexExample : Result String (ElmTextSearch.Index ExampleDocType)
+addDocToIndexExample :
+      Result String (ElmTextSearch.Index ExampleDocType)
 addDocToIndexExample =
     ElmTextSearch.add
-      createNewWithIndexExample
       { cid = "id1"
       , title = "First Title"
       , author = "Some Author"
       , body = "Words in this example document with explanations."
       }
+      createNewWithIndexExample
 
 
 {-| Search the index for a word in our extended stop words.
@@ -80,9 +81,7 @@ firstResultSearchIndex :
 firstResultSearchIndex =
     addDocToIndexExample
       `Result.andThen`
-      (\index ->
-        ElmTextSearch.search index "explanation"
-      )
+      (ElmTextSearch.search "explanation")
 
 
 {-| Search the index for a word that is not a stop word.
@@ -96,9 +95,7 @@ secondResultSearchIndex :
 secondResultSearchIndex =
     addDocToIndexExample
       `Result.andThen`
-      (\index ->
-        ElmTextSearch.search index "examples"
-      )
+      (ElmTextSearch.search "examples")
 
 
 {-| Display search result. -}

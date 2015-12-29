@@ -46,7 +46,7 @@ index0 =
       }
 
 index1 : () -> IndexResult
-index1 _ = Index.add (index0) (doc1 ())
+index1 _ = Index.add (doc1 ()) index0
 
 
 doc1 : () -> MyDoc

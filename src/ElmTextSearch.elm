@@ -47,7 +47,7 @@ https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
 * You can save a [`IndexModel.CodecIndexRecord`](IndexModel#CodecIndexRecord)
   using [`ElmTextSearch.Json.Encoder.codecIndexRecordEncoder`](ElmTextSearch.Json.Encoder#codecIndexRecordEncoder)
 * ** Modifying an index outside of ElmTextSearch using the Decoder and Encoder directly
-may cause it to not work correctly loaded into Lurelm. **
+may cause it to not work correctly loaded into ElmTextSearch. **
 
 @docs storeToValue
 @docs storeToString
@@ -193,12 +193,12 @@ Starting with the ElmTextSearch.new example above this adds a document.
 ```
 addDocToIndexExample =
     ElmTextSearch.add
-      createNewWithIndexExample
       { cid = "id1"
       , title = "First Title"
       , author = "Some Author"
       , body = "Words in this example document with explanations."
       }
+      createNewWithIndexExample
 ```
 
 Conditions that cause a result Err with message.
@@ -206,7 +206,7 @@ Conditions that cause a result Err with message.
 * Error after tokenisation there are no terms to index.
 * Error adding document that allready exists.
 -}
-add : Index doc -> doc -> Result String (Index doc)
+add : doc -> Index doc -> Result String (Index doc)
 add = Index.add
 
 {-| Remove a document from an index.
@@ -215,19 +215,19 @@ Starting with the ElmTextSearch.new example above this removes a document.
 ```
 removeDocFromIndexExample =
     ElmTextSearch.remove
-      createNewIndexExample
       { cid = "123"
       , title = "Examples of a Banana"
       , author = "Sally Apples"
       , body = "Sally writes words about a banana."
       }
+      createNewIndexExample
 ```
 
 Conditions that cause a result Err with message.
 * Error document has an empty unique id (ref).
 * Error document is not in index.
 -}
-remove : Index doc -> doc -> Result String (Index doc)
+remove : doc -> Index doc -> Result String (Index doc)
 remove = Index.remove
 
 
@@ -236,13 +236,13 @@ remove = Index.remove
 Starting with the ElmTextSearch.new example above this updates a document.
 ```
     updatedIndex =
-      ElmTextSearch.remove
-        createNewIndexExample
+      ElmTextSearch.update
         { cid = "123"
         , title = "Examples of a Bananas in every day life."
         , author = "Sally Apples"
         , body = "Sally writes more words about a banana."
         }
+        createNewIndexExample
 ```
 
 Conditions that cause an error result are those for
@@ -250,7 +250,7 @@ Conditions that cause an error result are those for
 [`ElmTextSearch.add`](ElmTextSearch#add).
 
 -}
-update : Index doc -> doc -> Result String (Index doc)
+update : doc -> Index doc -> Result String (Index doc)
 update = Index.update
 
 
@@ -268,7 +268,7 @@ The following example runs a search for documents containing both "apple" and "b
 
 ```
 searchResult =
-    Index.search createNewIndexExample "Apple banana"
+    Index.search "Apple banana" createNewIndexExample
 ```
 
 Results are a list of matching document reference identifiers with
@@ -287,7 +287,10 @@ Conditions that cause a result Err with message.
 * Error after tokenisation there are no terms to search for.
 
 -}
-search : Index doc -> String -> Result String (Index doc, List (String, Float))
+search :
+       String
+    -> Index doc
+    -> Result String (Index doc, List (String, Float))
 search = Index.search
 
 
