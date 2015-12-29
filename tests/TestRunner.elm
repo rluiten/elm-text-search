@@ -9,6 +9,7 @@ import IndexEncoderTests
 import IndexLoadTests
 import IndexTests
 import IndexUtilsTests
+import SaveLoadTests
 import StopWordFilterTests
 import TokenProcessorTests
 
@@ -32,5 +33,6 @@ main =
         , IndexEncoderTests.tests
         , IndexDecoderTests.tests
         , IndexLoadTests.tests
+        , SaveLoadTests.tests
         ]
       )

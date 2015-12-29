@@ -35,7 +35,7 @@ decodeIndex1 _ =
           Encode.encode 0 (IndexEncoder.codecIndexRecordEncoder decodedIndex)
         )
         decodedIndexResult
-      _ = Debug.log ("decodeIndex1") (resultStr)
+      -- _ = Debug.log ("decodeIndex1") (resultStr)
     in
       test "decode exampleJsonIndex1" <|
         assertEqual

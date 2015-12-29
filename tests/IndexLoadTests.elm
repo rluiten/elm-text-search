@@ -12,6 +12,7 @@ import IndexUtils
 import IndexLoad
 import StopWordFilter
 import TokenProcessors
+import TestUtils exposing (assertOk, assertErr)
 
 
 -- useful with |> thenAnd chaining. avoid infix
@@ -56,10 +57,6 @@ index0 =
           , ( .body, 1 )
           ]
       }
-
-
-index1 : () -> IndexResult
-index1 _ = Index.add (index0) (doc1 ())
 
 
 type alias IndexResult = Result String (Index MyDoc)
@@ -153,10 +150,3 @@ indexfromString1 _ =
               ]
           }
           exampleJsonIndex100default
-
-
-assertOk : Result String a -> Assertion
-assertOk result =
-    case result of
-      Ok _ -> assert True
-      Err _ -> assert False

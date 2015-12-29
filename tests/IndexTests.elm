@@ -8,7 +8,7 @@ import Index
 import IndexModel exposing ( Index(..) )
 
 
--- useful with |> thenAnd chaining. avoid infix
+-- useful with |> thenAnd chaining. avoid infix `Result.andThen`
 thenAnd = flip Result.andThen
 
 

@@ -57,17 +57,18 @@ doc1 _ =
     , body = "Sally writes words about a grown banana."
     }
 
-_ = Debug.log("index1") (index1)
-_ = Debug.log("encoder index1")
-    (
-      let
-        a = 1
-        encodedTrie = Encode.encode 0
-            (IndexEncoder.encoder (safeIndex index1))
 
-      in
-        encodedTrie
-    )
+-- _ = Debug.log("index1") (index1)
+-- _ = Debug.log("encoder index1")
+--     (
+--       let
+--         a = 1
+--         encodedTrie = Encode.encode 0
+--             (IndexEncoder.encoder (safeIndex index1))
+--
+--       in
+--         encodedTrie
+--     )
 
 
 encoder1 _ =
