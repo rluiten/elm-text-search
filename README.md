@@ -1,4 +1,4 @@
-# Lunrelm full text indexer
+# ElmTextSearch full text indexer
 
 Copyright (c) 2016 Robin Luiten
 
@@ -17,17 +17,29 @@ Several packages were created for this project and published seperately for this
 * sparsevector
  * http://package.elm-lang.org/packages/rluiten/sparsevector/latest
 
+ ### Parts of lunr.js were left out
+
+ * This does not have an event system.
+ * Its internal data structure is not compatible.
+
+ ### Notes captured along way writing this.
+
+ * lunr.js
+  * tokenStore.remove does not decrement length, but it doesnt use length really only save/load
+  * stemmer "lay" -> "lay" "try" -> "tri" is opposite to porter stemmer
+ * porter stemmer erlang implementation
+  * step5b does not use endsWithDoubleCons which is required afaik to pass the voc.txt output.txt cases
 
 
-### Parts of lunr.js were left out
+### Examples
 
-* This does not have an event system.
-* Its internal data structure is not compatible.
+See examples folder for two examples.
+Which are included here in line.
 
-### Notes captured along way writing this.
+IndexNewAddSearch.elm
+```elm
+```
 
-* lunr.js
- * tokenStore.remove does not decrement length, but it doesnt use length really only save/load
- * stemmer "lay" -> "lay" "try" -> "tri" is opposite to porter stemmer
-* porter stemmer erlang implementation
- * step5b does not use endsWithDoubleCons which is required afaik to pass the voc.txt output.txt cases
+IndexNewWithAddSearch.elm
+```elm
+```

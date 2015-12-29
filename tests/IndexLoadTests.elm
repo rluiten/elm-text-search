@@ -5,11 +5,11 @@ import ElmTest exposing (..)
 import String
 import Stemmer
 
+import ElmTextSearch
 import Index
 import IndexModel exposing ( Index(..) )
 import IndexUtils
 import IndexLoad
-import Lunrelm
 import StopWordFilter
 import TokenProcessors
 
@@ -119,7 +119,7 @@ exampleJsonIndex100default =
 
 loadIndexWithErr1 _ =
     test "Fails to load an index with non indexVersion." <|
-      assertEqual ( Err ("Error cannot load Lunrelm Index. Version supported is 1.0.0. Version tried to load is 1.0.1.")) <|
+      assertEqual ( Err ("Error cannot load Index. Version supported is 1.0.0. Version tried to load is 1.0.1.")) <|
         IndexLoad.loadIndexWith
           [ config1 ]
           exampleJsonIndex101
@@ -127,7 +127,7 @@ loadIndexWithErr1 _ =
 
 loadIndexWithErr2 _ =
     test "Fails to load an index with an indexType not in configuration provided." <|
-      assertEqual (Err ("Error cannot load Lunrelm Index. Tried to load index of type \"__IndexTest Type -\". It is not in supported index configurations.")) <|
+      assertEqual (Err ("Error cannot load Index. Tried to load index of type \"__IndexTest Type -\". It is not in supported index configurations.")) <|
         IndexLoad.loadIndexWith
           [ config1 ]
           exampleJsonIndex100
@@ -143,9 +143,9 @@ loadIndexWith1 _ =
 
 
 indexfromString1 _ =
-    test "I can load index from sting with Lunrelm.SimpleConfig." <|
+    test "I can load index from sting with ElmTextSearch.SimpleConfig." <|
       assertOk <|
-        Lunrelm.fromString
+        ElmTextSearch.fromString
           { ref = .cid
             , fields =
               [ ( .title, 5 )

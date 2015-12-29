@@ -1,6 +1,6 @@
 module IndexDefaults
     ( indexVersion
-    , lunrelmIndexType
+    , elmTextSearchIndexType
     , defaultTransformFactories
     , defaultFilterFactories
     , defaultTokenTrimmerFuncCreator
@@ -9,11 +9,11 @@ module IndexDefaults
     , getDefaultIndexConfig
     ) where
 
-{-| Where to get defaults for Lunrelm Index options.
+{-| Defaults for indexes and configurations.
 
-## Lunrelm Index Storage Engine Version and Type
+## Index Storage Engine Version and Type
 @docs indexVersion
-@docs lunrelmIndexType
+@docs elmTextSearchIndexType
 
 
 ## Built in Transforms and Filters
@@ -40,23 +40,25 @@ import TokenProcessors
 
 {-| The version of index, for loading a saved index.
 
-This is not the same as Lunrelm package version.
+This is not the same as package version.
 
-This needs to change if the encoded format changes.
+This needs to change if the encoded format changes. Be careful of updates to
+Trie package, if Trie encoding format changes this version needs to change as
+well.
 -}
 indexVersion : String
 indexVersion = "1.0.0"
 
 
-{-| The type of index Lunrelm defaults to using.
+{-| The type of index defaults to using.
 
 It defines the default token transforms and filters.
 -}
-lunrelmIndexType : String
-lunrelmIndexType = "-= Lunrelm Index Type 1 =-"
+elmTextSearchIndexType : String
+elmTextSearchIndexType = "-= ElmTextSearch Index Type 1 =-"
 
 
-{-| Lunrelm index default transform factories. -}
+{-| Index default transform factories. -}
 defaultTransformFactories : List (TransformFactory doc)
 defaultTransformFactories =
     [ defaultTokenTrimmerFuncCreator
@@ -64,7 +66,7 @@ defaultTransformFactories =
     ]
 
 
-{-| Lunrelm index default filter factories. -}
+{-| Index default filter factories. -}
 defaultFilterFactories : List (FilterFactory doc)
 defaultFilterFactories =
     [ defaultStopWordFilterFuncCreator

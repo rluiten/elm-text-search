@@ -8,7 +8,7 @@ module Index
     , search
     ) where
 
-{-| Index module for Lunrelm full text indexer
+{-| Index module for full text indexer
 
 ## Create Index
 @docs new
@@ -78,7 +78,7 @@ newWith {indexType, ref, fields, transformFactories, filterFactories} =
 
 {-| Add document to an Index if no error conditions found.
 
-See Lunrelm documentation for `add` to see error conditions.
+See ElmTextSearch documentation for `add` to see error conditions.
 -}
 add : Index doc -> doc -> Result String (Index doc)
 add (Index irec as index) doc =
@@ -177,7 +177,7 @@ scoreToken fieldTokensAndBoost token =
 
 {-| Remove document from an Index if no error result conditions encountered.
 
-See Lunrelm documentation for `remove` to see error result conditions.
+See ElmTextSearch documentation for `remove` to see error result conditions.
 
 This does the following things
 * Remove the document tags from documentStore.
@@ -224,7 +224,7 @@ removeDoc docRef (Index irec as index) docTokens =
 
 {-| Update document in Index. Does a remove then add.
 
-See Lunrelm documentation for `add` and `remove` to see error result conditions.
+See ElmTextSearch documentation for `add` and `remove` to see error result conditions.
 -}
 update : Index doc -> doc -> Result String (Index doc)
 update index doc =
@@ -235,7 +235,7 @@ update index doc =
 
 {-| Search index with query.
 
-See Lunrelm documentation for `search` to see error result conditions.
+See ElmTextSearch documentation for `search` to see error result conditions.
 -}
 search : Index doc -> String -> Result String (Index doc, List (String, Float))
 search index query =

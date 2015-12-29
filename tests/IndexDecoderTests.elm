@@ -4,13 +4,13 @@ import ElmTest exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
 
-import Lunrelm.Json.Decoder as LunrelmDecoder
-import Lunrelm.Json.Encoder as LunrelmEncoder
+import ElmTextSearch.Json.Decoder as IndexDecoder
+import ElmTextSearch.Json.Encoder as IndexEncoder
 
 
 tests : Test
 tests =
-    suite "Lunrelm Index Decoder tests"
+    suite "Index Decoder tests"
       [ decodeIndex1 ()
       ]
 
@@ -29,10 +29,10 @@ Therefore decode then encode back to string to check its same.
 decodeIndex1 _ =
     let
       decodedIndexResult =
-        Decode.decodeString LunrelmDecoder.decoder exampleJsonIndex1
+        Decode.decodeString IndexDecoder.decoder exampleJsonIndex1
       resultStr = Result.map
         (\decodedIndex ->
-          Encode.encode 0 (LunrelmEncoder.codecIndexRecordEncoder decodedIndex)
+          Encode.encode 0 (IndexEncoder.codecIndexRecordEncoder decodedIndex)
         )
         decodedIndexResult
       _ = Debug.log ("decodeIndex1") (resultStr)

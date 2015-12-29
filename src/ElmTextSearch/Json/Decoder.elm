@@ -1,6 +1,6 @@
-module Lunrelm.Json.Decoder (decoder) where
+module ElmTextSearch.Json.Decoder (decoder) where
 
-{-| Decoder for Lunrelm Index.
+{-| Decoder for Index.
 
 It decodes to a CodecIndexRecord.
 
@@ -14,14 +14,14 @@ import Json.Decode exposing (..)
 import Set exposing (Set)
 import Trie.Json.Decoder as TrieDecoder
 
-import IndexModel exposing (..)
+import IndexModel
 import Utils exposing ((|:))
 
 
 {-| CodecIndexRecord decoder. -}
-decoder : Decoder CodecIndexRecord
+decoder : Decoder IndexModel.CodecIndexRecord
 decoder =
-    succeed CodecIndexRecord
+    succeed IndexModel.CodecIndexRecord
       |: ("indexVersion" := string)
       |: ("indexType" := string)
       |: ("documentStore" := documentStoreDecoder)

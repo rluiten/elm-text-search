@@ -1,6 +1,6 @@
-module Lunrelm
+module ElmTextSearch
     ( Index
-    , LunrelmSimpleConfig
+    , ElmTextSearchSimpleConfig
     , Config
     , new
     , newWith
@@ -16,7 +16,7 @@ module Lunrelm
     , fromValueWith
     ) where
 
-{-| Lunrelm a full text indexer written in Elm language inspired by lunr.js.
+{-| A full text indexer written in Elm language inspired by lunr.js.
 
 A useful article about lunr.js
 https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
@@ -36,16 +36,17 @@ https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
 ## Types
 @docs Index
 @docs Config
-@docs LunrelmSimpleConfig
+@docs ElmTextSearchSimpleConfig
 
 ## Save and Load a Lunerlm Index
 
-* You can save an index using [`Lunrelm.Json.Encoder.encoder`](Lunrelm.Json.Encoder#encoder)
+* You can save an index using [`ElmTextSearch.Json.Encoder.encoder`](ElmTextSearch.Json.Encoder#encoder)
 * You can load a saved index using
-  [`Lunrelm.Json.Decoder.decoder`](Lunrelm.Json.Decoder#decoder)
-  to produce a `CodecIndexRecord`.
-* You can save a CodecIndexRecord using [`Lunrelm.Json.Encoder.encoder`](Lunrelm.Json.Encoder#encoder)
-* ** Modifying an index outside of Lunrelm using the Decoder and Encoder directly
+  [`ElmTextSearch.Json.Decoder.decoder`](ElmTextSearch.Json.Decoder#decoder)
+  to produce a [`IndexModel.CodecIndexRecord`](IndexModel#CodecIndexRecord).
+* You can save a [`IndexModel.CodecIndexRecord`](IndexModel#CodecIndexRecord)
+  using [`ElmTextSearch.Json.Encoder.codecIndexRecordEncoder`](ElmTextSearch.Json.Encoder#codecIndexRecordEncoder)
+* ** Modifying an index outside of ElmTextSearch using the Decoder and Encoder directly
 may cause it to not work correctly loaded into Lurelm. **
 
 @docs storeToValue
@@ -65,7 +66,7 @@ import Index
 import IndexDefaults
 import IndexLoad
 import IndexModel
-import Lunrelm.Json.Encoder as LunrelmEncoder
+import ElmTextSearch.Json.Encoder as IndexEncoder
 
 import IndexUtils
 import Stemmer
@@ -73,37 +74,38 @@ import StopWordFilter
 import TokenProcessors
 
 
-{-| Lunrelm Index
+{-| An Index holds the data to be able search for added documents.
 -}
 type alias Index doc = Index.Index doc
 
 
-{-| Lunrelm SimpleConfig. -}
-type alias LunrelmSimpleConfig doc =
+{-| A ElmTextSearchSimpleConfig is the least amount of
+configuration data required to create an Index.
+-}
+type alias ElmTextSearchSimpleConfig doc =
     { ref : (doc -> String)
     , fields : List (doc -> String, Float)
     }
 
 
-{-| Lunrelm configuration. -}
+{-| A Config is used to create an Index. -}
 type alias Config doc = IndexModel.Config doc
 
 
-{- convert Lunrelm.LunrelmSimpleConfig to IndexModel.SimpleConfig -}
-getIndexSimpleConfig : LunrelmSimpleConfig doc -> IndexModel.SimpleConfig doc
+{- convert ElmTextSearch.ElmTextSearchSimpleConfig to IndexModel.SimpleConfig -}
+getIndexSimpleConfig : ElmTextSearchSimpleConfig doc -> IndexModel.SimpleConfig doc
 getIndexSimpleConfig {ref, fields} =
-    { indexType = IndexDefaults.lunrelmIndexType
+    { indexType = IndexDefaults.elmTextSearchIndexType
     , ref = ref
     , fields = fields
     }
 
 
-{-| Create new Lunrelm index.
+{-| Create new index.
 
 Example
-
 ```
-import Lunrelm
+import ElmTextSearch
 
 type alias ExampleDocType =
     { cid : String
@@ -113,9 +115,9 @@ type alias ExampleDocType =
     }
 
 
-createNewIndexExample : Lunrelm.Index ExampleDocType
+createNewIndexExample : ElmTextSearch.Index ExampleDocType
 createNewIndexExample =
-  Lunrelm.new
+  ElmTextSearch.new
     { ref = .cid
     , fields =
         [ ( .title, 5.0 )
@@ -124,29 +126,31 @@ createNewIndexExample =
     }
 ```
 
-### The default Lunrelm transform factories.
-
-```
-    IndexDefaults.defaultTransformFactories
-```
-
-
-### The default Lunrelm filter factories.
-
-```
-    IndexDefaults.defaultFilterFactories
-```
+The `ElmTextSearchSimpleConfig` parameter to new is
+* ref
+ * The unique document reference will be extracted from each
+   document using `.cid`.
+* fields
+ * The following fields will be indexed from each document
+  * `.title`
+  * `.body`
+ * When searching the index any word matches found in the
+   `.title` field (boost value 5.0) raise the document match score
+   more than if found in the `.body` field (boost value 1.0).
+  * The document match score determines the order of the list
+    of matching documents returned.
 
 -}
-new : LunrelmSimpleConfig doc -> Index doc
+new : ElmTextSearchSimpleConfig doc -> Index doc
 new simpleConfig =
     Index.new (getIndexSimpleConfig simpleConfig)
 
 
-{-| Create new Lunrelm index with additional configuration.
+{-| Create new index with additional configuration.
 
+Example.
 ```
-import Lunrelm
+import ElmTextSearch
 import IndexDefaults
 import StopWordFilter
 
@@ -161,13 +165,13 @@ type alias ExampleDocType =
 
 createMyStopWordFilter =
     StopWordFilter.createFilterFuncWith
-      [ "electronic" ]
+      [ "explanations" ]
 
 
-createNewWithIndexExample : Lunrelm.Index ExampleDocType
+createNewWithIndexExample : ElmTextSearch.Index ExampleDocType
 createNewWithIndexExample =
-  Lunrelm.newWith
-    { indexType = "Lunrelm - For paw paw automation index v1"
+  ElmTextSearch.newWith
+    { indexType = "ElmTextSearch - Customized Stop Words v1"
     , ref = .cid
     , fields =
         [ ( .title, 5.0 )
@@ -183,18 +187,18 @@ newWith : Config doc -> Index doc
 newWith = Index.newWith
 
 
-{-| Add a document to Lunrelm index.
+{-| Add a document to an index.
 
-Starting with the Lunrelm.new example above this adds a document.
+Starting with the ElmTextSearch.new example above this adds a document.
 ```
-    updatedIndex =
-      Lunrelm.add
-        indexMyDocs
-        { cid = "123"
-        , title = "Examples of a Banana"
-        , author = "Sally Apples"
-        , body = "Sally writes words about a banana."
-        }
+addDocToIndexExample =
+    ElmTextSearch.add
+      createNewWithIndexExample
+      { cid = "id1"
+      , title = "First Title"
+      , author = "Some Author"
+      , body = "Words in this example document with explanations."
+      }
 ```
 
 Conditions that cause a result Err with message.
@@ -205,18 +209,18 @@ Conditions that cause a result Err with message.
 add : Index doc -> doc -> Result String (Index doc)
 add = Index.add
 
-{-| Remove a document from Lunrelm index.
+{-| Remove a document from an index.
 
-Starting with the Lunrelm.new example above this removes a document.
+Starting with the ElmTextSearch.new example above this removes a document.
 ```
-    updatedIndex =
-      Lunrelm.remove
-        createNewIndexExample
-        { cid = "123"
-        , title = "Examples of a Banana"
-        , author = "Sally Apples"
-        , body = "Sally writes words about a banana."
-        }
+removeDocFromIndexExample =
+    ElmTextSearch.remove
+      createNewIndexExample
+      { cid = "123"
+      , title = "Examples of a Banana"
+      , author = "Sally Apples"
+      , body = "Sally writes words about a banana."
+      }
 ```
 
 Conditions that cause a result Err with message.
@@ -227,12 +231,12 @@ remove : Index doc -> doc -> Result String (Index doc)
 remove = Index.remove
 
 
-{-| Update a doc in Lunrelm index.
+{-| Update a document in an index.
 
-Starting with the Lunrelm.new example above this updates a document.
+Starting with the ElmTextSearch.new example above this updates a document.
 ```
     updatedIndex =
-      Lunrelm.remove
+      ElmTextSearch.remove
         createNewIndexExample
         { cid = "123"
         , title = "Examples of a Bananas in every day life."
@@ -242,18 +246,15 @@ Starting with the Lunrelm.new example above this updates a document.
 ```
 
 Conditions that cause an error result are those for
-[`Lunrelm.remove`](Lunrelm#remove) and then
-[`Lunrelm.add`](Lunrelm#add).
+[`ElmTextSearch.remove`](ElmTextSearch#remove) and
+[`ElmTextSearch.add`](ElmTextSearch#add).
 
 -}
 update : Index doc -> doc -> Result String (Index doc)
 update = Index.update
 
 
-{-| Search Lunrelm index with query.
-
-
-Queries are a string.
+{-| Search an index with query.
 
 Tokens are extracted from the query string and passed through the
 same processing used when indexing documents.
@@ -266,19 +267,19 @@ Multiple tokens are allowed and will lead to an AND based query.
 The following example runs a search for documents containing both "apple" and "banana".
 
 ```
-    (updatedMyIndex, results) =
-      Index.search createNewIndexExample "Apple banana"
+searchResult =
+    Index.search createNewIndexExample "Apple banana"
 ```
 
 Results are a list of matching document reference identifiers with
-there similarity to query score, ordered by score ascending.
+there similarity to query score, ordered by score descending, so the
+best matches are earliest in the list.
 
-A possibly updated index is returned from search as well `updatedMyIndex`.
-This is because the data model is updated with searches to cache information
-to improve overall perfromance, it is expected after sufficient searches the
-index will no longer update due to searches.
+An index is returned from search as well. This is because the data model may
+be updated to improve performance for later searches.
 
-Adding or removing a new document will cause some of the internal caching to be reset.
+Adding or removing a new document will cause some of the internal caching
+to be reset.
 
 Conditions that cause a result Err with message.
 * Error there are no documents in index to search.
@@ -290,30 +291,30 @@ search : Index doc -> String -> Result String (Index doc, List (String, Float))
 search = Index.search
 
 
-{-| Store a Lunrelm index to a Value.
+{-| Store an index to a Value.
 
-You can also use [`Lunrelm.Json.Encoder`](Lunrelm.Json.Encoder).
+You can also use [`ElmTextSearch.Json.Encoder`](ElmTextSearch.Json.Encoder).
 -}
 storeToValue : Index doc -> Encode.Value
 storeToValue =
-    LunrelmEncoder.encoder
+    IndexEncoder.encoder
 
 
-{-| Store a Lunrelm index to a String.
+{-| Store an index to a String.
 
-You can also use [`Lunrelm.Json.Encoder`](Lunrelm.Json.Encoder).
+You can also use [`ElmTextSearch.Json.Encoder`](ElmTextSearch.Json.Encoder).
 -}
 storeToString : Index doc -> String
 storeToString index =
-    Encode.encode 0 (LunrelmEncoder.encoder index)
+    Encode.encode 0 (IndexEncoder.encoder index)
 
 
 {-| Create an Index from a String which has a stored Index in it and the
 supplied basic configurations.
 
-See [`Lunrelm.fromStringWith`](Lunrelm#fromStringWith) for possible Err results.
+See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
-fromString : LunrelmSimpleConfig doc -> String -> Result String (Index doc)
+fromString : ElmTextSearchSimpleConfig doc -> String -> Result String (Index doc)
 fromString simpleConfig inputString =
     IndexLoad.loadIndex
       (getIndexSimpleConfig simpleConfig)
@@ -322,9 +323,9 @@ fromString simpleConfig inputString =
 
 {-| Create an Index from a Value which has a stored Index in it.
 
-See [`Lunrelm.fromStringWith`](Lunrelm#fromStringWith) for possible Err results.
+See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
-fromValue : LunrelmSimpleConfig doc -> Decode.Value -> Result String (Index doc)
+fromValue : ElmTextSearchSimpleConfig doc -> Decode.Value -> Result String (Index doc)
 fromValue simpleConfigs inputString =
     Err "load is not implemented"
 
@@ -343,9 +344,9 @@ will try if the index being loaded matches the default version if so
 it will still load the index.
 
 The following Err results may be returned.
-* "Error cannot load Lunrelm Index. Tried to load index of type \"__IndexTest Type -\". It is not in supported index configurations."
+* "Error cannot load Index. Tried to load index of type \"__IndexTest Type -\". It is not in supported index configurations."
  * It contains the loaded version index type which comes from input.
-* "Error cannot load Lunrelm Index. Version supported is 1.0.0. Version tried to load is 1.0.1."
+* "Error cannot load Index. Version supported is 1.0.0. Version tried to load is 1.0.1."
  * It includes both expected and loaded versions which may vary.
 
 -}
@@ -359,7 +360,7 @@ fromStringWith =
 If none of the indexVersion in the list of SimpleConfig match the index
 being decoded it will return an Err.
 
-See [`Lunrelm.fromStringWith`](Lunrelm#fromStringWith) for possible Err results.
+See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
 fromValueWith : List (Config doc) -> Decode.Value -> Result String (Index doc)
 fromValueWith =

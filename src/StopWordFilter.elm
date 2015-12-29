@@ -3,7 +3,7 @@ module StopWordFilter where
 {-| StopWordFilter is an English language stop word list filter, any words
 contained in the list are not stored in the index.
 
-This is intended to be used in the Lunrelm token processing pipeline.
+This is intended to be used in the ElmTextSearch token processing pipeline.
 
 ### Things to know about stop word lists.
 * Input tokens to create stop word filters should be full words, if you
@@ -160,14 +160,14 @@ stopEnglishWordList =
     ]
 
 
-{-| Default english stop word filter suitable for Lunrelm.
+{-| Default english stop word filter suitable for ElmTextSearch.
 -}
 createDefaultFilterFunc : FilterFactory doc
 createDefaultFilterFunc index =
     createFilterFunc stopEnglishWordList index
 
 
-{-| Create stop word list filter suitable for Lunrelm, this versions
+{-| Create stop word list filter suitable for ElmTextSearch, this versions
 extends the default word list with the extra words provided.
 -}
 createFilterFuncWith : List String -> FilterFactory doc
@@ -175,7 +175,7 @@ createFilterFuncWith extraWords index =
     createFilterFunc (List.append extraWords stopEnglishWordList) index
 
 
-{-| Create stop word filter for provided list of tokens suitable for Lunrelm.
+{-| Create stop word filter for provided list of tokens suitable for ElmTextSearch.
 
 ** This creates a stop world filter purely from your own word list, understand
 what you are doing and consequences if you use this. **

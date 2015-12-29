@@ -2,7 +2,7 @@ module StopWordFilterTests where
 
 import ElmTest exposing (..)
 
-import Lunrelm
+import ElmTextSearch
 import IndexUtils
 import StopWordFilter
 import Stemmer
@@ -17,7 +17,7 @@ type alias ExampleDocType =
 
 
 newIndex =
-  Lunrelm.new
+  ElmTextSearch.new
     { ref = .cid
     , fields =
         [ ( .title, 5 )

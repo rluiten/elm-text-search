@@ -14,7 +14,7 @@ import Set exposing (Set)
 import Trie exposing (Trie)
 
 
-{- Func and Factory types used with Lunrelm. -}
+{- Func and Factory types used with ElmTextSearch. -}
 type alias FuncFactory doc func = Index doc -> (Index doc, func)
 type alias TransformFunc = String -> String
 type alias TransformFactory doc = Index doc -> (Index doc, (String -> String))
@@ -71,32 +71,48 @@ type Index doc =
 
 {-| The Record model in an Index. -}
 type alias IndexRecord doc =
-      { indexVersion : String
+    { indexVersion : String
 
-      , indexType : String
-      , ref : doc -> String
-      , fields : List (doc -> String, Float)
-      , transformFactories : List (TransformFactory doc)
-      , filterFactories : List (FilterFactory doc)
+    , indexType : String
+    , ref : doc -> String
+    , fields : List (doc -> String, Float)
+    , transformFactories : List (TransformFactory doc)
+    , filterFactories : List (FilterFactory doc)
 
-      , documentStore : Dict String (Set String)
-      , corpusTokens : Set String
-      , tokenStore : Trie Float
+    , documentStore : Dict String (Set String)
+    , corpusTokens : Set String
+    , tokenStore : Trie Float
 
-      , corpusTokensIndex : Dict String Int
-      , transforms : Maybe (List TransformFunc)
-      , filters : Maybe (List FilterFunc)
-      , idfCache : Dict String Float
-      }
+    , corpusTokensIndex : Dict String Int
+    , transforms : Maybe (List TransformFunc)
+    , filters : Maybe (List FilterFunc)
+    , idfCache : Dict String Float
+    }
 
 
 {-| Simple index config with default token processing.
 
 Simple still requires configuring the fields for your document type.
+See [`ElmTextSearch.ElmTextSearchSimpleConfig`](ElmTextSearch#ElmTextSearchSimpleConfig)
+for explantions of `ref` and `fields` fields.
 
-At Index level SimpleConfig includes `indexType`.
+* ElmTextSearch.SimpleConfig does not include `indexType`.
+ * In this case the user is getting the ElmTextSearch default token processing.
+* Index.SimpleConfig includes `indexType`.
 
-At Lunrelm level SimpleConfig does not require `indexType`.
+`indexType` is an identifier used to determine the transforms and filters the
+index uses for operation. It should be unique for all possible differently
+configured indexes you plan to use.
+
+### The default transform factories.
+```
+    IndexDefaults.defaultTransformFactories
+```
+
+### The default filter factories.
+```
+    IndexDefaults.defaultFilterFactories
+```
 -}
 type alias SimpleConfig doc =
     { indexType : String
@@ -120,14 +136,11 @@ type alias Config doc =
 
 
 {-| Just the fields encoded for an Index.
-
-This can't be a `CodecIndexRecord a` because the
-decoder appeared to object.
 -}
 type alias CodecIndexRecord =
-      { indexVersion : String
-      , indexType : String
-      , documentStore : Dict String (Set String)
-      , corpusTokens : Set String
-      , tokenStore : Trie Float
-      }
+    { indexVersion : String
+    , indexType : String
+    , documentStore : Dict String (Set String)
+    , corpusTokens : Set String
+    , tokenStore : Trie Float
+    }

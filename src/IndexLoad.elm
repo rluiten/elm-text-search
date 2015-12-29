@@ -1,6 +1,6 @@
 module IndexLoad where
 
-{-| Load a Lunrelm index from Value or String
+{-| Load an index from Value or String
 
 Copyright (c) 2016 Robin Luiten
 -}
@@ -13,12 +13,12 @@ import Stemmer
 import IndexDefaults
 import IndexModel exposing (..)
 import IndexUtils
-import Lunrelm.Json.Decoder as LunrelmDecoder
+import ElmTextSearch.Json.Decoder as IndexDecoder
 import StopWordFilter
 import TokenProcessors
 
 
-errorPrefix = "Error cannot load Lunrelm Index."
+errorPrefix = "Error cannot load Index."
 
 {-| Decode an index with one of provided configs.
 
@@ -30,7 +30,7 @@ Then try the default just in case.
 -}
 loadIndexWith : List (Config doc) -> String -> Result String (Index doc)
 loadIndexWith supportedIndexConfigs inputString =
-    (Decode.decodeString LunrelmDecoder.decoder inputString)
+    (Decode.decodeString IndexDecoder.decoder inputString)
       `Result.andThen` checkIndexVersion
       `Result.andThen` (checkIndexType supportedIndexConfigs)
       `Result.andThen` loadIndexFull
@@ -38,7 +38,7 @@ loadIndexWith supportedIndexConfigs inputString =
 
 loadIndexValueWith : List (Config doc) -> Decode.Value -> Result String (Index doc)
 loadIndexValueWith supportedIndexConfigs inputValue =
-    (Decode.decodeValue LunrelmDecoder.decoder inputValue)
+    (Decode.decodeValue IndexDecoder.decoder inputValue)
       `Result.andThen` checkIndexVersion
       `Result.andThen` (checkIndexType supportedIndexConfigs)
       `Result.andThen` loadIndexFull

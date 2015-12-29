@@ -1,6 +1,6 @@
-module Lunrelm.Json.Encoder (encoder, codecIndexRecordEncoder) where
+module ElmTextSearch.Json.Encoder (encoder, codecIndexRecordEncoder) where
 
-{-| Encoder for Lunrelm Index.
+{-| Encoder for Index.
 
 @docs encoder
 @docs codecIndexRecordEncoder
@@ -15,7 +15,7 @@ import Trie exposing (Trie)
 import Trie.Json.Encoder as TrieEncoder
 
 import Index
-import IndexModel exposing (..)
+import IndexModel exposing (Index (Index))
 
 
 {-| Encoder for Index a.
@@ -54,7 +54,7 @@ encoder (Index irec) =
 
 
 {-| Encode CodecIndexRecord. -}
-codecIndexRecordEncoder : CodecIndexRecord -> Encode.Value
+codecIndexRecordEncoder : IndexModel.CodecIndexRecord -> Encode.Value
 codecIndexRecordEncoder rec =
     Encode.object
       [ ("indexVersion", Encode.string rec.indexVersion)

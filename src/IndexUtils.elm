@@ -35,7 +35,7 @@ import IndexModel exposing (Index(Index), FuncFactory, FilterFactory)
 import TokenProcessors
 
 
-{-| Create a Lunrelm function creator (FuncFactory)
+{-| Create a function creator (FuncFactory)
 given the simple Function to start with
 -}
 createFuncCreator : func -> FuncFactory doc func

@@ -1,17 +1,13 @@
 {
     "version": "1.0.0",
-    "summary": "Full text index engine in Elm language inspired by lunr.js.",
+    "summary": "Examples folder for ElmTextSearch",
     "repository": "https://github.com/rluiten/elm-text-search.git",
     "license": "BSD3",
     "source-directories": [
-        "src"
+        ".",
+        "../src"
     ],
     "exposed-modules": [
-        "ElmTextSearch",
-        "IndexDefaults",
-        "StopWordFilter",
-        "ElmTextSearch.Json.Encoder",
-        "ElmTextSearch.Json.Decoder"
     ],
     "dependencies": {
         "elm-lang/core": "3.0.0 <= v < 4.0.0",

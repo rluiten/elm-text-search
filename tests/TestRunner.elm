@@ -1,23 +1,16 @@
 module TestRunner where
 
-import String
 import Graphics.Element exposing (Element)
-
 import ElmTest exposing (..)
+import String
 
-import TokenProcessorTests
+import IndexDecoderTests
+import IndexEncoderTests
+import IndexLoadTests
 import IndexTests
 import IndexUtilsTests
 import StopWordFilterTests
-import IndexEncoderTests
-import IndexDecoderTests
-import IndexLoadTests
-
-
--- These are imported just to make sure they compile
-import Examples.LunrelmNew
-import Examples.LunrelmNewWith
-
+import TokenProcessorTests
 
 import Index
 import IndexModel exposing (..)
