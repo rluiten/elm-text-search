@@ -4,9 +4,9 @@ module IndexUtilsTests where
 import ElmTest exposing (..)
 -- import String
 
-import IndexModel
+import Index.Model
 import Index exposing (Index)
-import IndexUtils
+import Index.Utils
 import TokenProcessors
 import Stemmer
 
@@ -34,7 +34,7 @@ index0 =
 
 tests : Test
 tests =
-    suite "IndexUtils tests"
+    suite "Index.Utils tests"
       [ suite "apply default transform tests"
           (List.map testDefaultTransforms defaultTransformCases)
       ]
@@ -60,4 +60,4 @@ testDefaultTransforms (name, input, expected) =
     test ("getTokens \"" ++ input ++ "\" " ++ name)
       <| assertEqual
           expected
-          (snd (IndexUtils.getTokens index0 input))
+          (snd (Index.Utils.getTokens index0 input))

@@ -43,8 +43,8 @@ https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
 * You can save an index using [`ElmTextSearch.Json.Encoder.encoder`](ElmTextSearch.Json.Encoder#encoder)
 * You can load a saved index using
   [`ElmTextSearch.Json.Decoder.decoder`](ElmTextSearch.Json.Decoder#decoder)
-  to produce a [`IndexModel.CodecIndexRecord`](IndexModel#CodecIndexRecord).
-* You can save a [`IndexModel.CodecIndexRecord`](IndexModel#CodecIndexRecord)
+  to produce a [`Index.Model.CodecIndexRecord`](Index.Model#CodecIndexRecord).
+* You can save a [`Index.Model.CodecIndexRecord`](Index.Model#CodecIndexRecord)
   using [`ElmTextSearch.Json.Encoder.codecIndexRecordEncoder`](ElmTextSearch.Json.Encoder#codecIndexRecordEncoder)
 * ** Modifying an index outside of ElmTextSearch using the Decoder and Encoder directly
 may cause it to not work correctly loaded into ElmTextSearch. **
@@ -62,13 +62,12 @@ Copyright (c) 2016 Robin Luiten
 import Json.Decode as Decode
 import Json.Encode as Encode
 
-import Index
-import IndexDefaults
-import IndexLoad
-import IndexModel
 import ElmTextSearch.Json.Encoder as IndexEncoder
-
-import IndexUtils
+import Index
+import Index.Defaults as Defaults
+import Index.Load
+import Index.Model as Model
+import Index.Utils
 import Stemmer
 import StopWordFilter
 import TokenProcessors
@@ -89,14 +88,14 @@ type alias SimpleConfig doc =
 
 
 {-| A Config is required to create an Index. -}
-type alias Config doc = IndexModel.Config doc
+type alias Config doc = Model.Config doc
 
 
-{- convert ElmTextSearch.SimpleConfig to IndexModel.SimpleConfig
+{- convert ElmTextSearch.SimpleConfig to Index.Model.SimpleConfig
 -}
-getIndexSimpleConfig : SimpleConfig doc -> IndexModel.SimpleConfig doc
+getIndexSimpleConfig : SimpleConfig doc -> Model.SimpleConfig doc
 getIndexSimpleConfig {ref, fields} =
-    { indexType = IndexDefaults.elmTextSearchIndexType
+    { indexType = Defaults.elmTextSearchIndexType
     , ref = ref
     , fields = fields
     }
@@ -151,7 +150,7 @@ new simpleConfig =
 Example.
 ```
 import ElmTextSearch
-import IndexDefaults
+import Index.Defaults
 import StopWordFilter
 
 
@@ -177,7 +176,7 @@ createNewWithIndexExample =
         [ ( .title, 5.0 )
         , ( .body, 1.0 )
         ]
-    , transformFactories = IndexDefaults.defaultTransformFactories
+    , transformFactories = Index.Defaults.defaultTransformFactories
     , filterFactories = [ createMyStopWordFilter ]
     }
 ```
@@ -322,7 +321,7 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 -}
 fromString : SimpleConfig doc -> String -> Result String (Index doc)
 fromString simpleConfig inputString =
-    IndexLoad.loadIndex
+    Index.Load.loadIndex
       (getIndexSimpleConfig simpleConfig)
       inputString
 
@@ -333,7 +332,7 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 -}
 fromValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
 fromValue simpleConfig inputValue =
-    IndexLoad.loadIndexValue
+    Index.Load.loadIndexValue
       (getIndexSimpleConfig simpleConfig)
       inputValue
 
@@ -359,7 +358,7 @@ The following Err results may be returned.
 -}
 fromStringWith : List (Config doc) -> String -> Result String (Index doc)
 fromStringWith =
-    IndexLoad.loadIndexWith
+    Index.Load.loadIndexWith
 
 
 {-| Create an Index from a String which has a stored Index in it.
@@ -371,4 +370,4 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 -}
 fromValueWith : List (Config doc) -> Decode.Value -> Result String (Index doc)
 fromValueWith =
-    IndexLoad.loadIndexValueWith
+    Index.Load.loadIndexValueWith

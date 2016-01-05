@@ -6,7 +6,7 @@ import Json.Encode as Encode
 import String
 
 import Index
-import IndexModel exposing (..)
+import Index.Model as Model exposing (..)
 import ElmTextSearch.Json.Encoder as IndexEncoder
 
 

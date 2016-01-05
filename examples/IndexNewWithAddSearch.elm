@@ -6,7 +6,7 @@ Copyright (c) 2016 Robin Luiten
 
 import ElmTextSearch
 import Graphics.Element exposing (show)
-import IndexDefaults
+import Index.Defaults
 import StopWordFilter
 
 
@@ -52,7 +52,7 @@ createNewWithIndexExample =
         [ ( .title, 5.0 )
         , ( .body, 1.0 )
         ]
-    , transformFactories = IndexDefaults.defaultTransformFactories
+    , transformFactories = Index.Defaults.defaultTransformFactories
     , filterFactories = [ createMyStopWordFilter ]
     }
 

@@ -1,4 +1,4 @@
-module IndexVector where
+module Index.Vector where
 
 {-| Index document vector support. -}
 
@@ -9,8 +9,8 @@ import SparseVector exposing (SparseVector)
 import String
 import Trie exposing (Trie)
 
-import IndexModel exposing (Index (..))
-import IndexUtils
+import Index.Model exposing (Index (..))
+import Index.Utils
 
 
 {-| Build a query vector. -}
@@ -57,7 +57,7 @@ updateSetAndVec :
     -> (List (Set String), SparseVector, Index doc)
 updateSetAndVec tf token expandedToken (docSets, vec, Index irec as index) =
     let
-      (Index u1irec as u1index, keyIdf) = IndexUtils.idf index expandedToken
+      (Index u1irec as u1index, keyIdf) = Index.Utils.idf index expandedToken
       tfidf = tf * keyIdf * (similarityBoost token expandedToken)
       -- _ = Debug.log("updateSetAndVec") (tf, token, expandedToken, (similarityBoost token expandedToken), keyIdf, tfidf)
       -- _ = Debug.log("updateSetAndVec corpus") (irec.corpusTokensIndex)
@@ -135,7 +135,7 @@ updateDocVector docRef token (Index irec as index, docVector) =
               (Dict.get docRef refs) `andThen`
                 (\tf ->
                   let
-                    (u1index, idfScore) = IndexUtils.idf index token
+                    (u1index, idfScore) = Index.Utils.idf index token
                   in
                     Just (u1index, SparseVector.insert pos (tf * idfScore) docVector)
                 )
@@ -190,6 +190,6 @@ updateDocVector docRef token (Index irec as index, docVector) =
 --
 -- updateVectorIdf token docVector index pos tf =
 --     let
---       (u1index, idfScore) = IndexUtils.idf index token
+--       (u1index, idfScore) = Index.Utils.idf index token
 --     in
 --       Just (u1index, SparseVector.insert pos (tf * idfScore) docVector)

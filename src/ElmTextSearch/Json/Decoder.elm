@@ -14,14 +14,14 @@ import Json.Decode exposing (..)
 import Set exposing (Set)
 import Trie.Json.Decoder as TrieDecoder
 
-import IndexModel
+import Index.Model as Model
 import Utils exposing ((|:))
 
 
 {-| CodecIndexRecord decoder. -}
-decoder : Decoder IndexModel.CodecIndexRecord
+decoder : Decoder Model.CodecIndexRecord
 decoder =
-    succeed IndexModel.CodecIndexRecord
+    succeed Model.CodecIndexRecord
       |: ("indexVersion" := string)
       |: ("indexType" := string)
       |: ("documentStore" := documentStoreDecoder)

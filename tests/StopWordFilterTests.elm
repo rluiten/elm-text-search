@@ -3,7 +3,7 @@ module StopWordFilterTests where
 import ElmTest exposing (..)
 
 import ElmTextSearch
-import IndexUtils
+import Index.Utils
 import StopWordFilter
 import Stemmer
 
@@ -29,7 +29,7 @@ newIndex =
 -- instantiate stop word filter
 (testIndex1, stopWordFilter) = (StopWordFilter.createDefaultFilterFunc) newIndex
 -- get the default stop word list and run through default index transform first
-(testIndex2, testWordList) = IndexUtils.applyTransform testIndex1 StopWordFilter.stopEnglishWordList
+(testIndex2, testWordList) = Index.Utils.applyTransform testIndex1 StopWordFilter.stopEnglishWordList
 
 
 tests : Test

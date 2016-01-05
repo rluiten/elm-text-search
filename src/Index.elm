@@ -34,16 +34,16 @@ import Set exposing (Set)
 import String
 import Trie exposing (Trie)
 
-import IndexDefaults
-import IndexModel exposing (Index (..))
-import IndexUtils
-import IndexVector exposing (..)
+import Index.Defaults as Defaults
+import Index.Model as Model exposing (Index (..))
+import Index.Utils
+import Index.Vector exposing (..)
 import Utils
 
 
-type alias Index doc = IndexModel.Index doc
-type alias Config doc = IndexModel.Config doc
-type alias SimpleConfig doc = IndexModel.SimpleConfig doc
+type alias Index doc = Model.Index doc
+type alias Config doc = Model.Config doc
+type alias SimpleConfig doc = Model.SimpleConfig doc
 
 
 {-| Create new index.
@@ -51,7 +51,7 @@ type alias SimpleConfig doc = IndexModel.SimpleConfig doc
 new : SimpleConfig doc -> Index doc
 new simpleConfig  =
     newWith
-      (IndexDefaults.getDefaultIndexConfig simpleConfig)
+      (Defaults.getDefaultIndexConfig simpleConfig)
 
 
 {-| Create new index with control of transformers and filters.
@@ -59,7 +59,7 @@ new simpleConfig  =
 newWith : Config doc -> Index doc
 newWith {indexType, ref, fields, transformFactories, filterFactories} =
     Index
-      { indexVersion = IndexDefaults.indexVersion
+      { indexVersion = Defaults.indexVersion
       , indexType = indexType
       , ref = ref
       , fields = fields
@@ -87,7 +87,7 @@ add doc (Index irec as index) =
     in
       if String.isEmpty docRef then
         Err "Error document has an empty unique id (ref)."
-      else if IndexUtils.refExists docRef index then
+      else if Index.Utils.refExists docRef index then
         Err "Error adding document that allready exists."
       else
         let
@@ -114,7 +114,7 @@ getWordsForField :
     -> (Index doc, List (List String))
 getWordsForField doc getField (index, fieldsLists) =
     let
-      (u1index, tokens) = IndexUtils.getTokens index (getField doc)
+      (u1index, tokens) = Index.Utils.getTokens index (getField doc)
     in
       (u1index, tokens :: fieldsLists)
 
@@ -134,7 +134,7 @@ addDoc docRef fieldsTokens docTokens (Index irec as index) =
       updatedDocumentStore = Dict.insert docRef docTokens irec.documentStore
       updatedCorpusTokens = Set.union irec.corpusTokens docTokens
       -- can the cost of this be reduced ?
-      updatedCorpusTokensIndex = IndexUtils.buildOrderIndex updatedCorpusTokens
+      updatedCorpusTokensIndex = Index.Utils.buildOrderIndex updatedCorpusTokens
       -- tokenAndScores : List (String, Float)
       tokenAndScores =
         List.map
@@ -196,7 +196,7 @@ remove doc (Index irec as index) =
     in
       if String.isEmpty docRef then
         Err "Error document has an empty unique id (ref)."
-      else if not (IndexUtils.refExists docRef index) then
+      else if not (Index.Utils.refExists docRef index) then
         Err "Error document is not in index."
       else
         Ok (
@@ -242,7 +242,7 @@ See ElmTextSearch documentation for `search` to see error result conditions.
 search : String -> Index doc -> Result String (Index doc, List (String, Float))
 search query index =
     let
-      (Index i1irec as i1index, tokens) = IndexUtils.getTokens index query
+      (Index i1irec as i1index, tokens) = Index.Utils.getTokens index query
       hasToken token = Trie.has token i1irec.tokenStore
       -- _ = Debug.log("search") (query, tokens, List.any hasToken tokens)
     in
@@ -268,7 +268,7 @@ searchTokens tokens (Index irec as index) =
       fieldBoosts = List.sum (List.map snd irec.fields)
       -- _ = Debug.log("searchTokens") (tokens, fieldBoosts)
       (tokenDocSets, queryVector, u1index) =
-        IndexVector.getQueryVector
+        Index.Vector.getQueryVector
           fieldBoosts
           tokens
           index

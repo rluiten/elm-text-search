@@ -30,8 +30,8 @@ Copyright (c) 2016 Robin Luiten
 
 import Set exposing (Set)
 
-import IndexModel exposing (Index, FilterFactory)
-import IndexUtils
+import Index.Model exposing (Index, FilterFactory)
+import Index.Utils
 import Stemmer
 
 {-| Default english stop word list to create filter.
@@ -186,7 +186,7 @@ So words found in the stopWordList return False
 createFilterFunc : List String -> FilterFactory doc
 createFilterFunc tokens index =
     let
-      (u1index, tokens) = IndexUtils.applyTransform index tokens
+      (u1index, tokens) = Index.Utils.applyTransform index tokens
       tokenSet = Set.fromList tokens
     in
       ( u1index, \word -> not (Set.member word tokenSet) )

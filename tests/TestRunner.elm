@@ -14,7 +14,7 @@ import StopWordFilterTests
 import TokenProcessorTests
 
 import Index
-import IndexModel exposing (..)
+import Index.Model exposing (..)
 
 
 main : Element

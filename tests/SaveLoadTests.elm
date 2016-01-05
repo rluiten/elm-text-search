@@ -4,7 +4,7 @@ import ElmTest exposing (..)
 
 {- Save and Load index check search results same -}
 import ElmTextSearch
-import IndexModel exposing ( Index(..) )
+import Index.Model exposing ( Index(..) )
 import TestUtils exposing (assertOk, assertErr)
 
 

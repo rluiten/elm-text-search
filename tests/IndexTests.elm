@@ -5,7 +5,7 @@ import ElmTest exposing (..)
 import String
 
 import Index
-import IndexModel exposing ( Index(..) )
+import Index.Model exposing ( Index(..) )
 
 
 -- useful with |> thenAnd chaining. avoid infix `Result.andThen`

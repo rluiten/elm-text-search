@@ -1,5 +1,5 @@
 {
-    "version": "1.0.3",
+    "version": "2.0.0",
     "summary": "Full text index engine in Elm language inspired by lunr.js.",
     "repository": "https://github.com/rluiten/elm-text-search.git",
     "license": "BSD3",
@@ -8,7 +8,7 @@
     ],
     "exposed-modules": [
         "ElmTextSearch",
-        "IndexDefaults",
+        "Index.Defaults",
         "StopWordFilter",
         "ElmTextSearch.Json.Encoder",
         "ElmTextSearch.Json.Decoder"

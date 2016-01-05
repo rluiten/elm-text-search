@@ -1,4 +1,4 @@
-module IndexModel where
+module Index.Model where
 
 {-| Define the Index Model
 
@@ -106,12 +106,12 @@ configured indexes you plan to use.
 
 ### The default transform factories.
 ```
-    IndexDefaults.defaultTransformFactories
+    Index.Defaults.defaultTransformFactories
 ```
 
 ### The default filter factories.
 ```
-    IndexDefaults.defaultFilterFactories
+    Index.Defaults.defaultFilterFactories
 ```
 -}
 type alias SimpleConfig doc =

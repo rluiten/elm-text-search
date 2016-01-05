@@ -1,4 +1,4 @@
-module IndexUtils
+module Index.Utils
     ( createFuncCreator
     , getTokens
     , processTokens
@@ -29,9 +29,7 @@ import Maybe exposing (andThen, withDefault)
 import Trie exposing (Trie)
 import Set exposing (Set)
 
-import IndexModel exposing (Index(Index), FuncFactory, FilterFactory)
--- import IndexUtils
--- import StopWordFilter
+import Index.Model exposing (Index(Index), FuncFactory, FilterFactory)
 import TokenProcessors
 
 

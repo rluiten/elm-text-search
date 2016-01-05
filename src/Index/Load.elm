@@ -1,4 +1,4 @@
-module IndexLoad where
+module Index.Load where
 
 {-| Load an index from Value or String
 
@@ -10,9 +10,9 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import Stemmer
 
-import IndexDefaults
-import IndexModel exposing (..)
-import IndexUtils
+import Index.Defaults as Defaults
+import Index.Model exposing (..)
+import Index.Utils
 import ElmTextSearch.Json.Decoder as IndexDecoder
 import StopWordFilter
 import TokenProcessors
@@ -46,11 +46,11 @@ loadIndexValueWith supportedIndexConfigs inputValue =
 
 checkIndexVersion : CodecIndexRecord -> Result String (CodecIndexRecord)
 checkIndexVersion decodedIndex =
-    if IndexDefaults.indexVersion == decodedIndex.indexVersion then
+    if Defaults.indexVersion == decodedIndex.indexVersion then
       Ok decodedIndex
     else
       Err (errorPrefix ++ " Version supported is "
-          ++ IndexDefaults.indexVersion ++ ". Version tried to load is "
+          ++ Defaults.indexVersion ++ ". Version tried to load is "
           ++ decodedIndex.indexVersion ++ ".")
 
 checkIndexType :
@@ -88,7 +88,7 @@ loadIndexFull (config, decodedIndex) =
         , corpusTokens = decodedIndex.corpusTokens
         , tokenStore = decodedIndex.tokenStore
         , corpusTokensIndex =
-            (IndexUtils.buildOrderIndex decodedIndex.corpusTokens)
+            (Index.Utils.buildOrderIndex decodedIndex.corpusTokens)
         , transforms = Nothing
         , filters = Nothing
         , idfCache = Dict.empty
@@ -98,12 +98,12 @@ loadIndexFull (config, decodedIndex) =
 loadIndex : SimpleConfig doc -> String -> Result String (Index doc)
 loadIndex simpleConfig inputString =
     loadIndexWith
-      [ IndexDefaults.getDefaultIndexConfig simpleConfig ]
+      [ Defaults.getDefaultIndexConfig simpleConfig ]
       inputString
 
 
 loadIndexValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
 loadIndexValue simpleConfig inputValue =
     loadIndexValueWith
-      [ IndexDefaults.getDefaultIndexConfig simpleConfig ]
+      [ Defaults.getDefaultIndexConfig simpleConfig ]
       inputValue

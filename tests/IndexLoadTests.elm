@@ -7,9 +7,9 @@ import Stemmer
 
 import ElmTextSearch
 import Index
-import IndexModel exposing ( Index(..) )
-import IndexUtils
-import IndexLoad
+import Index.Model exposing ( Index(..) )
+import Index.Utils
+import Index.Load
 import StopWordFilter
 import TokenProcessors
 import TestUtils exposing (assertOk, assertErr)
@@ -76,8 +76,8 @@ config1 =
         , ( .body, 1 )
         ]
     , transformFactories =
-        [ IndexUtils.createFuncCreator TokenProcessors.trimmer
-        , IndexUtils.createFuncCreator Stemmer.stem
+        [ Index.Utils.createFuncCreator TokenProcessors.trimmer
+        , Index.Utils.createFuncCreator Stemmer.stem
         ]
     , filterFactories =
         [ createMyStopWordFilter
@@ -93,8 +93,8 @@ config2 =
         , ( .body, 1 )
         ]
     , transformFactories =
-        [ IndexUtils.createFuncCreator TokenProcessors.trimmer
-        , IndexUtils.createFuncCreator Stemmer.stem
+        [ Index.Utils.createFuncCreator TokenProcessors.trimmer
+        , Index.Utils.createFuncCreator Stemmer.stem
         ]
     , filterFactories =
         [ createMyStopWordFilter
@@ -117,7 +117,7 @@ exampleJsonIndex100default =
 loadIndexWithErr1 _ =
     test "Fails to load an index with non indexVersion." <|
       assertEqual ( Err ("Error cannot load Index. Version supported is 1.0.0. Version tried to load is 1.0.1.")) <|
-        IndexLoad.loadIndexWith
+        Index.Load.loadIndexWith
           [ config1 ]
           exampleJsonIndex101
 
@@ -125,7 +125,7 @@ loadIndexWithErr1 _ =
 loadIndexWithErr2 _ =
     test "Fails to load an index with an indexType not in configuration provided." <|
       assertEqual (Err ("Error cannot load Index. Tried to load index of type \"__IndexTest Type -\". It is not in supported index configurations.")) <|
-        IndexLoad.loadIndexWith
+        Index.Load.loadIndexWith
           [ config1 ]
           exampleJsonIndex100
 
@@ -133,7 +133,7 @@ loadIndexWithErr2 _ =
 loadIndexWith1 _ =
     test "Load an index. really dumb check" <|
       assertOk <|
-        IndexLoad.loadIndexWith
+        Index.Load.loadIndexWith
           [ config2
           , config1 ]
           exampleJsonIndex100somestring

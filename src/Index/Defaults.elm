@@ -1,4 +1,4 @@
-module IndexDefaults
+module Index.Defaults
     ( indexVersion
     , elmTextSearchIndexType
     , defaultTransformFactories
@@ -32,8 +32,8 @@ Copyright (c) 2016 Robin Luiten
 
 import Stemmer
 
-import IndexModel exposing (TransformFactory, FilterFactory)
-import IndexUtils
+import Index.Model as Model exposing (TransformFactory, FilterFactory)
+import Index.Utils
 import StopWordFilter
 import TokenProcessors
 
@@ -78,13 +78,13 @@ Normally applied first in transform functions.
 -}
 defaultTokenTrimmerFuncCreator : TransformFactory doc
 defaultTokenTrimmerFuncCreator =
-    IndexUtils.createFuncCreator TokenProcessors.trimmer
+    Index.Utils.createFuncCreator TokenProcessors.trimmer
 
 
 {-| The default token stemmer transform function creator. -}
 defaultStemmerFuncCreator : TransformFactory doc
 defaultStemmerFuncCreator =
-    IndexUtils.createFuncCreator Stemmer.stem
+    Index.Utils.createFuncCreator Stemmer.stem
 
 
 {-| The default stop word filter function creator. -}
@@ -93,13 +93,13 @@ defaultStopWordFilterFuncCreator =
     StopWordFilter.createDefaultFilterFunc
 
 
-{-| Convert IndexModel.SimpleConfig to IndexModel.Config
+{-| Convert Index.Model.SimpleConfig to Index.Model.Config
 
 Filling in default values for fields not in SimpleConfig
 
 This is the definition of the default index configuration.
 -}
-getDefaultIndexConfig : IndexModel.SimpleConfig doc -> IndexModel.Config doc
+getDefaultIndexConfig : Model.SimpleConfig doc -> Model.Config doc
 getDefaultIndexConfig {indexType, ref, fields} =
       { indexType = indexType
       , ref = ref
