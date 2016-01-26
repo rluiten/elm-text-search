@@ -65,7 +65,7 @@ updateSetAndVec tf token expandedToken (docSets, vec, Index irec as index) =
         withDefault vec <|
           Maybe.map
             (\pos -> (SparseVector.insert pos tfidf vec))
-            (Dict.get token irec.corpusTokensIndex)
+            (Dict.get expandedToken irec.corpusTokensIndex)
       expandedTokenDocSet =
         withDefault Set.empty <|
           Maybe.map

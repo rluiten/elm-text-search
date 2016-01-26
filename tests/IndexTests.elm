@@ -148,6 +148,15 @@ searchCases =
       , ["doc2"], (safeIndex index2))
     , ( "with doc3 returns no docs with both words", "-misery! .appeal,"
       , [], (safeIndex index3))
+    , ( "returns doc2 with prefix of word it only returns doc2 as e expands to example and engineer and while both words exist in documents the intersection of matches is returned and engineering only exists in one."
+      , "e"
+      , ["doc2"], (safeIndex index2))
+    , ( "searcg \"ex\" returns doc1, doc2 as both contain example."
+      , "ex"
+      , ["doc1","doc2"], (safeIndex index2))
+    , ( "search \"en\" returns doc2 as it contains engineering."
+      , "en"
+      , ["doc2"], (safeIndex index2))
     ]
 
 

@@ -252,8 +252,6 @@ search query index =
         Err "Error query is empty."
       else if List.isEmpty tokens then
         Err "Error after tokenisation there are no terms to search for."
-      else if List.isEmpty tokens || not (List.any hasToken tokens) then
-        Ok (i1index, [])
       else
         Ok (searchTokens tokens i1index)
 

@@ -160,7 +160,7 @@ saveAndLoadSame _ =
       result2AfterLoad =
         result2AfterLoadSearch
         |> thenAnd (\searchResult -> Ok (snd searchResult))
-      _ = Debug.log("saveAndLoadSame") (result2, result2AfterLoad)
+      -- _ = Debug.log("saveAndLoadSame") (result2, result2AfterLoad)
 
     in
       suite "results same before and after save and load index"
