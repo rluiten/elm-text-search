@@ -3,6 +3,7 @@ module Index
     , new
     , newWith
     , add
+    , addDocs
     , remove
     , update
     , search
@@ -16,6 +17,7 @@ module Index
 
 ## Update Index
 @docs add
+@docs addDocs
 @docs remove
 @docs update
 
@@ -104,6 +106,38 @@ add doc (Index irec as index) =
             Err "Error after tokenisation there are no terms to index."
           else
             Ok (addDoc docRef fieldsTokens docTokens u3index)
+
+
+{-| Add multiple documents. Tries to add all docs and collects errors..
+It does not stop adding at first error encountered.
+
+The result part List (Int, String) is the list of document index
+and the error string message result of adding.
+Returns the index un changed if all documents error when addded.
+Returns the updated index after adding the documents.
+-}
+addDocs : List doc -> Index doc -> (Index doc, List (Int, String))
+addDocs docs index =
+  addDocsCore 0 docs index []
+
+
+addDocsCore :
+     Int
+  -> List doc
+  -> Index doc
+  -> List (Int, String)
+  -> (Index doc, List (Int, String))
+addDocsCore docsI docs (Index irec as index) errors =
+  case docs of
+    [] ->
+      (index, errors)
+
+    headDoc :: tailDocs ->
+      case add headDoc index of
+        Ok u1index ->
+          addDocsCore (docsI + 1) tailDocs u1index errors
+        Err msg ->
+          addDocsCore (docsI + 1) tailDocs index (errors ++ [(docsI, msg)])
 
 
 {- reducer to extract tokens from each field of doc -}

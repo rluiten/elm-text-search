@@ -26,6 +26,7 @@ tests =
       , addErr3 ()
       , removeErr1 ()
       , removeErr2 ()
+      , addDocsTest ()
       ]
 
 
@@ -247,3 +248,14 @@ removeErr2 _ =
     test "Remove a doc with Err field empty is an error." <|
       assertEqual (Err "Error document has an empty unique id (ref).") <|
         Index.remove (doc5 ()) (safeIndex index2)
+
+
+addDocsTest _ =
+  suite "addAllDocs Tests" <|
+    [ test "Add multiple docs returning list of errors" <|
+        assertEqual [(1, "Error after tokenisation there are no terms to index.")] <|
+          snd (Index.addDocs [doc3 (), doc4 ()] index0)
+    ,  test "Add multiple docs returning list of errors swap order of documents." <|
+        assertEqual [(0, "Error after tokenisation there are no terms to index.")] <|
+          snd (Index.addDocs [doc4 (), doc3 ()] index0)
+    ]

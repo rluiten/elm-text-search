@@ -5,6 +5,7 @@ module ElmTextSearch
     , new
     , newWith
     , add
+    , addDocs
     , remove
     , update
     , search
@@ -27,6 +28,7 @@ https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
 
 ## Modify Index
 @docs add
+@docs addDocs
 @docs remove
 @docs update
 
@@ -208,6 +210,18 @@ add : doc -> Index doc -> Result String (Index doc)
 add =
     Index.add
 
+
+{-| Add multiple documents. Tries to add all docs and collects errors..
+It does not stop adding at first error encountered.
+
+The result part List (Int, String) is the list of document index
+and the error string message result of adding.
+Returns the index un changed if all documents error when addded.
+Returns the updated index after adding the documents.
+-}
+addDocs : List doc -> Index doc -> (Index doc, List (Int, String))
+addDocs =
+    Index.addDocs
 
 {-| Remove a document from an index.
 
