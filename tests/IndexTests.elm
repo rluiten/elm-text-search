@@ -27,6 +27,7 @@ tests =
       , removeErr1 ()
       , removeErr2 ()
       , addDocsTest ()
+      , searchDocsTest ()
       ]
 
 
@@ -145,14 +146,14 @@ searchCases =
       , ["doc1", "doc2"], (safeIndex index2))
     , ( "two docs one with term in title first", "grown"
       , ["doc2", "doc1"], (safeIndex index2))
-    , ( "returns doc with one of the words", "-misery! .appeal,"
-      , ["doc2"], (safeIndex index2))
+    , ( "neither document contains both words so return nothing", "-misery! .appeal,"
+      , [], (safeIndex index2))
     , ( "with doc3 returns no docs with both words", "-misery! .appeal,"
       , [], (safeIndex index3))
-    , ( "returns doc2 with prefix of word it only returns doc2 as e expands to example and engineer and while both words exist in documents the intersection of matches is returned and engineering only exists in one."
+    , ( "returns doc1 and doc2 e expands to example and engineer which exist in both documents."
       , "e"
-      , ["doc2"], (safeIndex index2))
-    , ( "searcg \"ex\" returns doc1, doc2 as both contain example."
+      , ["doc1","doc2"], (safeIndex index2))
+    , ( "search \"ex\" returns doc1, doc2 as both contain example."
       , "ex"
       , ["doc1","doc2"], (safeIndex index2))
     , ( "search \"en\" returns doc2 as it contains engineering."
@@ -259,3 +260,41 @@ addDocsTest _ =
         assertEqual [(0, "Error after tokenisation there are no terms to index.")] <|
           snd (Index.addDocs [doc4 (), doc3 ()] index0)
     ]
+
+
+docQ1 : MyDoc
+docQ1 =
+    { cid = "qdoc1"
+    , title = "Question1"
+    , author = "Sally Apples"
+    , body = "Sally writes words about a grown banana."
+    }
+
+
+docQ2 :MyDoc
+docQ2 =
+    { cid = "qdoc2"
+    , title = "Question2"
+    , author = "John Banana"
+    , body = "An example of apple engineering."
+    }
+
+
+-- Case from https://github.com/rluiten/elm-text-search/issues/4
+-- Two docs with titles Question1 and Question2
+-- "q" search was not returning both documents.
+searchDocsTest _ =
+  let
+    (index, _) = Index.addDocs [docQ1, docQ2] index0
+    searchResult = Index.search "q" index
+    collapsedSearchResult =
+      case searchResult of
+        Ok (index, results) ->
+            List.map fst results
+        Err msg ->
+            []
+  in
+    test "results are" <|
+        assertEqual
+          ["qdoc1", "qdoc2"]
+          collapsedSearchResult

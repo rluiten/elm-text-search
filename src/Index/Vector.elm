@@ -13,12 +13,19 @@ import Index.Model exposing (Index (..))
 import Index.Utils
 
 
-{-| Build a query vector. -}
+{-| Build a query vector and the sets of candidate document matches
+for each token in our query tokens.
+
+Each token in our query will have a seperate Set String entry in
+the returned List. As all query token document result sets are
+intersected togethere for final list of documents matched. (a logical and
+of all the query tokens)
+-}
 getQueryVector :
        Float
     -> List String
     -> (Index doc)
-    -> (List (Set String) ,SparseVector , Index doc)
+    -> (List (Set String), SparseVector, Index doc)
 getQueryVector fieldBoosts tokens index =
     List.foldr
       (buildDocVector (List.length tokens) fieldBoosts)
@@ -26,7 +33,10 @@ getQueryVector fieldBoosts tokens index =
       tokens
 
 
-{- Update vector of token scores for document. -}
+{-
+Update query vector elements to create query vectory.
+Update the list of documents that match for each query token (baseToken).
+-}
 buildDocVector :
        Int
     -> Float
@@ -41,20 +51,24 @@ buildDocVector tokensLength fieldBoosts baseToken (docSets, vec, Index irec as i
         * fieldBoosts
       expandedTokens = Trie.expand baseToken irec.tokenStore
       -- _ = Debug.log("buildDocVector") (tokensLength, baseToken, expandedTokens)
+      (docs, vec, index) =
+        List.foldr
+          (updateSetAndVec termFrequency baseToken)
+          (Set.empty, vec, index)
+          expandedTokens
     in
-      List.foldr
-        (updateSetAndVec termFrequency baseToken)
-        (docSets, vec, index)
-        expandedTokens
+      (docs :: docSets, vec, index)
 
 
-{- Calculate Term frequency-inverse document frequency (tf-idf) -}
+{- Calculate Term frequency-inverse document frequency (tf-idf).
+Union of documents for each expandedToken for this (base)token.
+-}
 updateSetAndVec :
        Float
     -> String
     -> String
-    -> (List (Set String), SparseVector, Index doc)
-    -> (List (Set String), SparseVector, Index doc)
+    -> (Set String, SparseVector, Index doc)
+    -> (Set String, SparseVector, Index doc)
 updateSetAndVec tf token expandedToken (docSets, vec, Index irec as index) =
     let
       (Index u1irec as u1index, keyIdf) = Index.Utils.idf index expandedToken
@@ -71,8 +85,8 @@ updateSetAndVec tf token expandedToken (docSets, vec, Index irec as index) =
           Maybe.map
             (\dict -> Set.fromList (Dict.keys dict))
             (Trie.get expandedToken u1irec.tokenStore)
-      u1docSets = expandedTokenDocSet :: docSets
-      -- _ = Debug.log("updateSetAndVec u1docSets u1vec") (u1docSets, u1vec)
+      u1docSets = Set.union expandedTokenDocSet docSets
+      -- _ = Debug.log("updateSetAndVec u1docSets u1vec") (expandedToken, u1docSets, u1vec)
     in
       (u1docSets, u1vec, u1index)
 
@@ -141,55 +155,3 @@ updateDocVector docRef token (Index irec as index, docVector) =
                 )
             )
         )
-
-
---
--- {-----------------------------------------------------
---
--- Alternate version of updateDocVector above.
--- Still here to think about at the moment.
---
--- -----------------------------------------------------}
--- flipAndThen' = flip Maybe.andThen
--- getThen : (a -> Maybe b) -> Maybe a -> Maybe b
--- getThen = flip Maybe.andThen
---
--- updateDocVector'
---     : String
---     -> String
---     -> (Index doc, SparseVector)
---     -> (Index doc, SparseVector)
--- updateDocVector' docRef token (Index irec as index, docVector) =
---     withDefault (index, docVector) <|
---       Maybe.andThen
---         (Dict.get token irec.corpusTokensIndex)
---         (updateAddPos docRef token index docVector)
---       -- (Dict.get token irec.corpusTokensIndex) `andThen`
---       --   (updateAddPos docRef token index docVector)
---
---
--- updateAddPos docRef token (Index irec as index) docVector pos =
---     Maybe.andThen
---       (Trie.get token irec.tokenStore)
---       (updateAddTf docRef token index docVector pos)
---     -- (Trie.get token irec.tokenStore) `andThen`
---     --   (updateAddTf docRef token index docVector pos)
---     -- (Trie.get token irec.tokenStore)
---     --   |> flipAndThen' (updateAddTf docRef token index docVector pos)
---
---
--- updateAddTf docRef token index docVector pos refs =
---     Maybe.andThen
---       (Dict.get docRef refs)
---       (updateVectorIdf token docVector index pos)
---     -- (Dict.get docRef refs) `andThen`
---     --   (updateVectorIdf token docVector index pos)
---     -- (Dict.get docRef refs)
---     --   |> flipAndThen' (updateVectorIdf token docVector index pos)
---
---
--- updateVectorIdf token docVector index pos tf =
---     let
---       (u1index, idfScore) = Index.Utils.idf index token
---     in
---       Just (u1index, SparseVector.insert pos (tf * idfScore) docVector)

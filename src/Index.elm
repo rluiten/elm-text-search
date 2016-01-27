@@ -113,7 +113,7 @@ It does not stop adding at first error encountered.
 
 The result part List (Int, String) is the list of document index
 and the error string message result of adding.
-Returns the index un changed if all documents error when addded.
+Returns the index unchanged if all documents error when added.
 Returns the updated index after adding the documents.
 -}
 addDocs : List doc -> Index doc -> (Index doc, List (Int, String))
@@ -277,8 +277,9 @@ search : String -> Index doc -> Result String (Index doc, List (String, Float))
 search query index =
     let
       (Index i1irec as i1index, tokens) = Index.Utils.getTokens index query
-      hasToken token = Trie.has token i1irec.tokenStore
-      -- _ = Debug.log("search") (query, tokens, List.any hasToken tokens)
+      tokenInStore token =
+        (Trie.getNode token i1irec.tokenStore) /= Nothing
+      -- _ = Debug.log "search d" (query, tokens, List.any tokenInStore tokens)
     in
       if Dict.isEmpty i1irec.documentStore then
         Err "Error there are no documents in index to search."
@@ -286,6 +287,8 @@ search query index =
         Err "Error query is empty."
       else if List.isEmpty tokens then
         Err "Error after tokenisation there are no terms to search for."
+      else if List.isEmpty tokens || not (List.any tokenInStore tokens) then
+        Ok (i1index, [])
       else
         Ok (searchTokens tokens i1index)
 
