@@ -1,4 +1,4 @@
-module ElmTextSearch
+module ElmTextSearch exposing
     ( Index
     , SimpleConfig
     , Config
@@ -15,7 +15,7 @@ module ElmTextSearch
     , fromValue
     , fromStringWith
     , fromValueWith
-    ) where
+    )
 
 {-| A full text indexer written in Elm language inspired by lunr.js.
 

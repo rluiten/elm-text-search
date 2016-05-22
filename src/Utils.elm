@@ -1,8 +1,8 @@
-module Utils
+module Utils exposing
     ( intersectSets
     , apply
     , (|:)
-    ) where
+    )
 
 {-| Some misc utils
 

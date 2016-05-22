@@ -1,4 +1,4 @@
-module ElmTextSearch.Json.Decoder (decoder) where
+module ElmTextSearch.Json.Decoder exposing (decoder)
 
 {-| Decoder for Index.
 

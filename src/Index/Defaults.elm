@@ -1,4 +1,4 @@
-module Index.Defaults
+module Index.Defaults exposing
     ( indexVersion
     , elmTextSearchIndexType
     , defaultTransformFactories
@@ -7,7 +7,7 @@ module Index.Defaults
     , defaultStemmerFuncCreator
     , defaultStopWordFilterFuncCreator
     , getDefaultIndexConfig
-    ) where
+    )
 
 {-| Defaults for indexes and configurations.
 

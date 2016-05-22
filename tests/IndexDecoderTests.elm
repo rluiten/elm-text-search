@@ -1,4 +1,4 @@
-module IndexDecoderTests where
+module IndexDecoderTests exposing (..)
 
 import ElmTest exposing (..)
 import Json.Decode as Decode

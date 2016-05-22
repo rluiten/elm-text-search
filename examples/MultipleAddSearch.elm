@@ -4,16 +4,17 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import ElmTextSearch
-import Graphics.Element exposing (show)
+import Html exposing (Html, div, text)
+import Html.App as Html
 
 
 {-| Example document type. -}
 type alias ExampleDocType =
-    { cid : String
-    , title : String
-    , author : String
-    , body : String
-    }
+  { cid : String
+  , title : String
+  , author : String
+  , body : String
+  }
 
 
 {-| Create an index with default configuration.
@@ -50,9 +51,9 @@ If any add result is an Err this returns the first failure.
 -}
 indexWithMulitpleDocumentsAdded : (ElmTextSearch.Index ExampleDocType, List (Int, String))
 indexWithMulitpleDocumentsAdded =
-    ElmTextSearch.addDocs
-      documents
-      createNewIndexExample
+  ElmTextSearch.addDocs
+    documents
+    createNewIndexExample
 
 
 {-| Search the index.
@@ -64,21 +65,23 @@ This is ignoring any errors from call to addAllDocs
 in indexWithMulitpleDocumentsAdded.
 -}
 resultSearchIndex :
-    Result String
-      ( ElmTextSearch.Index ExampleDocType
-      , List (String, Float)
-      )
+  Result String
+    ( ElmTextSearch.Index ExampleDocType
+    , List (String, Float)
+    )
 resultSearchIndex =
   ElmTextSearch.search "title" (fst indexWithMulitpleDocumentsAdded)
 
 
 {-| Display search result. -}
 main =
-    let
-      -- want only the search results not the returned index
-      searchResults = Result.map snd resultSearchIndex
-    in
-      show
-        [ "Result of searching for \"explanations\" is "
-           ++ (toString searchResults)
-        ]
+  let
+    -- want only the search results not the returned index
+    searchResults = Result.map snd resultSearchIndex
+  in
+    div []
+    [ text
+      ( "Result of searching for \"explanations\" is "
+          ++ (toString searchResults)
+      )
+    ]

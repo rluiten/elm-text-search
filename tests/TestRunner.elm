@@ -1,8 +1,7 @@
-module TestRunner where
+module TestRunner exposing (..)
 
-import Graphics.Element exposing (Element)
-import ElmTest exposing (..)
 import String
+import ElmTest exposing (..)
 
 import IndexDecoderTests
 import IndexEncoderTests
@@ -17,10 +16,9 @@ import Index
 import Index.Model exposing (..)
 
 
-main : Element
 main =
-    elementRunner
-      ( suite "Element Test Runner Tests"
+  runSuite
+      ( suite "Elm Text Search test runner"
         [ TokenProcessorTests.tests
         , IndexTests.tests
         , IndexUtilsTests.tests

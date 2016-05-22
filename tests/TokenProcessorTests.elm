@@ -1,4 +1,4 @@
-module TokenProcessorTests where
+module TokenProcessorTests exposing (..)
 
 import ElmTest exposing (..)
 import Regex exposing (regex)

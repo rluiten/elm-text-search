@@ -1,4 +1,4 @@
-module Index.Utils
+module Index.Utils exposing
     ( createFuncCreator
     , getTokens
     , processTokens
@@ -7,7 +7,7 @@ module Index.Utils
     , idf
     , refExists
     , buildOrderIndex
-    ) where
+    )
 
 {-| Index Utilities
 

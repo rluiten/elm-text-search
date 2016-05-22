@@ -1,4 +1,4 @@
-module StopWordFilterTests where
+module StopWordFilterTests exposing (..)
 
 import ElmTest exposing (..)
 

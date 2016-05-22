@@ -2,5 +2,6 @@ elm.js
 elm.html
 elm-stuff
 tests/elm.js
+tests/program.js
 tests/index.html
 lunr.js

@@ -1,4 +1,4 @@
-module Index.Load where
+module Index.Load exposing (..)
 
 {-| Load an index from Value or String
 

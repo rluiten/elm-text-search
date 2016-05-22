@@ -1,4 +1,4 @@
-module ElmTextSearch.Json.Encoder (encoder, codecIndexRecordEncoder) where
+module ElmTextSearch.Json.Encoder exposing (encoder, codecIndexRecordEncoder)
 
 {-| Encoder for Index.
 

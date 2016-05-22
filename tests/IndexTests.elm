@@ -1,4 +1,4 @@
-module IndexTests where
+module IndexTests exposing (..)
 
 import Dict
 import ElmTest exposing (..)

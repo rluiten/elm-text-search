@@ -1,4 +1,4 @@
-module TestUtils where
+module TestUtils exposing (..)
 
 import ElmTest exposing (..)
 

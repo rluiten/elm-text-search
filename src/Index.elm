@@ -1,4 +1,4 @@
-module Index
+module Index exposing
     ( Index
     , new
     , newWith
@@ -7,7 +7,7 @@ module Index
     , remove
     , update
     , search
-    ) where
+    )
 
 {-| Index module for full text indexer
 

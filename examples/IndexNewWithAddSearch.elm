@@ -5,18 +5,20 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import ElmTextSearch
-import Graphics.Element exposing (show)
+import Html exposing (Html, div, text)
+import Html.App as Html
+
 import Index.Defaults
 import StopWordFilter
 
 
 {-| Example document type. -}
 type alias ExampleDocType =
-    { cid : String
-    , title : String
-    , author : String
-    , body : String
-    }
+  { cid : String
+  , title : String
+  , author : String
+  , body : String
+  }
 
 
 {-| Create an extended stop word filter.
@@ -29,8 +31,8 @@ It is possible to completely replace the stop word list and not
 just extend it.
 -}
 createMyStopWordFilter =
-    StopWordFilter.createFilterFuncWith
-      [ "explanations" ]
+  StopWordFilter.createFilterFuncWith
+    [ "explanations" ]
 
 
 {-| Create an index with extra options.
@@ -59,56 +61,64 @@ createNewWithIndexExample =
 
 {-| Adding a document to the index. -}
 addDocToIndexExample :
-      Result String (ElmTextSearch.Index ExampleDocType)
+  Result String (ElmTextSearch.Index ExampleDocType)
 addDocToIndexExample =
-    ElmTextSearch.add
-      { cid = "id1"
-      , title = "First Title"
-      , author = "Some Author"
-      , body = "Words in this example document with explanations."
-      }
-      createNewWithIndexExample
+  ElmTextSearch.add
+    { cid = "id1"
+    , title = "First Title"
+    , author = "Some Author"
+    , body = "Words in this example document with explanations."
+    }
+    createNewWithIndexExample
 
 
 {-| Search the index for a word in our extended stop words.
 This will return no matches.
 -}
 firstResultSearchIndex :
-    Result String
-      ( ElmTextSearch.Index ExampleDocType
-      , List (String, Float)
-      )
+  Result String
+    ( ElmTextSearch.Index ExampleDocType
+    , List (String, Float)
+    )
 firstResultSearchIndex =
-    addDocToIndexExample
-      `Result.andThen`
-      (ElmTextSearch.search "explanation")
+  addDocToIndexExample
+    `Result.andThen`
+    (ElmTextSearch.search "explanation")
 
 
 {-| Search the index for a word that is not a stop word.
 It will return an Err about no search terms.
 -}
 secondResultSearchIndex :
-    Result String
-      ( ElmTextSearch.Index ExampleDocType
-      , List (String, Float)
-      )
+  Result String
+    ( ElmTextSearch.Index ExampleDocType
+    , List (String, Float)
+    )
 secondResultSearchIndex =
-    addDocToIndexExample
-      `Result.andThen`
-      (ElmTextSearch.search "examples")
+  addDocToIndexExample
+    `Result.andThen`
+    (ElmTextSearch.search "examples")
 
 
 {-| Display search result. -}
 main =
-    let
-      searchResults1 =
-        Result.map snd firstResultSearchIndex
-      searchResults2 =
-        Result.map snd secondResultSearchIndex
-    in
-      show
-        [ "Result of first search for \"explanation\" is "
-           ++ (toString searchResults1)
-        , "Result of second search for \"examples\" is "
-           ++ (toString searchResults2)
-        ]
+  let
+    searchResults1 =
+      Result.map snd firstResultSearchIndex
+    searchResults2 =
+      Result.map snd secondResultSearchIndex
+  in
+    div []
+    [ div []
+      [ text
+        ( "Expecting no matches (because explanation is in stop words). Result of first search for \"explanation\" is "
+            ++ (toString searchResults1)
+          )
+      ],
+      div []
+      [ text
+        ( "Result of second search for \"examples\" is "
+            ++ (toString searchResults2)
+          )
+      ]
+    ]

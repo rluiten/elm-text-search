@@ -1,4 +1,4 @@
-module Index.Vector where
+module Index.Vector exposing (..)
 
 {-| Index document vector support. -}
 

@@ -4,16 +4,17 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import ElmTextSearch
-import Graphics.Element exposing (show)
+import Html exposing (Html, div, text)
+import Html.App as Html
 
 
 {-| Example document type. -}
 type alias ExampleDocType =
-    { cid : String
-    , title : String
-    , author : String
-    , body : String
-    }
+  { cid : String
+  , title : String
+  , author : String
+  , body : String
+  }
 
 
 {-| Create an index with default configuration.
@@ -32,15 +33,15 @@ createNewIndexExample =
 
 {-| Add a document to an index. -}
 resultUpdatedMyIndexAfterAdd :
-    Result String (ElmTextSearch.Index ExampleDocType)
+  Result String (ElmTextSearch.Index ExampleDocType)
 resultUpdatedMyIndexAfterAdd =
-    ElmTextSearch.add
-      { cid = "id1"
-      , title = "First Title"
-      , author = "Some Author"
-      , body = "Words in this example document with explanations."
-      }
-      createNewIndexExample
+  ElmTextSearch.add
+    { cid = "id1"
+    , title = "First Title"
+    , author = "Some Author"
+    , body = "Words in this example document with explanations."
+    }
+    createNewIndexExample
 
 
 {-| Search the index.
@@ -49,23 +50,26 @@ The result includes an updated Index because a search causes internal
 caches to be updated to improve overall performance.
 -}
 resultSearchIndex :
-    Result String
-      ( ElmTextSearch.Index ExampleDocType
-      , List (String, Float)
-      )
+  Result String
+    ( ElmTextSearch.Index ExampleDocType
+    , List (String, Float)
+    )
 resultSearchIndex =
-    resultUpdatedMyIndexAfterAdd
-      `Result.andThen`
-      (ElmTextSearch.search "explanations")
+  resultUpdatedMyIndexAfterAdd
+    `Result.andThen`
+    (ElmTextSearch.search "explanations")
 
 
 {-| Display search result. -}
 main =
-    let
-      -- want only the search results not the returned index
-      searchResults = Result.map snd resultSearchIndex
-    in
-      show
-        [ "Result of searching for \"explanations\" is "
-           ++ (toString searchResults)
-        ]
+  let
+    -- want only the search results not the returned index
+    searchResults = Result.map snd resultSearchIndex
+  in
+    div []
+    [ text
+        (
+          "Result of searching for \"explanations\" is "
+            ++ (toString searchResults)
+        )
+    ]

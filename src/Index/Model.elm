@@ -1,4 +1,4 @@
-module Index.Model where
+module Index.Model exposing (..)
 
 {-| Define the Index Model
 

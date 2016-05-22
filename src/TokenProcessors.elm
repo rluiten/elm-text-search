@@ -1,9 +1,9 @@
-module TokenProcessors
+module TokenProcessors exposing
     ( tokenizer
     , tokenizerWith
     , tokenizerWithRegex
     , trimmer
-    ) where
+    )
 
 {-| TokenProcessors for strings.
 

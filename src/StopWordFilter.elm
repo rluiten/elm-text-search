@@ -1,4 +1,4 @@
-module StopWordFilter where
+module StopWordFilter exposing (..)
 
 {-| StopWordFilter is an English language stop word list filter, any words
 contained in the list are not stored in the index.
