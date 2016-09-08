@@ -28,6 +28,8 @@ tests =
       , removeErr2 ()
       , addDocsTest ()
       , searchDocsTest ()
+      , searchDocsTestList ()
+      , searchDocsTestList2 ()
       ]
 
 
@@ -40,6 +42,13 @@ type alias MyDoc =
     }
 
 
+type alias MyDoc2 =
+    { cid : String
+    , title : String
+    , author : String
+    , body : List String
+    }
+
 -- example index
 index0 : Index MyDoc
 index0 =
@@ -49,6 +58,22 @@ index0 =
       , fields =
           [ ( .title, 5 )
           , ( .body, 1 )
+          ]
+      , listFields = []
+      }
+
+
+-- example index with indexed List String field
+index0list : Index MyDoc2
+index0list =
+    Index.new
+      { indexType = "- IndexTest Type -"
+      , ref = .cid
+      , fields =
+          [ ( .title, 5 )
+          ]
+      , listFields =
+          [ ( .body, 1 )
           ]
       }
 
@@ -294,7 +319,67 @@ searchDocsTest _ =
         Err msg ->
             []
   in
-    test "results are" <|
+    test "search String fields results are" <|
+        assertEqual
+          ["qdoc1", "qdoc2"]
+          collapsedSearchResult
+
+
+docQ1list : MyDoc2
+docQ1list =
+    { cid = "qdoc1"
+    , title = "Question1 Green"
+    , author = "Sally Apples"
+    , body =
+        [ "Sally writes words about "
+        , "a grown blue banana."
+        ]
+    }
+
+
+docQ2list :MyDoc2
+docQ2list =
+    { cid = "qdoc2"
+    , title = "Question2 Purple"
+    , author = "John Banana"
+    , body =
+      [ "An example of "
+      , "green apple engineering."
+      ]
+    }
+
+
+-- Configure to have some data in listFields body, match title
+searchDocsTestList _ =
+  let
+    (index, _) = Index.addDocs [docQ1list, docQ2list] index0list
+    searchResult = Index.search "q" index
+    collapsedSearchResult =
+      case searchResult of
+        Ok (index, results) ->
+            List.map fst results
+        Err msg ->
+            []
+  in
+    test "search List String fields where match in title results are" <|
+        assertEqual
+          ["qdoc1", "qdoc2"]
+          collapsedSearchResult
+
+
+-- Configure to have some data in listFields body, match in listFields body
+searchDocsTestList2 _ =
+  let
+    (index, _) = Index.addDocs [docQ1list, docQ2list] index0list
+    searchResult = Index.search "green" index
+    collapsedSearchResult =
+      case searchResult of
+        Ok (index, results) ->
+            List.map fst results
+        Err msg ->
+            []
+  in
+    test "search List String fields where match in body List String and title" <|
         assertEqual
           ["qdoc1", "qdoc2"]
           collapsedSearchResult

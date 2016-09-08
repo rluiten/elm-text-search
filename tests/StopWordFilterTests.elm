@@ -23,6 +23,7 @@ newIndex =
         [ ( .title, 5 )
         , ( .body, 1 )
         ]
+    , listFields = []
     }
 
 

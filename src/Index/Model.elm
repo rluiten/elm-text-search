@@ -33,8 +33,12 @@ The internal data model of Index
 * ref
  * how to get at unique id of documents added
 * fields
- * list of fields to index from document
-  * first field is function to get content of field
+ * list of fields of type String to index from document
+  * first field is function to get String content of field
+  * second field Float is a boost to text frequency of tokens in this field
+* listFields
+ * list of fields of type List String to index from document
+  * first field is function to get List String content of field
   * second field Float is a boost to text frequency of tokens in this field
 
 * transformFactories
@@ -76,6 +80,7 @@ type alias IndexRecord doc =
     , indexType : String
     , ref : doc -> String
     , fields : List (doc -> String, Float)
+    , listFields : List (doc -> List String, Float)
     , transformFactories : List (TransformFactory doc)
     , filterFactories : List (FilterFactory doc)
 
@@ -94,7 +99,7 @@ type alias IndexRecord doc =
 
 Simple still requires configuring the fields for your document type.
 See [`ElmTextSearch.SimpleConfig`](ElmTextSearch#SimpleConfig)
-for explantions of `ref` and `fields` fields.
+for explantions of `ref`, `fields` and `listFields` fields.
 
 * ElmTextSearch.SimpleConfig does not include `indexType`.
  * In this case the user is getting the ElmTextSearch default token processing.
@@ -118,6 +123,8 @@ type alias SimpleConfig doc =
     { indexType : String
     , ref : (doc -> String)
     , fields : List (doc -> String, Float)
+    , listFields : List (doc -> List String, Float)
+    , fields : List (doc -> String, Float)
     }
 
 
@@ -130,6 +137,7 @@ type alias Config doc =
     { indexType : String
     , ref : doc -> String
     , fields : List (doc -> String, Float)
+    , listFields : List (doc -> List String, Float)
     , transformFactories : List (TransformFactory doc)
     , filterFactories : List (FilterFactory doc)
     }

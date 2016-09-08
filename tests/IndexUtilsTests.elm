@@ -29,6 +29,7 @@ index0 =
           [ ( .title, 5 )
           , ( .body, 1 )
           ]
+      , listFields = []
       }
 
 

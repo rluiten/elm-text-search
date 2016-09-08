@@ -28,6 +28,7 @@ createNewIndexExample =
         [ ( .title, 5.0 )
         , ( .body, 1.0 )
         ]
+    , listFields = []
     }
 
 

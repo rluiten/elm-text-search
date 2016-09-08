@@ -59,12 +59,13 @@ new simpleConfig  =
 {-| Create new index with control of transformers and filters.
 -}
 newWith : Config doc -> Index doc
-newWith {indexType, ref, fields, transformFactories, filterFactories} =
+newWith {indexType, ref, fields, listFields, transformFactories, filterFactories} =
     Index
       { indexVersion = Defaults.indexVersion
       , indexType = indexType
       , ref = ref
       , fields = fields
+      , listFields = listFields
       , transformFactories = transformFactories
       , filterFactories = filterFactories
 
@@ -93,19 +94,26 @@ add doc (Index irec as index) =
         Err "Error adding document that allready exists."
       else
         let
-          (u3index, fieldsWordList) =
+          (u1index, fieldsWordList) =
             List.foldr
               (getWordsForField doc)
               (index, [])
               (List.map fst irec.fields)
-          fieldsTokens = List.map Set.fromList fieldsWordList
+          -- _ = Debug.log "fieldsWordList" fieldsWordList
+          (u2index, u2fieldsWordList) =
+            List.foldr
+              (getWordsForFieldList doc)
+              (u1index, fieldsWordList)
+              (List.map fst irec.listFields)
+          -- _ = Debug.log "u2fieldsWordList" u2fieldsWordList
+          fieldsTokens = List.map Set.fromList u2fieldsWordList
           docTokens = List.foldr Set.union Set.empty fieldsTokens
           -- _ = Debug.log("add docTokens") (docTokens)
         in
           if Set.isEmpty docTokens then
             Err "Error after tokenisation there are no terms to index."
           else
-            Ok (addDoc docRef fieldsTokens docTokens u3index)
+            Ok (addDoc docRef fieldsTokens docTokens u2index)
 
 
 {-| Add multiple documents. Tries to add all docs and collects errors..
@@ -140,7 +148,7 @@ addDocsCore docsI docs (Index irec as index) errors =
           addDocsCore (docsI + 1) tailDocs index (errors ++ [(docsI, msg)])
 
 
-{- reducer to extract tokens from each field of doc -}
+{- reducer to extract tokens from each field Strin from doc -}
 getWordsForField :
        doc
     -> (doc -> String)
@@ -153,16 +161,34 @@ getWordsForField doc getField (index, fieldsLists) =
       (u1index, tokens :: fieldsLists)
 
 
+{- reducer to extract tokens from each field List String from doc -}
+getWordsForFieldList :
+       doc
+    -> (doc -> List String)
+    -> (Index doc, List (List String))
+    -> (Index doc, List (List String))
+getWordsForFieldList doc getFieldList (index, fieldsLists) =
+    let
+      (u1index, tokens) = Index.Utils.getTokensList index (getFieldList doc)
+    in
+      (u1index, tokens :: fieldsLists)
+
+
 {- Add the document to the index. -}
 addDoc : String -> List (Set String) -> Set String -> Index doc -> Index doc
 addDoc docRef fieldsTokens docTokens (Index irec as index) =
     let
       addTokenScore (token, score) trie =
         Trie.add (docRef, score) token trie
-
-      fieldsBoosts = List.map snd irec.fields
+      -- listFields is first in list because listFields tokens
+      -- pushed on front of fieldsTokens
+      allBoosts = List.append
+        (List.map snd irec.listFields)
+        (List.map snd irec.fields)
+      -- _ = Debug.log "allBoosts" allBoosts
       -- fieldTokensAndBoosts : List (Set String, Float)
-      fieldTokensAndBoosts = List.map2 (,) fieldsTokens fieldsBoosts
+      fieldTokensAndBoosts = List.map2 (,) fieldsTokens allBoosts
+      -- _ = Debug.log "fieldTokensAndBoosts" fieldTokensAndBoosts
 
       -- updatedDocumentStore : Dict String (Set String)
       updatedDocumentStore = Dict.insert docRef docTokens irec.documentStore

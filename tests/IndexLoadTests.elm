@@ -56,6 +56,7 @@ index0 =
           [ ( .title, 5 )
           , ( .body, 1 )
           ]
+      , listFields = []
       }
 
 
@@ -75,6 +76,7 @@ config1 =
         [ ( .title, 5 )
         , ( .body, 1 )
         ]
+    , listFields = []
     , transformFactories =
         [ Index.Utils.createFuncCreator TokenProcessors.trimmer
         , Index.Utils.createFuncCreator Stemmer.stem
@@ -92,6 +94,7 @@ config2 =
         [ ( .title, 5 )
         , ( .body, 1 )
         ]
+    , listFields = []
     , transformFactories =
         [ Index.Utils.createFuncCreator TokenProcessors.trimmer
         , Index.Utils.createFuncCreator Stemmer.stem
@@ -148,5 +151,6 @@ indexfromString1 _ =
               [ ( .title, 5 )
               , ( .body, 1 )
               ]
+            , listFields = []
           }
           exampleJsonIndex100default

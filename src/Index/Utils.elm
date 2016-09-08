@@ -1,6 +1,7 @@
 module Index.Utils exposing
     ( createFuncCreator
     , getTokens
+    , getTokensList
     , processTokens
     , applyTransform
     , applyFilter
@@ -14,6 +15,7 @@ module Index.Utils exposing
 ## Functions
 @docs createFuncCreator
 @docs getTokens
+@docs getTokensList
 @docs processTokens
 @docs applyTransform
 @docs applyFilter
@@ -45,6 +47,11 @@ createFuncCreator func index = (index, func)
 getTokens : Index doc -> String -> (Index doc, List (String))
 getTokens index string =
     processTokens index (TokenProcessors.tokenizer string)
+
+
+getTokensList : Index doc -> List String -> (Index doc, List (String))
+getTokensList index listString =
+    processTokens index (TokenProcessors.tokenizerList listString)
 
 
 {-| Transform list of words into tokens for index and search.

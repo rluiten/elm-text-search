@@ -14,6 +14,7 @@ tests : Test
 tests =
     suite "Index Encoder tests"
       [ encoder1 ()
+      , encoder1List ()
       ]
 
 
@@ -26,11 +27,28 @@ type alias MyDoc =
     }
 
 
+type alias MyDocList =
+    { cid : String
+    , title : String
+    --, subTitle : String
+    , author : String
+    , body : List String
+    --, bodyExtra : List String
+    }
+
+
 type alias IndexResult = Result String (Index MyDoc)
+
+
+type alias IndexResultList = Result String (Index MyDocList)
 
 
 safeIndex : (() -> IndexResult) -> Index MyDoc
 safeIndex result = Result.withDefault index0 (result ())
+
+
+safeIndexList : (() -> IndexResultList) -> Index MyDocList
+safeIndexList result = Result.withDefault index0List (result ())
 
 
 -- example index
@@ -43,10 +61,33 @@ index0 =
           [ ( .title, 5 )
           , ( .body, 1 )
           ]
+      , listFields = []
       }
+
+
+-- example index
+index0List : Index MyDocList
+index0List =
+    Index.new
+      { indexType = "- IndexTest Type -"
+      , ref = .cid
+      , fields =
+          [ ( .title, 5 )
+          --, ( .subTitle, 3 )
+          ]
+      , listFields =
+          [ ( .body, 1 )
+          --, ( .bodyExtra, 2 )
+          ]
+      }
+
 
 index1 : () -> IndexResult
 index1 _ = Index.add (doc1 ()) index0
+
+
+index1List : () -> IndexResultList
+index1List _ = Index.add (doc1List ()) index0List
 
 
 doc1 : () -> MyDoc
@@ -55,6 +96,23 @@ doc1 _ =
     , title = "Examples of a Banana"
     , author = "Sally Apples"
     , body = "Sally writes words about a grown banana."
+    }
+
+
+doc1List : () -> MyDocList
+doc1List _ =
+    { cid = "doc1"
+    , title = "Examples of a Banana"
+    --, subTitle = "Wizard Courier"
+    , author = "Sally Apples"
+    , body =
+      [ "Sally writes words "
+      , "about a grown banana."
+      ]
+    --, bodyExtra =
+    --  [ "Demon Hunter "
+    --  , "Green Mango."
+    --  ]
     }
 
 
@@ -70,14 +128,26 @@ doc1 _ =
 --         encodedTrie
 --     )
 
+encodedIndex =
+  "{\"indexVersion\":\"1.0.0\",\"indexType\":\"- IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
 
 encoder1 _ =
-    test "Encode an index" <|
+    test "Encode an index " <|
       assertEqual
-        "{\"indexVersion\":\"1.0.0\",\"indexType\":\"- IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
+        encodedIndex
         ( Encode.encode 0
             (IndexEncoder.encoder (safeIndex index1))
         )
+
+
+encoder1List _ =
+    test "Encode an index with listFields body same content as encoder1 test " <|
+      assertEqual
+        encodedIndex
+        ( Encode.encode 0
+            (IndexEncoder.encoder (safeIndexList index1List))
+        )
+
 
 -- tweaked version of encdoer1 string to look at.
 a =

@@ -100,10 +100,11 @@ Filling in default values for fields not in SimpleConfig
 This is the definition of the default index configuration.
 -}
 getDefaultIndexConfig : Model.SimpleConfig doc -> Model.Config doc
-getDefaultIndexConfig {indexType, ref, fields} =
+getDefaultIndexConfig {indexType, ref, fields, listFields} =
       { indexType = indexType
       , ref = ref
       , fields = fields
+      , listFields = listFields
       , transformFactories = defaultTransformFactories
       , filterFactories = defaultFilterFactories
       }

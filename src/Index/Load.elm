@@ -82,6 +82,7 @@ loadIndexFull (config, decodedIndex) =
         , indexType = decodedIndex.indexType
         , ref = config.ref
         , fields = config.fields
+        , listFields = config.listFields
         , transformFactories = config.transformFactories
         , filterFactories = config.filterFactories
         , documentStore = decodedIndex.documentStore

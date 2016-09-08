@@ -86,6 +86,7 @@ required to create an Index.
 type alias SimpleConfig doc =
     { ref : (doc -> String)
     , fields : List (doc -> String, Float)
+    , listFields : List (doc -> List String, Float)
     }
 
 
@@ -96,10 +97,11 @@ type alias Config doc = Model.Config doc
 {- convert ElmTextSearch.SimpleConfig to Index.Model.SimpleConfig
 -}
 getIndexSimpleConfig : SimpleConfig doc -> Model.SimpleConfig doc
-getIndexSimpleConfig {ref, fields} =
+getIndexSimpleConfig {ref, fields, listFields} =
     { indexType = Defaults.elmTextSearchIndexType
     , ref = ref
     , fields = fields
+    , listFields = listFields
     }
 
 
@@ -125,6 +127,7 @@ createNewIndexExample =
         [ ( .title, 5.0 )
         , ( .body, 1.0 )
         ]
+    , listFields = []
     }
 ```
 
@@ -178,6 +181,7 @@ createNewWithIndexExample =
         [ ( .title, 5.0 )
         , ( .body, 1.0 )
         ]
+    , listFields = []
     , transformFactories = Index.Defaults.defaultTransformFactories
     , filterFactories = [ createMyStopWordFilter ]
     }

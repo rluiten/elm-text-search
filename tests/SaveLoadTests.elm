@@ -41,6 +41,7 @@ configElmTextSearchMyDoc =
         [ ( .title, 5 )
         , ( .body, 1 )
         ]
+    , listFields = []
     }
 
 doc1 : () -> MyDoc

@@ -1,4 +1,5 @@
-{-| Create an index and add multiple documents.
+{-| Create an index and add a document, search a document
+This variation indexes words from a field which is List String.
 
 Copyright (c) 2016 Robin Luiten
 -}
@@ -13,7 +14,7 @@ type alias ExampleDocType =
   { cid : String
   , title : String
   , author : String
-  , body : String
+  , body : List String
   }
 
 
@@ -26,34 +27,26 @@ createNewIndexExample =
     { ref = .cid
     , fields =
         [ ( .title, 5.0 )
-        , ( .body, 1.0 )
         ]
-    , listFields = []
+    , listFields =
+        [ ( .body, 1.0)
+        ]
     }
 
 
-documents =
-  [ { cid = "id1"
+{-| Add a document to an index. -}
+resultUpdatedMyIndexAfterAdd :
+  Result String (ElmTextSearch.Index ExampleDocType)
+resultUpdatedMyIndexAfterAdd =
+  ElmTextSearch.add
+    { cid = "id1"
     , title = "First Title"
     , author = "Some Author"
-    , body = "Words in this example document with explanations."
+    , body =
+      [ "Words in this example "
+      , "document with explanations."
+      ]
     }
-  , { cid = "id2"
-    , title = "Is a cactus as pretty as a tree ?"
-    , author = "Joe Greeny"
-    , body = "This title contains information about cactuses."
-    }
-  ]
-
-
-{-| Add a documents to index.
-
-If any add result is an Err this returns the first failure.
--}
-indexWithMulitpleDocumentsAdded : (ElmTextSearch.Index ExampleDocType, List (Int, String))
-indexWithMulitpleDocumentsAdded =
-  ElmTextSearch.addDocs
-    documents
     createNewIndexExample
 
 
@@ -61,9 +54,6 @@ indexWithMulitpleDocumentsAdded =
 
 The result includes an updated Index because a search causes internal
 caches to be updated to improve overall performance.
-
-This is ignoring any errors from call to addAllDocs
-in indexWithMulitpleDocumentsAdded.
 -}
 resultSearchIndex :
   Result String
@@ -71,7 +61,9 @@ resultSearchIndex :
     , List (String, Float)
     )
 resultSearchIndex =
-  ElmTextSearch.search "title" (fst indexWithMulitpleDocumentsAdded)
+  resultUpdatedMyIndexAfterAdd
+    `Result.andThen`
+    (ElmTextSearch.search "explanations")
 
 
 {-| Display search result. -}
@@ -82,7 +74,8 @@ main =
   in
     div []
     [ text
-      ( "Result of searching for \"explanations\" is "
-          ++ (toString searchResults)
-      )
+        (
+          "Result of searching for \"explanations\" is "
+            ++ (toString searchResults)
+        )
     ]

@@ -5,8 +5,28 @@ Copyright (c) 2016 Robin Luiten
 This is a full text indexing engine inspired by lunr.js and written in Elm language.
 See http://lunrjs.com/ for lunr.js
 
-While ElmTextSearch has a good selection of tests this library is not battle tested and may contain some performance issues that need
-addressing still.
+While ElmTextSearch has a good selection of tests this library is not battle tested and may contain some performance issues that need addressing.
+
+### Upgrading from 2.1.2 to 3.0.0.
+
+Add `listFields = []` to your Configuration and that should be all thats required.
+
+* New field in Config is listFields for doc fields of type `List String`
+
+Example of updated config passed to create Index.
+```elm
+createNewIndexExample =
+  ElmTextSearch.new
+    { ref = .cid
+    , fields =
+        [ ( .title, 5.0 )
+        , ( .body, 1.0 )
+        ]
+    , listFields = []
+    }
+```
+
+### Packages
 
 Several packages were created for this project and published seperately for this package to depend on.
 
@@ -68,6 +88,7 @@ createNewIndexExample =
         [ ( .title, 5.0 )
         , ( .body, 1.0 )
         ]
+    , listFields = []
     }
 
 
