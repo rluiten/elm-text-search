@@ -15,6 +15,7 @@ module ElmTextSearch exposing
     , fromValue
     , fromStringWith
     , fromValueWith
+    , addOrUpdate
     )
 
 {-| A full text indexer written in Elm language inspired by lunr.js.
@@ -31,6 +32,7 @@ https://www.new-bamboo.co.uk/blog/2013/02/26/full-text-search-in-your-browser/
 @docs addDocs
 @docs remove
 @docs update
+@docs addOrUpdate
 
 ## Query Index
 @docs search
@@ -271,6 +273,14 @@ Conditions that cause an error result are those for
 update : doc -> Index doc -> Result String (Index doc)
 update =
     Index.update
+
+
+{-| Add or Update a document in an index.
+This removes the document first if it is allready in index then adds it.
+-}
+addOrUpdate : doc -> Index doc -> Result String (Index doc)
+addOrUpdate =
+    Index.addOrUpdate
 
 
 {-| Search an index with query.

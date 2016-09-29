@@ -21,8 +21,6 @@ type alias TransformFactory doc = Index doc -> (Index doc, (String -> String))
 type alias FilterFunc = String -> Bool
 type alias FilterFactory doc = Index doc -> (Index doc, (String -> Bool))
 
---type alias FilterFactory doc = Index doc -> (String -> Bool)
-
 {-| Index is a full text index for a document type.
 
 The internal data model of Index

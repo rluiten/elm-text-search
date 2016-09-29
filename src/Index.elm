@@ -7,6 +7,7 @@ module Index exposing
     , remove
     , update
     , search
+    , addOrUpdate
     )
 
 {-| Index module for full text indexer
@@ -20,6 +21,7 @@ module Index exposing
 @docs addDocs
 @docs remove
 @docs update
+@docs addOrUpdate
 
 ## Query Index
 @docs search
@@ -257,7 +259,7 @@ remove doc (Index irec as index) =
       if String.isEmpty docRef then
         Err "Error document has an empty unique id (ref)."
       else if not (Index.Utils.refExists docRef index) then
-        Err "Error document is not in index."
+        Err errorMessageNotIndex
       else
         Ok (
           withDefault index <|
@@ -265,6 +267,10 @@ remove doc (Index irec as index) =
               (removeDoc docRef index)
               (Dict.get docRef irec.documentStore)
         )
+
+
+errorMessageNotIndex : String
+errorMessageNotIndex = "Error document is not in index."
 
 
 {- Remove the doc by docRef id from the index. -}
@@ -293,6 +299,22 @@ update doc index =
     (remove doc index)
       `Result.andThen`
       (\u1index -> add doc index)
+
+
+{-| Add or Update document in Index.
+This does an add if document is not in index.
+-}
+addOrUpdate : doc -> Index doc -> Result String (Index doc)
+addOrUpdate doc index =
+  case (remove doc index) of
+    Ok u1index ->
+      add doc u1index
+
+    Err msg ->
+      if msg == errorMessageNotIndex then
+        add doc index
+      else
+        Err msg
 
 
 {-| Search index with query.

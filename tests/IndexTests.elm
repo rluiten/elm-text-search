@@ -30,6 +30,9 @@ tests =
       , searchDocsTest ()
       , searchDocsTestList ()
       , searchDocsTestList2 ()
+      , test_index3_add_doc3 ()
+      , test_index3_addOrUpdate_doc3 ()
+      , test_index2_addOrUpdate_doc3 ()
       ]
 
 
@@ -383,3 +386,40 @@ searchDocsTestList2 _ =
         assertEqual
           ["qdoc1", "qdoc2"]
           collapsedSearchResult
+
+
+-- verify add of existing document causes an error
+test_index3_add_doc3 _ =
+  let
+    updated = Index.add (doc3 ()) (safeIndex index3)
+    indexCreatedOk : Index doc -> Result String String
+    indexCreatedOk _ = Ok "Index"
+  in
+    test "add same document to index produces error" <|
+      assertEqual
+        (Err "Error adding document that allready exists.")
+        (updated `Result.andThen` indexCreatedOk)
+
+
+test_index3_addOrUpdate_doc3 _ =
+  let
+    updated = Index.addOrUpdate (doc3 ()) (safeIndex index3)
+    indexCreatedOk : Index doc -> Result String String
+    indexCreatedOk _ = Ok "Index"
+  in
+    test "addOrUpdate same document does not produce error" <|
+      assertEqual
+        (Ok "Index")
+        (updated `Result.andThen` indexCreatedOk)
+
+
+test_index2_addOrUpdate_doc3 _ =
+  let
+    updated = Index.addOrUpdate (doc3 ()) (safeIndex index2)
+    indexCreatedOk : Index doc -> Result String String
+    indexCreatedOk _ = Ok "Index"
+  in
+    test "addOrUpdate document not in index updates index with new doc" <|
+      assertEqual
+        (Ok "Index")
+        (updated `Result.andThen` indexCreatedOk)
