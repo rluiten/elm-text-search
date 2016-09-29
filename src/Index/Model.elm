@@ -124,7 +124,6 @@ type alias SimpleConfig doc =
     , ref : (doc -> String)
     , fields : List (doc -> String, Float)
     , listFields : List (doc -> List String, Float)
-    , fields : List (doc -> String, Float)
     }
 
 
