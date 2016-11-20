@@ -1,13 +1,13 @@
 module Index.Defaults exposing
-    ( indexVersion
-    , elmTextSearchIndexType
-    , defaultTransformFactories
-    , defaultFilterFactories
-    , defaultTokenTrimmerFuncCreator
-    , defaultStemmerFuncCreator
-    , defaultStopWordFilterFuncCreator
-    , getDefaultIndexConfig
-    )
+  ( indexVersion
+  , elmTextSearchIndexType
+  , defaultTransformFactories
+  , defaultFilterFactories
+  , defaultTokenTrimmerFuncCreator
+  , defaultStemmerFuncCreator
+  , defaultStopWordFilterFuncCreator
+  , getDefaultIndexConfig
+  )
 
 {-| Defaults for indexes and configurations.
 
@@ -61,16 +61,16 @@ elmTextSearchIndexType = "-= ElmTextSearch Index Type 1 =-"
 {-| Index default transform factories. -}
 defaultTransformFactories : List (TransformFactory doc)
 defaultTransformFactories =
-    [ defaultTokenTrimmerFuncCreator
-    , defaultStemmerFuncCreator
-    ]
+  [ defaultTokenTrimmerFuncCreator
+  , defaultStemmerFuncCreator
+  ]
 
 
 {-| Index default filter factories. -}
 defaultFilterFactories : List (FilterFactory doc)
 defaultFilterFactories =
-    [ defaultStopWordFilterFuncCreator
-    ]
+  [ defaultStopWordFilterFuncCreator
+  ]
 
 
 {-| The default token trimmer transform function creator.
@@ -78,19 +78,19 @@ Normally applied first in transform functions.
 -}
 defaultTokenTrimmerFuncCreator : TransformFactory doc
 defaultTokenTrimmerFuncCreator =
-    Index.Utils.createFuncCreator TokenProcessors.trimmer
+  Index.Utils.createFuncCreator TokenProcessors.trimmer
 
 
 {-| The default token stemmer transform function creator. -}
 defaultStemmerFuncCreator : TransformFactory doc
 defaultStemmerFuncCreator =
-    Index.Utils.createFuncCreator Stemmer.stem
+  Index.Utils.createFuncCreator Stemmer.stem
 
 
 {-| The default stop word filter function creator. -}
 defaultStopWordFilterFuncCreator : FilterFactory doc
 defaultStopWordFilterFuncCreator =
-    StopWordFilter.createDefaultFilterFunc
+  StopWordFilter.createDefaultFilterFunc
 
 
 {-| Convert Index.Model.SimpleConfig to Index.Model.Config
@@ -101,10 +101,10 @@ This is the definition of the default index configuration.
 -}
 getDefaultIndexConfig : Model.SimpleConfig doc -> Model.Config doc
 getDefaultIndexConfig {indexType, ref, fields, listFields} =
-      { indexType = indexType
-      , ref = ref
-      , fields = fields
-      , listFields = listFields
-      , transformFactories = defaultTransformFactories
-      , filterFactories = defaultFilterFactories
-      }
+  { indexType = indexType
+  , ref = ref
+  , fields = fields
+  , listFields = listFields
+  , transformFactories = defaultTransformFactories
+  , filterFactories = defaultFilterFactories
+  }

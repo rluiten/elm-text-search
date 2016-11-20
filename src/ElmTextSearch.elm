@@ -1,22 +1,22 @@
 module ElmTextSearch exposing
-    ( Index
-    , SimpleConfig
-    , Config
-    , new
-    , newWith
-    , add
-    , addDocs
-    , remove
-    , update
-    , search
-    , storeToValue
-    , storeToString
-    , fromString
-    , fromValue
-    , fromStringWith
-    , fromValueWith
-    , addOrUpdate
-    )
+  ( Index
+  , SimpleConfig
+  , Config
+  , new
+  , newWith
+  , add
+  , addDocs
+  , remove
+  , update
+  , search
+  , storeToValue
+  , storeToString
+  , fromString
+  , fromValue
+  , fromStringWith
+  , fromValueWith
+  , addOrUpdate
+  )
 
 {-| A full text indexer written in Elm language inspired by lunr.js.
 
@@ -86,10 +86,10 @@ type alias Index doc = Index.Index doc
 required to create an Index.
 -}
 type alias SimpleConfig doc =
-    { ref : (doc -> String)
-    , fields : List (doc -> String, Float)
-    , listFields : List (doc -> List String, Float)
-    }
+  { ref : (doc -> String)
+  , fields : List (doc -> String, Float)
+  , listFields : List (doc -> List String, Float)
+  }
 
 
 {-| A Config is required to create an Index. -}
@@ -100,11 +100,11 @@ type alias Config doc = Model.Config doc
 -}
 getIndexSimpleConfig : SimpleConfig doc -> Model.SimpleConfig doc
 getIndexSimpleConfig {ref, fields, listFields} =
-    { indexType = Defaults.elmTextSearchIndexType
-    , ref = ref
-    , fields = fields
-    , listFields = listFields
-    }
+  { indexType = Defaults.elmTextSearchIndexType
+  , ref = ref
+  , fields = fields
+  , listFields = listFields
+  }
 
 
 {-| Create new index.
@@ -113,14 +113,19 @@ Example
 ```
 import ElmTextSearch
 
+
+{-| Example document type. -}
 type alias ExampleDocType =
-    { cid : String
-    , title : String
-    , author : String
-    , body : String
-    }
+  { cid : String
+  , title : String
+  , author : String
+  , body : String
+  }
 
 
+{-| Create an index with default configuration.
+See ElmTextSearch.SimpleConfig documentation for parameter information.
+-}
 createNewIndexExample : ElmTextSearch.Index ExampleDocType
 createNewIndexExample =
   ElmTextSearch.new
@@ -149,7 +154,7 @@ The `SimpleConfig` parameter to new is
 -}
 new : SimpleConfig doc -> Index doc
 new simpleConfig =
-    Index.new (getIndexSimpleConfig simpleConfig)
+  Index.new (getIndexSimpleConfig simpleConfig)
 
 
 {-| Create new index with additional configuration.
@@ -162,16 +167,16 @@ import StopWordFilter
 
 
 type alias ExampleDocType =
-    { cid : String
-    , title : String
-    , author : String
-    , body : String
-    }
+  { cid : String
+  , title : String
+  , author : String
+  , body : String
+  }
 
 
 createMyStopWordFilter =
-    StopWordFilter.createFilterFuncWith
-      [ "explanations" ]
+  StopWordFilter.createFilterFuncWith
+    [ "explanations" ]
 
 
 createNewWithIndexExample : ElmTextSearch.Index ExampleDocType
@@ -197,14 +202,16 @@ newWith = Index.newWith
 
 Starting with the ElmTextSearch.new example above this adds a document.
 ```
+addDocToIndexExample :
+  Result String (ElmTextSearch.Index ExampleDocType)
 addDocToIndexExample =
-    ElmTextSearch.add
-      { cid = "id1"
-      , title = "First Title"
-      , author = "Some Author"
-      , body = "Words in this example document with explanations."
-      }
-      createNewWithIndexExample
+  ElmTextSearch.add
+    { cid = "id1"
+    , title = "First Title"
+    , author = "Some Author"
+    , body = "Words in this example document with explanations."
+    }
+    createNewWithIndexExample
 ```
 
 Conditions that cause a result Err with message.
@@ -214,7 +221,7 @@ Conditions that cause a result Err with message.
 -}
 add : doc -> Index doc -> Result String (Index doc)
 add =
-    Index.add
+  Index.add
 
 
 {-| Add multiple documents. Tries to add all docs and collects errors..
@@ -227,20 +234,20 @@ Returns the updated index after adding the documents.
 -}
 addDocs : List doc -> Index doc -> (Index doc, List (Int, String))
 addDocs =
-    Index.addDocs
+  Index.addDocs
 
 {-| Remove a document from an index.
 
 Starting with the ElmTextSearch.new example above this removes a document.
 ```
 removeDocFromIndexExample =
-    ElmTextSearch.remove
-      { cid = "123"
-      , title = "Examples of a Banana"
-      , author = "Sally Apples"
-      , body = "Sally writes words about a banana."
-      }
-      createNewIndexExample
+  ElmTextSearch.remove
+    { cid = "123"
+    , title = "Examples of a Banana"
+    , author = "Sally Apples"
+    , body = "Sally writes words about a banana."
+    }
+    createNewIndexExample
 ```
 
 Conditions that cause a result Err with message.
@@ -249,21 +256,21 @@ Conditions that cause a result Err with message.
 -}
 remove : doc -> Index doc -> Result String (Index doc)
 remove =
-    Index.remove
+  Index.remove
 
 
 {-| Update a document in an index.
 
 Starting with the ElmTextSearch.new example above this updates a document.
 ```
-    updatedIndex =
-      ElmTextSearch.update
-        { cid = "123"
-        , title = "Examples of a Bananas in every day life."
-        , author = "Sally Apples"
-        , body = "Sally writes more words about a banana."
-        }
-        createNewIndexExample
+  updatedIndex =
+    ElmTextSearch.update
+      { cid = "123"
+      , title = "Examples of a Bananas in every day life."
+      , author = "Sally Apples"
+      , body = "Sally writes more words about a banana."
+      }
+      createNewIndexExample
 ```
 
 Conditions that cause an error result are those for
@@ -272,7 +279,7 @@ Conditions that cause an error result are those for
 -}
 update : doc -> Index doc -> Result String (Index doc)
 update =
-    Index.update
+  Index.update
 
 
 {-| Add or Update a document in an index.
@@ -280,7 +287,7 @@ This removes the document first if it is allready in index then adds it.
 -}
 addOrUpdate : doc -> Index doc -> Result String (Index doc)
 addOrUpdate =
-    Index.addOrUpdate
+  Index.addOrUpdate
 
 
 {-| Search an index with query.
@@ -297,7 +304,7 @@ The following example runs a search for documents containing both "apple" and "b
 
 ```
 searchResult =
-    Index.search "Apple banana" createNewIndexExample
+  Index.search "Apple banana" createNewIndexExample
 ```
 
 Results are a list of matching document reference identifiers with
@@ -317,11 +324,11 @@ Conditions that cause a result Err with message.
 
 -}
 search :
-       String
-    -> Index doc
-    -> Result String (Index doc, List (String, Float))
+     String
+  -> Index doc
+  -> Result String (Index doc, List (String, Float))
 search =
-      Index.search
+  Index.search
 
 
 {-| Store an index to a Value.
@@ -330,7 +337,7 @@ You can also use [`ElmTextSearch.Json.Encoder`](ElmTextSearch.Json.Encoder).
 -}
 storeToValue : Index doc -> Encode.Value
 storeToValue =
-    IndexEncoder.encoder
+  IndexEncoder.encoder
 
 
 {-| Store an index to a String.
@@ -339,7 +346,7 @@ You can also use [`ElmTextSearch.Json.Encoder`](ElmTextSearch.Json.Encoder).
 -}
 storeToString : Index doc -> String
 storeToString index =
-    Encode.encode 0 (IndexEncoder.encoder index)
+  Encode.encode 0 (IndexEncoder.encoder index)
 
 
 {-| Create an Index from a String which has a stored Index in it and the
@@ -349,9 +356,9 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 -}
 fromString : SimpleConfig doc -> String -> Result String (Index doc)
 fromString simpleConfig inputString =
-    Index.Load.loadIndex
-      (getIndexSimpleConfig simpleConfig)
-      inputString
+  Index.Load.loadIndex
+    (getIndexSimpleConfig simpleConfig)
+    inputString
 
 
 {-| Create an Index from a Value which has a stored Index in it.
@@ -386,7 +393,7 @@ The following Err results may be returned.
 -}
 fromStringWith : List (Config doc) -> String -> Result String (Index doc)
 fromStringWith =
-    Index.Load.loadIndexWith
+  Index.Load.loadIndexWith
 
 
 {-| Create an Index from a String which has a stored Index in it.
@@ -398,4 +405,4 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 -}
 fromValueWith : List (Config doc) -> Decode.Value -> Result String (Index doc)
 fromValueWith =
-    Index.Load.loadIndexValueWith
+  Index.Load.loadIndexValueWith

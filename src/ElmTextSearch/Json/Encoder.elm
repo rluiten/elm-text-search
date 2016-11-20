@@ -44,44 +44,45 @@ type and that is never encoded from an Index.
 -}
 encoder : (Index doc) -> Encode.Value
 encoder (Index irec) =
-    codecIndexRecordEncoder
-      { indexVersion = irec.indexVersion
-      , indexType = irec.indexType
-      , documentStore = irec.documentStore
-      , corpusTokens = irec.corpusTokens
-      , tokenStore = irec.tokenStore
-      }
+  codecIndexRecordEncoder
+    { indexVersion = irec.indexVersion
+    , indexType = irec.indexType
+    , documentStore = irec.documentStore
+    , corpusTokens = irec.corpusTokens
+    , tokenStore = irec.tokenStore
+    }
 
 
 {-| Encode CodecIndexRecord. -}
 codecIndexRecordEncoder : Model.CodecIndexRecord -> Encode.Value
 codecIndexRecordEncoder rec =
-    Encode.object
-      [ ("indexVersion", Encode.string rec.indexVersion)
-      , ("indexType", Encode.string rec.indexType)
-      , ("documentStore", documentStoreEncoder rec.documentStore)
-      , ("corpusTokens", corpusTokensEncoder rec.corpusTokens)
-      , ("tokenStore", tokenStore rec.tokenStore)
-      ]
+  Encode.object
+    [ ("indexVersion", Encode.string rec.indexVersion)
+    , ("indexType", Encode.string rec.indexType)
+    , ("documentStore", documentStoreEncoder rec.documentStore)
+    , ("corpusTokens", corpusTokensEncoder rec.corpusTokens)
+    , ("tokenStore", tokenStore rec.tokenStore)
+    ]
 
 
 documentStoreEncoder : (Dict String (Set String)) -> Encode.Value
 documentStoreEncoder dict =
-    Encode.object <|
-      List.map
-        (\(key, val) ->
-          ( key
-          , Encode.list
-            (List.map Encode.string (Set.toList val))
-          )
+  Encode.object <|
+    List.map
+      (\(key, val) ->
+        ( key
+        , Encode.list
+          (List.map Encode.string (Set.toList val))
         )
-        (Dict.toList dict)
+      )
+      (Dict.toList dict)
 
 
 corpusTokensEncoder : Set String -> Encode.Value
 corpusTokensEncoder setVal =
-    Encode.list (List.map Encode.string (Set.toList setVal))
+  Encode.list (List.map Encode.string (Set.toList setVal))
 
 
 tokenStore : Trie Float -> Encode.Value
-tokenStore = TrieEncoder.encoder Encode.float
+tokenStore =
+  TrieEncoder.encoder Encode.float

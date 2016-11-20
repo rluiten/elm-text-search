@@ -5,7 +5,6 @@ Copyright (c) 2016 Robin Luiten
 
 import ElmTextSearch
 import Html exposing (Html, div, text)
-import Html.App as Html
 
 
 {-| Example document type. -}
@@ -71,14 +70,14 @@ resultSearchIndex :
     , List (String, Float)
     )
 resultSearchIndex =
-  ElmTextSearch.search "title" (fst indexWithMulitpleDocumentsAdded)
+  ElmTextSearch.search "title" (Tuple.first indexWithMulitpleDocumentsAdded)
 
 
 {-| Display search result. -}
 main =
   let
     -- want only the search results not the returned index
-    searchResults = Result.map snd resultSearchIndex
+    searchResults = Result.map Tuple.second resultSearchIndex
   in
     div []
     [ text

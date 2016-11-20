@@ -1,12 +1,12 @@
 module TokenProcessors exposing
-    ( tokenizer
-    , tokenizerList
-    , tokenizerWith
-    , tokenizerWithList
-    , tokenizerWithRegex
-    , tokenizerWithRegexList
-    , trimmer
-    )
+  ( tokenizer
+  , tokenizerList
+  , tokenizerWith
+  , tokenizerWithList
+  , tokenizerWithRegex
+  , tokenizerWithRegexList
+  , trimmer
+  )
 
 {-| TokenProcessors for strings.
 
@@ -26,11 +26,11 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import Regex exposing
-    ( Regex
-    , HowMany(All)
-    , regex
-    , split
-    , replace)
+  ( Regex
+  , HowMany(All)
+  , regex
+  , split
+  , replace)
 import String exposing ( trim, toLower )
 
 
@@ -101,7 +101,7 @@ Supply your own String which is turned into a regex for splitting the string.
 -}
 tokenizerWith : String -> String -> List String
 tokenizerWith seperatorPattern =
-    tokenizerWithRegex (regex seperatorPattern)
+  tokenizerWithRegex (regex seperatorPattern)
 
 
 {-| Tokenize a List String.
@@ -112,7 +112,7 @@ Supply your own String which is turned into a regex for splitting the string.
 -}
 tokenizerWithList : String -> List String -> List String
 tokenizerWithList seperatorPattern =
-    tokenizerWithRegexList (regex seperatorPattern)
+  tokenizerWithRegexList (regex seperatorPattern)
 
 
 -- not sure want to do this here maybe it belongs elsewhere
@@ -125,4 +125,4 @@ tokenizerWithList seperatorPattern =
 -}
 trimmer : String -> String
 trimmer =
-    replace All (regex "^\\W+|\\W+$") (\_ -> "")
+  replace All (regex "^\\W+|\\W+$") (\_ -> "")

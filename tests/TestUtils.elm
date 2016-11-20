@@ -1,17 +1,18 @@
 module TestUtils exposing (..)
 
-import ElmTest exposing (..)
+import Expect
+import Test exposing (..)
 
 
-assertOk : Result String a -> Assertion
-assertOk result =
-    case result of
-      Ok _ -> assert True
-      Err _ -> assert False
+expectOk : Result String a -> Expect.Expectation
+expectOk result =
+  case result of
+    Ok _ -> Expect.true "Result Ok as expected" True
+    Err _ -> Expect.false "Result Err not expected" False
 
 
-assertErr : Result String a -> Assertion
-assertErr result =
-    case result of
-      Ok _ -> assert False
-      Err _ -> assert True
+expectErr : Result String a -> Expect.Expectation
+expectErr result =
+  case result of
+    Ok _ -> Expect.true "Result Ok not expected" False
+    Err _ -> Expect.false "Result Err as expected" True

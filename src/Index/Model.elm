@@ -68,29 +68,29 @@ The internal data model of Index
 
 -}
 type Index doc =
-    Index (IndexRecord doc)
+  Index (IndexRecord doc)
 
 
 {-| The Record model in an Index. -}
 type alias IndexRecord doc =
-    { indexVersion : String
+  { indexVersion : String
 
-    , indexType : String
-    , ref : doc -> String
-    , fields : List (doc -> String, Float)
-    , listFields : List (doc -> List String, Float)
-    , transformFactories : List (TransformFactory doc)
-    , filterFactories : List (FilterFactory doc)
+  , indexType : String
+  , ref : doc -> String
+  , fields : List (doc -> String, Float)
+  , listFields : List (doc -> List String, Float)
+  , transformFactories : List (TransformFactory doc)
+  , filterFactories : List (FilterFactory doc)
 
-    , documentStore : Dict String (Set String)
-    , corpusTokens : Set String
-    , tokenStore : Trie Float
+  , documentStore : Dict String (Set String)
+  , corpusTokens : Set String
+  , tokenStore : Trie Float
 
-    , corpusTokensIndex : Dict String Int
-    , transforms : Maybe (List TransformFunc)
-    , filters : Maybe (List FilterFunc)
-    , idfCache : Dict String Float
-    }
+  , corpusTokensIndex : Dict String Int
+  , transforms : Maybe (List TransformFunc)
+  , filters : Maybe (List FilterFunc)
+  , idfCache : Dict String Float
+  }
 
 
 {-| Simple index config with default token processing.
@@ -118,11 +118,11 @@ configured indexes you plan to use.
 ```
 -}
 type alias SimpleConfig doc =
-    { indexType : String
-    , ref : (doc -> String)
-    , fields : List (doc -> String, Float)
-    , listFields : List (doc -> List String, Float)
-    }
+  { indexType : String
+  , ref : (doc -> String)
+  , fields : List (doc -> String, Float)
+  , listFields : List (doc -> List String, Float)
+  }
 
 
 {-| Index config with customized token processing.
@@ -131,21 +131,21 @@ If a configuration does not match an index being loaded
 you will get an Err Result returned.
 -}
 type alias Config doc =
-    { indexType : String
-    , ref : doc -> String
-    , fields : List (doc -> String, Float)
-    , listFields : List (doc -> List String, Float)
-    , transformFactories : List (TransformFactory doc)
-    , filterFactories : List (FilterFactory doc)
-    }
+  { indexType : String
+  , ref : doc -> String
+  , fields : List (doc -> String, Float)
+  , listFields : List (doc -> List String, Float)
+  , transformFactories : List (TransformFactory doc)
+  , filterFactories : List (FilterFactory doc)
+  }
 
 
 {-| Just the fields encoded for an Index.
 -}
 type alias CodecIndexRecord =
-    { indexVersion : String
-    , indexType : String
-    , documentStore : Dict String (Set String)
-    , corpusTokens : Set String
-    , tokenStore : Trie Float
-    }
+  { indexVersion : String
+  , indexType : String
+  , documentStore : Dict String (Set String)
+  , corpusTokens : Set String
+  , tokenStore : Trie Float
+  }

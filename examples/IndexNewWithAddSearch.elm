@@ -6,7 +6,6 @@ Copyright (c) 2016 Robin Luiten
 
 import ElmTextSearch
 import Html exposing (Html, div, text)
-import Html.App as Html
 
 import Index.Defaults
 import StopWordFilter
@@ -83,8 +82,8 @@ firstResultSearchIndex :
     )
 firstResultSearchIndex =
   addDocToIndexExample
-    `Result.andThen`
-    (ElmTextSearch.search "explanation")
+    |> Result.andThen
+      (ElmTextSearch.search "explanation")
 
 
 {-| Search the index for a word that is not a stop word.
@@ -97,17 +96,17 @@ secondResultSearchIndex :
     )
 secondResultSearchIndex =
   addDocToIndexExample
-    `Result.andThen`
-    (ElmTextSearch.search "examples")
+    |> Result.andThen
+      (ElmTextSearch.search "examples")
 
 
 {-| Display search result. -}
 main =
   let
     searchResults1 =
-      Result.map snd firstResultSearchIndex
+      Result.map Tuple.second firstResultSearchIndex
     searchResults2 =
-      Result.map snd secondResultSearchIndex
+      Result.map Tuple.second secondResultSearchIndex
   in
     div []
     [ div []
