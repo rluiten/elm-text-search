@@ -142,20 +142,20 @@ updateDocVector
   -> (Index doc, SparseVector)
 updateDocVector docRef token ((Index irec as index, docVector) as inputTuple) =
   Maybe.withDefault inputTuple
-    ( (Dict.get token irec.corpusTokensIndex)
-        |> Maybe.andThen
-          ( \pos ->
-              (Trie.get token irec.tokenStore)
-                |> Maybe.andThen
-                  ( \refs ->
-                      (Dict.get docRef refs)
-                      |> Maybe.andThen
-                        ( \tf ->
-                            let
-                              (u1index, idfScore) = Index.Utils.idf index token
-                            in
-                              Just (u1index, SparseVector.insert pos (tf * idfScore) docVector)
-                        )
-                  )
-          )
+    ( Dict.get token irec.corpusTokensIndex
+      |> Maybe.andThen
+        ( \pos ->
+            Trie.get token irec.tokenStore
+              |> Maybe.andThen
+                ( \refs ->
+                    Dict.get docRef refs
+                    |> Maybe.andThen
+                      ( \tf ->
+                          let
+                            (u1index, idfScore) = Index.Utils.idf index token
+                          in
+                            Just (u1index, SparseVector.insert pos (tf * idfScore) docVector)
+                      )
+                )
+        )
     )
