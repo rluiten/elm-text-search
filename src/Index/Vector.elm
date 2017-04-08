@@ -18,7 +18,7 @@ for each token in our query tokens.
 
 Each token in our query will have a seperate Set String entry in
 the returned List. As all query token document result sets are
-intersected togethere for final list of documents matched. (a logical and
+intersected together for final list of documents matched. (a logical and
 of all the query tokens)
 -}
 getQueryVector :
@@ -34,7 +34,7 @@ getQueryVector fieldBoosts tokens index =
 
 
 {-
-Update query vector elements to create query vectory.
+Update query vector elements to create query vector.
 Update the list of documents that match for each query token (baseToken).
 -}
 buildDocVector :
@@ -135,27 +135,17 @@ getDocVector (Index irec as index) docRef =
 
 
 {- reducer for docRef docVector for this token -}
-updateDocVector
-  : String
-  -> String
-  -> (Index doc, SparseVector)
-  -> (Index doc, SparseVector)
+updateDocVector : String -> String -> (Index doc, SparseVector) -> (Index doc, SparseVector)
 updateDocVector docRef token ((Index irec as index, docVector) as inputTuple) =
-  Maybe.withDefault inputTuple
-    ( Dict.get token irec.corpusTokensIndex
-      |> Maybe.andThen
-        ( \pos ->
-            Trie.get token irec.tokenStore
-              |> Maybe.andThen
-                ( \refs ->
-                    Dict.get docRef refs
-                    |> Maybe.andThen
-                      ( \tf ->
-                          let
-                            (u1index, idfScore) = Index.Utils.idf index token
-                          in
-                            Just (u1index, SparseVector.insert pos (tf * idfScore) docVector)
-                      )
-                )
-        )
-    )
+  Maybe.withDefault inputTuple <|
+    Maybe.map2
+      ( \position termFrequency ->
+        let
+          (u1index, idfScore) = Index.Utils.idf index token
+        in
+          (u1index, SparseVector.insert position (termFrequency * idfScore) docVector)
+      )
+      (Dict.get token irec.corpusTokensIndex)
+      ( Trie.get token irec.tokenStore
+          |> Maybe.andThen ( Dict.get docRef )
+      )
