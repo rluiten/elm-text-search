@@ -60,19 +60,27 @@ getTokensList index listString =
 
 {-| Transform list of words into tokens for index and search.
 
-Applies transformers and filters configured in index.
+Applies filters and transformers configured in index.
+
+Applies filters first then tokenizers.
+So filtesr applie to untokenized words from document.
 
 -}
 processTokens : Index doc -> List String -> ( Index doc, List String )
-processTokens index rawTokens =
+processTokens index tokens =
     let
-        ( u1index, u1tokens ) =
-            applyTransform index rawTokens
+        ( u1index, initialTransformTokens ) =
+            applyInitialTransform index tokens
+
+        ( u2index, filterTokens ) =
+            applyFilter u1index initialTransformTokens
     in
-        applyFilter index u1tokens
+        applyTransform u2index filterTokens
 
 
 {-| Apply the transforms to tokens.
+If any transform converts a token to an empty string no further transforms
+are applied and the empty string is removed from the set of tokens.
 -}
 applyTransform : Index doc -> List String -> ( Index doc, List String )
 applyTransform index strings =
@@ -80,16 +88,17 @@ applyTransform index strings =
         ( u1index, transformList ) =
             getOrSetTransformList index
     in
-        ( u1index, List.map (applyTransformList transformList) strings )
+        ( u1index
+        , (List.filter
+            (\val -> val /= "")
+            (List.map (applyTransformList transformList) strings)
+          )
+        )
 
 
-
-{-
-   Would prefer to past just accessors (eg .transforms) to
-   getOrSetIndexFuncList but so far the types are beating me.
+{-| Would prefer to past just accessors (eg .transforms) to
+getOrSetIndexFuncList but so far the types are beating me.
 -}
-
-
 getOrSetTransformList : Index doc -> ( Index doc, List (String -> String) )
 getOrSetTransformList index =
     getOrSetIndexFuncList
@@ -99,13 +108,39 @@ getOrSetTransformList index =
         index
 
 
-
-{- set Index transforms func field -}
-
-
+{-| set Index transforms func field
+-}
 setIndexTransforms : Index doc -> List (String -> String) -> Index doc
 setIndexTransforms (Index irec) listFuncs =
     Index { irec | transforms = Just listFuncs }
+
+
+applyInitialTransform : Index doc -> List String -> ( Index doc, List String )
+applyInitialTransform index strings =
+    let
+        ( u1index, intitialTransformList ) =
+            getOrSetInitialTransformList index
+    in
+        ( u1index
+        , (List.filter
+            (\val -> val /= "")
+            (List.map (applyTransformList intitialTransformList) strings)
+          )
+        )
+
+
+getOrSetInitialTransformList : Index doc -> ( Index doc, List (String -> String) )
+getOrSetInitialTransformList index =
+    getOrSetIndexFuncList
+        (\(Index irec) -> irec.initialTransforms)
+        (\(Index irec) -> irec.initialTransformFactories)
+        setIndexInitialTransforms
+        index
+
+
+setIndexInitialTransforms : Index doc -> List (String -> String) -> Index doc
+setIndexInitialTransforms (Index irec) listFuncs =
+    Index { irec | initialTransforms = Just listFuncs }
 
 
 {-| Apply all transforms in sequence to input token.
@@ -130,7 +165,7 @@ applyTransformList transforms token =
                         ""
 
                     _ ->
-                        applyTransformList restTransforms (transform token)
+                        applyTransformList restTransforms newToken
 
 
 {-| Apply index filters to tokens.
@@ -156,10 +191,8 @@ getOrSetFilterList index =
         index
 
 
-
-{- set Index filters func field -}
-
-
+{-| set Index filters func field
+-}
 setIndexFilters : Index doc -> List (String -> Bool) -> Index doc
 setIndexFilters (Index irec) listFuncs =
     Index { irec | filters = Just listFuncs }
@@ -191,12 +224,9 @@ applyFilterList filters token =
                             applyFilterList restFilters token
 
 
-
-{- Get a list of functions from Index, if they have not been created
-   they are created and set on Index.
+{-| Get a list of functions from Index, if they have not been created
+they are created and set on Index.
 -}
-
-
 getOrSetIndexFuncList :
     (Index doc -> Maybe (List func))
     -> (Index doc -> List (FuncFactory doc func))
@@ -219,10 +249,8 @@ getOrSetIndexFuncList getFuncs getFactoryFuncs setFuncs index =
                 ( u2index, newFuncList )
 
 
-
-{- Run each of the function factories returning the list of functions. -}
-
-
+{-| Run each of the function factories returning the list of functions.
+-}
 runFactories : List (FuncFactory doc func) -> Index doc -> ( Index doc, List func )
 runFactories factoryList index =
     List.foldr

@@ -1,5 +1,6 @@
 module IndexLoadTests exposing (..)
 
+import Index.Defaults
 import Dict
 import Expect
 import Test exposing (..)
@@ -21,6 +22,7 @@ tests =
         [ loadIndexWithErr1 ()
         , loadIndexWithErr2 ()
         , loadIndexWith1 ()
+        , indexfromString1 ()
         ]
 
 
@@ -82,9 +84,10 @@ config1 =
         , ( .body, 1 )
         ]
     , listFields = []
+    , initialTransformFactories =
+        [ Index.Utils.createFuncCreator TokenProcessors.trimmer ]
     , transformFactories =
-        [ Index.Utils.createFuncCreator TokenProcessors.trimmer
-        , Index.Utils.createFuncCreator Stemmer.stem
+        [ Index.Utils.createFuncCreator Stemmer.stem
         ]
     , filterFactories =
         [ createMyStopWordFilter
@@ -100,9 +103,10 @@ config2 =
         , ( .body, 1 )
         ]
     , listFields = []
+    , initialTransformFactories =
+        [ Index.Utils.createFuncCreator TokenProcessors.trimmer ]
     , transformFactories =
-        [ Index.Utils.createFuncCreator TokenProcessors.trimmer
-        , Index.Utils.createFuncCreator Stemmer.stem
+        [ Index.Utils.createFuncCreator Stemmer.stem
         ]
     , filterFactories =
         [ createMyStopWordFilter
@@ -113,7 +117,7 @@ config2 =
 {-| encoded variants for testing load
 -}
 exampleJsonIndex100 =
-    "{\"indexVersion\":\"1.0.0\",\"indexType\":\"__IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
+    "{\"indexVersion\":\"1.1.0\",\"indexType\":\"__IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
 
 
 exampleJsonIndex101 =
@@ -128,10 +132,14 @@ exampleJsonIndex100default =
     "{\"indexVersion\":\"1.0.0\",\"indexType\":\"- IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
 
 
+jsonIndexDefault =
+    "{\"indexVersion\":\"1.0.0\",\"indexType\":\"__IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
+
+
 loadIndexWithErr1 _ =
     test "Fails to load an index with non indexVersion." <|
         \() ->
-            Expect.equal (Err ("Error cannot load Index. Version supported is 1.0.0. Version tried to load is 1.0.1.")) <|
+            Expect.equal (Err ("Error cannot load Index. Version supported is 1.1.0. Version tried to load is 1.0.1.")) <|
                 Index.Load.loadIndexWith
                     [ config1 ]
                     exampleJsonIndex101
@@ -158,7 +166,7 @@ loadIndexWith1 _ =
 
 
 indexfromString1 _ =
-    test "I can load index from sting with ElmTextSearch.SimpleConfig." <|
+    test "I can load index from string with ElmTextSearch.SimpleConfig." <|
         \() ->
             expectOk <|
                 ElmTextSearch.fromString

@@ -12,6 +12,7 @@ import IndexUtilsTests
 import SaveLoadTests
 import StopWordFilterTests
 import TokenProcessorTests
+import DefaultTests
 
 
 all : Test
@@ -29,4 +30,5 @@ all =
         , IndexDecoderTests.tests
         , IndexLoadTests.tests
         , SaveLoadTests.tests
+        , DefaultTests.tests
         ]

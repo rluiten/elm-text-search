@@ -8,6 +8,8 @@ module Index.Defaults
         , defaultStemmerFuncCreator
         , defaultStopWordFilterFuncCreator
         , getDefaultIndexConfig
+        , getIndexSimpleConfig
+        , defaultInitialTransformFactories
         )
 
 {-| Defaults for indexes and configurations.
@@ -26,18 +28,25 @@ module Index.Defaults
 @docs defaultTokenTrimmerFuncCreator
 @docs defaultStemmerFuncCreator
 @docs defaultStopWordFilterFuncCreator
+@docs defaultInitialTransformFactories
 
 
 ## Config type adapters
 
 @docs getDefaultIndexConfig
+@docs getIndexSimpleConfig
 
-Copyright (c) 2016 Robin Luiten
+Copyright (c) 2016-2017 Robin Luiten
 
 -}
 
 import Stemmer
-import Index.Model as Model exposing (TransformFactory, FilterFactory)
+import Index.Model as Model
+    exposing
+        ( TransformFactory
+        , FilterFactory
+        , IndexSimpleConfig
+        )
 import Index.Utils
 import StopWordFilter
 import TokenProcessors
@@ -54,7 +63,7 @@ well.
 -}
 indexVersion : String
 indexVersion =
-    "1.0.0"
+    "1.1.0"
 
 
 {-| The type of index defaults to using.
@@ -69,8 +78,15 @@ elmTextSearchIndexType =
 -}
 defaultTransformFactories : List (TransformFactory doc)
 defaultTransformFactories =
+    [ defaultStemmerFuncCreator
+    ]
+
+
+{-| Index default transform factories that apply before filters.
+-}
+defaultInitialTransformFactories : List (TransformFactory doc)
+defaultInitialTransformFactories =
     [ defaultTokenTrimmerFuncCreator
-    , defaultStemmerFuncCreator
     ]
 
 
@@ -104,16 +120,28 @@ defaultStopWordFilterFuncCreator =
     StopWordFilter.createDefaultFilterFunc
 
 
-{-| Convert Index.Model.SimpleConfig to Index.Model.Config
+{-| Convert Index.Model.ModelSimpleConfig to Index.Model.Config
 Filling in default values for fields not in SimpleConfig
 This is the definition of the default index configuration.
 -}
-getDefaultIndexConfig : Model.SimpleConfig doc -> Model.Config doc
+getDefaultIndexConfig : Model.ModelSimpleConfig doc -> Model.Config doc
 getDefaultIndexConfig { indexType, ref, fields, listFields } =
     { indexType = indexType
     , ref = ref
     , fields = fields
     , listFields = listFields
+    , initialTransformFactories = defaultInitialTransformFactories
     , transformFactories = defaultTransformFactories
     , filterFactories = defaultFilterFactories
+    }
+
+
+{-| convert ElmTextSearch.IndexSimpleConfig to Index.Model.ModelSimpleConfig
+-}
+getIndexSimpleConfig : IndexSimpleConfig doc -> Model.ModelSimpleConfig doc
+getIndexSimpleConfig { ref, fields, listFields } =
+    { indexType = elmTextSearchIndexType
+    , ref = ref
+    , fields = fields
+    , listFields = listFields
     }

@@ -95,29 +95,18 @@ type alias Index doc =
 
 {-| A SimpleConfig is the least amount of configuration data
 required to create an Index.
+
+See [`ElmTextSearch.new`](ElmTextSearch#new) for fields.
+
 -}
 type alias SimpleConfig doc =
-    { ref : doc -> String
-    , fields : List ( doc -> String, Float )
-    , listFields : List ( doc -> List String, Float )
-    }
+    Model.IndexSimpleConfig doc
 
 
 {-| A Config is required to create an Index.
 -}
 type alias Config doc =
     Model.Config doc
-
-
-{-| convert ElmTextSearch.SimpleConfig to Index.Model.SimpleConfig
--}
-getIndexSimpleConfig : SimpleConfig doc -> Model.SimpleConfig doc
-getIndexSimpleConfig { ref, fields, listFields } =
-    { indexType = Defaults.elmTextSearchIndexType
-    , ref = ref
-    , fields = fields
-    , listFields = listFields
-    }
 
 
 {-| Create new index.
@@ -155,6 +144,7 @@ The `SimpleConfig` parameter to new is
       - The unique document reference will be extracted from each
         document using `.cid`.
   - fields
+      - Define which fields contain a strings to be indexed.
       - The following fields will be indexed from each document
           - `.title`
           - `.body`
@@ -163,11 +153,13 @@ The `SimpleConfig` parameter to new is
         more than if found in the `.body` field (boost value 1.0).
           - The document match score determines the order of the list
             of matching documents returned.
+  - listFields
+      - Define which fields contain list of strings to be indexed.
 
 -}
 new : SimpleConfig doc -> Index doc
 new simpleConfig =
-    Index.new (getIndexSimpleConfig simpleConfig)
+    Index.new (Defaults.getIndexSimpleConfig simpleConfig)
 
 
 {-| Create new index with additional configuration.
@@ -199,6 +191,7 @@ Example.
                 , ( .body, 1.0 )
                 ]
             , listFields = []
+            , initialTransformFactories = Index.Defaults.defaultInitialTransformFactories
             , transformFactories = Index.Defaults.defaultTransformFactories
             , filterFactories = [ createMyStopWordFilter ]
             }
@@ -367,7 +360,7 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 fromString : SimpleConfig doc -> String -> Result String (Index doc)
 fromString simpleConfig inputString =
     Index.Load.loadIndex
-        (getIndexSimpleConfig simpleConfig)
+        (Defaults.getIndexSimpleConfig simpleConfig)
         inputString
 
 
@@ -377,7 +370,7 @@ See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible 
 fromValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
 fromValue simpleConfig inputValue =
     Index.Load.loadIndexValue
-        (getIndexSimpleConfig simpleConfig)
+        (Defaults.getIndexSimpleConfig simpleConfig)
         inputValue
 
 

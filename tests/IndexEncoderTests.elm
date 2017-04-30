@@ -115,37 +115,16 @@ doc1List : () -> MyDocList
 doc1List _ =
     { cid = "doc1"
     , title = "Examples of a Banana"
-
-    --, subTitle = "Wizard Courier"
     , author = "Sally Apples"
     , body =
         [ "Sally writes words "
         , "about a grown banana."
         ]
-
-    --, bodyExtra =
-    --  [ "Demon Hunter "
-    --  , "Green Mango."
-    --  ]
     }
 
 
-
--- _ = Debug.log("index1") (index1)
--- _ = Debug.log("encoder index1")
---     (
---       let
---         a = 1
---         encodedTrie = Encode.encode 0
---             (IndexEncoder.encoder (safeIndex index1))
---
---       in
---         encodedTrie
---     )
-
-
 encodedIndex =
-    "{\"indexVersion\":\"1.0.0\",\"indexType\":\"- IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
+    "{\"indexVersion\":\"1.1.0\",\"indexType\":\"- IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}"
 
 
 encoder1 _ =
@@ -166,15 +145,3 @@ encoder1List _ =
                 (Encode.encode 0
                     (IndexEncoder.encoder (safeIndexList index1List))
                 )
-
-
-{-| tweaked version of encoder1 string to look at.
--}
-a =
-    """
-    "{"indexVersion":"1.0.0"
-    ,"indexType":"- IndexTest Type -"
-    ,"documentStore":{"doc1":["banana","exampl","grown","salli","word","write"]}
-    ,"corpusTokens":["banana","exampl","grown","salli","word","write"]
-    ,"tokenStore":{"b":{"a":{"n":{"a":{"n":{"a":{"doc1":2.7}}}}}},"e":{"x":{"a":{"m":{"p":{"l":{"doc1":2.5}}}}}},"g":{"r":{"o":{"w":{"n":{"doc1":0.2}}}}},"s":{"a":{"l":{"l":{"i":{"doc1":0.2}}}}},"w":{"o":{"r":{"d":{"doc1":0.2}}},"r":{"i":{"t":{"e":{"doc1":0.2}}}}}}}"
-  """

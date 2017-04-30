@@ -5,27 +5,24 @@ Copyright (c) 2016-2017 Robin Luiten
 This is a full text indexing engine inspired by lunr.js and written in Elm language.
 See http://lunrjs.com/ for lunr.js
 
-While ElmTextSearch has a good selection of tests this library is not battle tested and may contain some performance issues that need addressing.
+While ElmTextSearch has a good selection of tests this library is not battle tested and may contain some performance issues.
 
-### Upgrading from 2.1.2 to 3.0.0.
+I am happy to hear about users of this package.
 
-Add `listFields = []` to your Configuration and that should be all thats required.
+I am happy to receive contributions be they bug reports, pull requests, documention updates or examples.
 
-* New field in Config is listFields for doc fields of type `List String`
+### v4.0.0 will not load indexes saved with old version.
 
-Example of updated config passed to create Index.
-```elm
-createNewIndexExample : ElmTextSearch.Index ExampleDocType
-createNewIndexExample =
-  ElmTextSearch.new
-    { ref = .cid
-    , fields =
-        [ ( .title, 5.0 )
-        , ( .body, 1.0 )
-        ]
-    , listFields = []
-    }
-```
+If you do not use `storeToValue` `storeToString` `fromString` `fromValue` in ElmTextSearch this update is not likely to introduce issues.
+
+The way that filters and transforms are applied to the content of documents has changed.
+This is to properly fix a bug reported see https://github.com/rluiten/elm-text-search/issues/10 where stop word filters werer not correctly applied. This means saved indexes from prevoius version of ElmTextSearch will not load in this version.
+
+* `Defaults.indexVersion` has changed value.
+
+The reason this is a Major version bump is some generalisation was done to enable future support
+for loading and saving of older version and types of default index confgurations.
+
 
 ### Packages
 

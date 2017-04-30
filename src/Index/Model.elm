@@ -6,7 +6,7 @@ module Index.Model exposing (..)
 @docs IndexSimpleConfig
 @docs IndexConfig
 
-Copyright (c) 2016 Robin Luiten
+Copyright (c) 2016-2017 Robin Luiten
 
 -}
 
@@ -60,6 +60,11 @@ The internal data model of Index
           - first field is function to get List String content of field
           - second field Float is a boost to text frequency of tokens in this field
 
+  - initialTransformFactories
+      - list of factory functions to create transform functions
+      - this list is of transforms is applied before filters
+      - the ones in `transformFactories` are applied after filters
+
   - transformFactories
       - list of factory functions to create transform functions
 
@@ -105,12 +110,14 @@ type alias IndexRecord doc =
     , ref : doc -> String
     , fields : List ( doc -> String, Float )
     , listFields : List ( doc -> List String, Float )
+    , initialTransformFactories : List (TransformFactory doc)
     , transformFactories : List (TransformFactory doc)
     , filterFactories : List (FilterFactory doc)
     , documentStore : Dict String (Set String)
     , corpusTokens : Set String
     , tokenStore : Trie Float
     , corpusTokensIndex : Dict String Int
+    , initialTransforms : Maybe (List TransformFunc)
     , transforms : Maybe (List TransformFunc)
     , filters : Maybe (List FilterFunc)
     , idfCache : Dict String Float
@@ -142,7 +149,7 @@ configured indexes you plan to use.
     Index.Defaults.defaultFilterFactories
 
 -}
-type alias SimpleConfig doc =
+type alias ModelSimpleConfig doc =
     { indexType : String
     , ref : doc -> String
     , fields : List ( doc -> String, Float )
@@ -161,6 +168,7 @@ type alias Config doc =
     , ref : doc -> String
     , fields : List ( doc -> String, Float )
     , listFields : List ( doc -> List String, Float )
+    , initialTransformFactories : List (TransformFactory doc)
     , transformFactories : List (TransformFactory doc)
     , filterFactories : List (FilterFactory doc)
     }
@@ -174,4 +182,14 @@ type alias CodecIndexRecord =
     , documentStore : Dict String (Set String)
     , corpusTokens : Set String
     , tokenStore : Trie Float
+    }
+
+
+{-| A SimpleConfig is the least amount of configuration data
+required to create an Index.
+-}
+type alias IndexSimpleConfig doc =
+    { ref : doc -> String
+    , fields : List ( doc -> String, Float )
+    , listFields : List ( doc -> List String, Float )
     }

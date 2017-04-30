@@ -63,7 +63,7 @@ type alias Config doc =
 
 
 type alias SimpleConfig doc =
-    Model.SimpleConfig doc
+    Model.ModelSimpleConfig doc
 
 
 {-| Create new index.
@@ -77,15 +77,17 @@ new simpleConfig =
 {-| Create new index with control of transformers and filters.
 -}
 newWith : Config doc -> Index doc
-newWith { indexType, ref, fields, listFields, transformFactories, filterFactories } =
+newWith { indexType, ref, fields, listFields, initialTransformFactories, transformFactories, filterFactories } =
     Index
         { indexVersion = Defaults.indexVersion
         , indexType = indexType
         , ref = ref
         , fields = fields
         , listFields = listFields
+        , initialTransformFactories = initialTransformFactories
         , transformFactories = transformFactories
         , filterFactories = filterFactories
+        , initialTransforms = Nothing
         , transforms = Nothing
         , filters = Nothing
         , corpusTokens = Set.empty
@@ -117,21 +119,17 @@ add doc ((Index irec) as index) =
                         ( index, [] )
                         (List.map Tuple.first irec.fields)
 
-                -- _ = Debug.log "fieldsWordList" fieldsWordList
                 ( u2index, u2fieldsWordList ) =
                     List.foldr
                         (getWordsForFieldList doc)
                         ( u1index, fieldsWordList )
                         (List.map Tuple.first irec.listFields)
 
-                -- _ = Debug.log "u2fieldsWordList" u2fieldsWordList
                 fieldsTokens =
                     List.map Set.fromList u2fieldsWordList
 
                 docTokens =
                     List.foldr Set.union Set.empty fieldsTokens
-
-                -- _ = Debug.log("add docTokens") (docTokens)
             in
                 if Set.isEmpty docTokens then
                     Err "Error after tokenisation there are no terms to index."
@@ -173,7 +171,7 @@ addDocsCore docsI docs ((Index irec) as index) errors =
                     addDocsCore (docsI + 1) tailDocs index (errors ++ [ ( docsI, msg ) ])
 
 
-{-| reducer to extract tokens from each field Strin from doc
+{-| reducer to extract tokens from each field String from doc
 -}
 getWordsForField :
     doc

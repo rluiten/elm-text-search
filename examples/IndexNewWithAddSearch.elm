@@ -59,6 +59,7 @@ createNewWithIndexExample =
             , ( .body, 1.0 )
             ]
         , listFields = []
+        , initialTransformFactories = Index.Defaults.defaultInitialTransformFactories
         , transformFactories = Index.Defaults.defaultTransformFactories
         , filterFactories = [ createMyStopWordFilter ]
         }

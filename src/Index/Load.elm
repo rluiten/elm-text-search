@@ -2,7 +2,7 @@ module Index.Load exposing (..)
 
 {-| Load an index from Value or String
 
-Copyright (c) 2016 Robin Luiten
+Copyright (c) 2016-2017 Robin Luiten
 
 -}
 
@@ -94,6 +94,7 @@ loadIndexFull ( config, decodedIndex ) =
             , ref = config.ref
             , fields = config.fields
             , listFields = config.listFields
+            , initialTransformFactories = config.initialTransformFactories
             , transformFactories = config.transformFactories
             , filterFactories = config.filterFactories
             , documentStore = decodedIndex.documentStore
@@ -101,20 +102,21 @@ loadIndexFull ( config, decodedIndex ) =
             , tokenStore = decodedIndex.tokenStore
             , corpusTokensIndex =
                 (Index.Utils.buildOrderIndex decodedIndex.corpusTokens)
+            , initialTransforms = Nothing
             , transforms = Nothing
             , filters = Nothing
             , idfCache = Dict.empty
             }
 
 
-loadIndex : SimpleConfig doc -> String -> Result String (Index doc)
+loadIndex : ModelSimpleConfig doc -> String -> Result String (Index doc)
 loadIndex simpleConfig inputString =
     loadIndexWith
         [ Defaults.getDefaultIndexConfig simpleConfig ]
         inputString
 
 
-loadIndexValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
+loadIndexValue : ModelSimpleConfig doc -> Decode.Value -> Result String (Index doc)
 loadIndexValue simpleConfig inputValue =
     loadIndexValueWith
         [ Defaults.getDefaultIndexConfig simpleConfig ]

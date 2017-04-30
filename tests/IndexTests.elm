@@ -182,7 +182,7 @@ doc5 _ =
 
 
 searchCases =
-    [ ( "two docs one with term in title first"
+    [ ( "two docs one with term in title first and body second"
       , "example"
       , [ "doc1", "doc2" ]
       , (safeIndex index2)
@@ -224,16 +224,16 @@ searchTest ( name, input, expect, index ) =
     test ("search \"" ++ input ++ "\" " ++ name) <|
         \() ->
             Expect.equal expect <|
-                let
-                    result =
-                        Index.search input index
-                in
-                    case result of
-                        Ok ( index, docs ) ->
-                            (List.map Tuple.first docs)
+                case (Index.search input index) of
+                    Ok ( index, docs ) ->
+                        (List.map Tuple.first docs)
 
-                        Err _ ->
-                            ([])
+                    Err err ->
+                        [ err ]
+
+
+
+-- [ "Index.search returned Error" ]
 
 
 searchErr1 _ =
@@ -355,12 +355,10 @@ docQ2 =
     }
 
 
-
--- Case from https://github.com/rluiten/elm-text-search/issues/4
--- Two docs with titles Question1 and Question2
--- "q" search was not returning both documents.
-
-
+{-| Case from <https://github.com/rluiten/elm-text-search/issues/4>
+Two docs with titles Question1 and Question2
+"q" search was not returning both documents.
+-}
 searchDocsTest _ =
     let
         ( index, _ ) =

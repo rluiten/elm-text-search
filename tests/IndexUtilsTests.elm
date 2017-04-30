@@ -36,11 +36,12 @@ tests : Test
 tests =
     describe "Index.Utils tests"
         [ describe "apply default transform tests"
-            (List.map testDefaultTransforms defaultTransformCases)
+            (List.map testGetTokens getTokensCases)
+        , testApplyTransform
         ]
 
 
-defaultTransformCases =
+getTokensCases =
     [ ( "words of only non word chars removed"
       , "engineering ???"
       , [ "engin" ]
@@ -53,16 +54,53 @@ defaultTransformCases =
       , "however among the dear .- -"
       , []
       )
+    , ( "\"on\" in the stop word list should not filter \"one\" (https://github.com/rluiten/elm-text-search/issues/10)"
+      , "one two three"
+        -- note that "one" is transformed to "on" by stemmer
+      , [ "on", "two", "three" ]
+      )
     ]
 
 
-testDefaultTransforms ( name, input, expected ) =
+testGetTokens ( name, input, expected ) =
+    test ("getTokens \"" ++ input ++ "\" " ++ name) <|
+        \() ->
+            Expect.equal
+                expected
+                (Tuple.second (Index.Utils.getTokens index0 input))
+
+
+{-| A test index, to ensure all transform factories are applied.
+-}
+index1removeLast3Transform : Index MyDoc
+index1removeLast3Transform =
     let
-        a =
-            1
+        removeLastCharFuncCreator =
+            Index.Utils.createFuncCreator (String.dropRight 1)
     in
-        test ("getTokens \"" ++ input ++ "\" " ++ name) <|
-            \() ->
-                Expect.equal
-                    expected
-                    (Tuple.second (Index.Utils.getTokens index0 input))
+        Index.newWith
+            { indexType = "- IndexTest Type -"
+            , ref = .cid
+            , fields =
+                [ ( .title, 5 )
+                , ( .body, 1 )
+                ]
+            , listFields = []
+            , initialTransformFactories = []
+            , transformFactories =
+                [ removeLastCharFuncCreator
+                , removeLastCharFuncCreator
+                ]
+            , filterFactories = []
+            }
+
+
+testApplyTransform =
+    test "test applyTransform applies all to words input" <|
+        \() ->
+            Expect.equal
+                [ "wor", "testi" ]
+                (Tuple.second <|
+                    Index.Utils.applyTransform index1removeLast3Transform
+                        [ "words", "testing", "a" ]
+                )

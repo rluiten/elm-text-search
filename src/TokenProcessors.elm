@@ -127,7 +127,7 @@ tokenizerWithList seperatorPattern =
 -- tokenizerArray = List.map toLower
 
 
-{-| Remove non word characters from start end of tokens
+{-| Remove non word characters from start and end of tokens
 -}
 trimmer : String -> String
 trimmer =

@@ -8,12 +8,9 @@ This is intended to be used in the ElmTextSearch token processing pipeline.
 
 ### Things to know about stop word lists.
 
-  - Input tokens to create stop word filters should be full words, if you
-    dont know the transform steps for index or if you use the list with different
-    sets of transforms.
-  - If you know the exact transform process of your Index you can prerun the
-    transform process to generate your word list, which in theory might
-    make it a little more efficient.
+  - Words in document are split on white space to create tokens.
+  - Tokens have non word characters from prefix and suffix to improve matching filters.
+  - Input tokens to create stop word filters should be full words.
   - It is more efficient to merge all your stop words into a single
     stop word filter.
 
@@ -196,10 +193,7 @@ So words found in the stopWordList return False
 createFilterFunc : List String -> FilterFactory doc
 createFilterFunc tokens index =
     let
-        ( u1index, tokensU1 ) =
-            Index.Utils.applyTransform index tokens
-
         tokenSet =
-            Set.fromList tokensU1
+            Set.fromList tokens
     in
-        ( u1index, \word -> not (Set.member word tokenSet) )
+        ( index, \word -> not (Set.member word tokenSet) )

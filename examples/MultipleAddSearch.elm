@@ -2,7 +2,7 @@ module Main exposing (..)
 
 {-| Create an index and add multiple documents.
 
-Copyright (c) 2016 Robin Luiten
+Copyright (c) 2016-2017 Robin Luiten
 
 -}
 
