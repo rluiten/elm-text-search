@@ -1,23 +1,22 @@
-module ElmTextSearch
-    exposing
-        ( Index
-        , SimpleConfig
-        , Config
-        , new
-        , newWith
-        , add
-        , addDocs
-        , remove
-        , update
-        , search
-        , storeToValue
-        , storeToString
-        , fromString
-        , fromValue
-        , fromStringWith
-        , fromValueWith
-        , addOrUpdate
-        )
+module ElmTextSearch exposing
+    ( new
+    , newWith
+    , add
+    , addDocs
+    , remove
+    , update
+    , addOrUpdate
+    , search
+    , Index
+    , Config
+    , SimpleConfig
+    , storeToValue
+    , storeToString
+    , fromString
+    , fromValue
+    , fromStringWith
+    , fromValueWith
+    )
 
 {-| A full text indexer written in Elm language inspired by lunr.js.
 
@@ -60,8 +59,8 @@ A useful article about lunr.js
     to produce a [`Index.Model.CodecIndexRecord`](Index.Model#CodecIndexRecord).
   - You can save a [`Index.Model.CodecIndexRecord`](Index.Model#CodecIndexRecord)
     using [`ElmTextSearch.Json.Encoder.codecIndexRecordEncoder`](ElmTextSearch.Json.Encoder#codecIndexRecordEncoder)
-  - ** Modifying an index outside of ElmTextSearch using the Decoder and Encoder directly
-    may cause it to not work correctly loaded into ElmTextSearch. **
+  - \*\* Modifying an index outside of ElmTextSearch using the Decoder and Encoder directly
+    may cause it to not work correctly loaded into ElmTextSearch. \*\*
 
 @docs storeToValue
 @docs storeToString
@@ -70,18 +69,18 @@ A useful article about lunr.js
 @docs fromStringWith
 @docs fromValueWith
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Json.Decode as Decode
-import Json.Encode as Encode
 import ElmTextSearch.Json.Encoder as IndexEncoder
 import Index
 import Index.Defaults as Defaults
 import Index.Load
 import Index.Model as Model
 import Index.Utils
+import Json.Decode as Decode
+import Json.Encode as Encode
 import Stemmer
 import StopWordFilter
 import TokenProcessors
@@ -357,7 +356,7 @@ storeToString index =
 supplied basic configurations.
 See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
-fromString : SimpleConfig doc -> String -> Result String (Index doc)
+fromString : SimpleConfig doc -> String -> Result Decode.Error (Index doc)
 fromString simpleConfig inputString =
     Index.Load.loadIndex
         (Defaults.getIndexSimpleConfig simpleConfig)
@@ -367,7 +366,7 @@ fromString simpleConfig inputString =
 {-| Create an Index from a Value which has a stored Index in it.
 See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 -}
-fromValue : SimpleConfig doc -> Decode.Value -> Result String (Index doc)
+fromValue : SimpleConfig doc -> Decode.Value -> Result Decode.Error (Index doc)
 fromValue simpleConfig inputValue =
     Index.Load.loadIndexValue
         (Defaults.getIndexSimpleConfig simpleConfig)
@@ -389,13 +388,13 @@ it will still load the index.
 
 The following Err results may be returned.
 
-  - "Error cannot load Index. Tried to load index of type "__IndexTest Type -". It is not in supported index configurations."
+  - "Error cannot load Index. Tried to load index of type "\_\_IndexTest Type -". It is not in supported index configurations."
       - It contains the loaded version index type which comes from input.
   - "Error cannot load Index. Version supported is 1.0.0. Version tried to load is 1.0.1."
       - It includes both expected and loaded versions which may vary.
 
 -}
-fromStringWith : List (Config doc) -> String -> Result String (Index doc)
+fromStringWith : List (Config doc) -> String -> Result Decode.Error (Index doc)
 fromStringWith =
     Index.Load.loadIndexWith
 
@@ -407,6 +406,6 @@ being decoded it will return an Err.
 See [`ElmTextSearch.fromStringWith`](ElmTextSearch#fromStringWith) for possible Err results.
 
 -}
-fromValueWith : List (Config doc) -> Decode.Value -> Result String (Index doc)
+fromValueWith : List (Config doc) -> Decode.Value -> Result Decode.Error (Index doc)
 fromValueWith =
     Index.Load.loadIndexValueWith

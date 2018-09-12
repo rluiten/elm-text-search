@@ -1,7 +1,15 @@
-module TokenProcessorTests exposing (..)
+module TokenProcessorTests exposing (TokenArrayCase, TokenCase, tests, tokenCases, tokenizerTest, trimmerCases, trimmerTest)
 
 import Expect
-import Regex exposing (regex)
+import Regex
+    exposing
+        ( Regex
+          -- , HowMany(..)
+        , fromString
+        , never
+        , replace
+        , split
+        )
 import Test exposing (..)
 import TokenProcessors
 
@@ -17,10 +25,10 @@ type alias TokenArrayCase =
 tests : Test
 tests =
     describe "Lunr TokenProcessors tests" <|
-        ((List.map tokenizerTest tokenCases)
+        (List.map tokenizerTest tokenCases
             ++ -- (List.map tokenizerArrayTest tokenArrayCases)
                -- ++
-               (List.map trimmerTest trimmerCases)
+               List.map trimmerTest trimmerCases
         )
 
 

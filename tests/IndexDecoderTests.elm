@@ -1,11 +1,11 @@
-module IndexDecoderTests exposing (..)
+module IndexDecoderTests exposing (decodeIndex1, exampleJsonIndex1, tests)
 
+import ElmTextSearch.Json.Decoder as IndexDecoder
+import ElmTextSearch.Json.Encoder as IndexEncoder
 import Expect
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Test exposing (..)
-import ElmTextSearch.Json.Decoder as IndexDecoder
-import ElmTextSearch.Json.Encoder as IndexEncoder
 
 
 tests : Test
@@ -41,8 +41,8 @@ decodeIndex1 _ =
 
         -- _ = Debug.log ("decodeIndex1") (resultStr)
     in
-        test "decode exampleJsonIndex1" <|
-            \() ->
-                Expect.equal
-                    (Ok "{\"indexVersion\":\"1.0.0\",\"indexType\":\"- IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}")
-                    resultStr
+    test "decode exampleJsonIndex1" <|
+        \() ->
+            Expect.equal
+                (Ok "{\"indexVersion\":\"1.0.0\",\"indexType\":\"- IndexTest Type -\",\"documentStore\":{\"doc1\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"]},\"corpusTokens\":[\"banana\",\"exampl\",\"grown\",\"salli\",\"word\",\"write\"],\"tokenStore\":{\"b\":{\"a\":{\"n\":{\"a\":{\"n\":{\"a\":{\"doc1\":2.7}}}}}},\"e\":{\"x\":{\"a\":{\"m\":{\"p\":{\"l\":{\"doc1\":2.5}}}}}},\"g\":{\"r\":{\"o\":{\"w\":{\"n\":{\"doc1\":0.2}}}}},\"s\":{\"a\":{\"l\":{\"l\":{\"i\":{\"doc1\":0.2}}}}},\"w\":{\"o\":{\"r\":{\"d\":{\"doc1\":0.2}}},\"r\":{\"i\":{\"t\":{\"e\":{\"doc1\":0.2}}}}}}}")
+                resultStr

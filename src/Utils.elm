@@ -1,13 +1,10 @@
-module Utils
-    exposing
-        ( intersectSets
-        )
+module Utils exposing (intersectSets)
 
 {-| Some misc utils
 
 @docs intersectSets
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 

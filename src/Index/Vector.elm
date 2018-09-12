@@ -1,19 +1,19 @@
-module Index.Vector exposing (..)
+module Index.Vector exposing (buildDocVector, getDocVector, getQueryVector, scoreAndCompare, similarityBoost, updateDocVector, updateSetAndVec)
 
 {-| Index document vector support.
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
 import Dict exposing (Dict)
+import Index.Model exposing (Index(..))
+import Index.Utils
 import Maybe
 import Set exposing (Set)
 import SparseVector exposing (SparseVector)
 import String
 import Trie exposing (Trie)
-import Index.Model exposing (Index(..))
-import Index.Utils
 
 
 {-| Build a query vector and the sets of candidate document matches
@@ -50,8 +50,8 @@ buildDocVector tokensLength fieldBoosts baseToken ( docSets, vec, (Index irec) a
     let
         termFrequency =
             1
-                / (toFloat tokensLength)
-                * (toFloat (List.length irec.fields))
+                / toFloat tokensLength
+                * toFloat (List.length irec.fields)
                 * fieldBoosts
 
         expandedTokens =
@@ -64,7 +64,7 @@ buildDocVector tokensLength fieldBoosts baseToken ( docSets, vec, (Index irec) a
                 ( Set.empty, vec, index )
                 expandedTokens
     in
-        ( docs :: docSets, vecU1, indexU1 )
+    ( docs :: docSets, vecU1, indexU1 )
 
 
 {-| Calculate Term frequency-inverse document frequency (tf-idf).
@@ -82,14 +82,14 @@ updateSetAndVec tf token expandedToken ( docSets, vec, (Index irec) as index ) =
             Index.Utils.idf index expandedToken
 
         tfidf =
-            tf * keyIdf * (similarityBoost token expandedToken)
+            tf * keyIdf * similarityBoost token expandedToken
 
         -- _ = Debug.log("updateSetAndVec") (tf, token, expandedToken, (similarityBoost token expandedToken), keyIdf, tfidf)
         -- _ = Debug.log("updateSetAndVec corpus") (irec.corpusTokensIndex)
         u1vec =
             Maybe.withDefault vec <|
                 Maybe.map
-                    (\pos -> (SparseVector.insert pos tfidf vec))
+                    (\pos -> SparseVector.insert pos tfidf vec)
                     (Dict.get expandedToken irec.corpusTokensIndex)
 
         expandedTokenDocSet =
@@ -103,7 +103,7 @@ updateSetAndVec tf token expandedToken ( docSets, vec, (Index irec) as index ) =
 
         -- _ = Debug.log("updateSetAndVec u1docSets u1vec") (expandedToken, u1docSets, u1vec)
     in
-        ( u1docSets, u1vec, u1index )
+    ( u1docSets, u1vec, u1index )
 
 
 {-| if the expanded token is not an exact match to the token then
@@ -114,17 +114,17 @@ similarityBoost : String -> String -> Float
 similarityBoost token expandedToken =
     if expandedToken == token then
         1
+
     else
         1
-            / (logBase 10
+            / logBase 10
                 (toFloat
                     (max 3
-                        ((String.length expandedToken)
-                            - (String.length token)
+                        (String.length expandedToken
+                            - String.length token
                         )
                     )
                 )
-              )
 
 
 {-| calculate the score for each doc
@@ -141,7 +141,7 @@ scoreAndCompare queryVector ref ( index, docs ) =
 
         -- _ = Debug.log("scoreAndCompare") (docVector)
     in
-        ( u1index, ( ref, SparseVector.cosineSimilarity queryVector docVector ) :: docs )
+    ( u1index, ( ref, SparseVector.cosineSimilarity queryVector docVector ) :: docs )
 
 
 {-| build vector for docRef
@@ -170,7 +170,7 @@ updateDocVector docRef token (( (Index irec) as index, docVector ) as inputTuple
                     ( u1index, idfScore ) =
                         Index.Utils.idf index token
                 in
-                    ( u1index, SparseVector.insert position (termFrequency * idfScore) docVector )
+                ( u1index, SparseVector.insert position (termFrequency * idfScore) docVector )
             )
             (Dict.get token irec.corpusTokensIndex)
             (Trie.get token irec.tokenStore

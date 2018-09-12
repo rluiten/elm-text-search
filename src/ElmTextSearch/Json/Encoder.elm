@@ -1,21 +1,24 @@
-module ElmTextSearch.Json.Encoder exposing (encoder, codecIndexRecordEncoder)
+module ElmTextSearch.Json.Encoder exposing
+    ( encoder
+    , codecIndexRecordEncoder
+    )
 
 {-| Encoder for Index.
 
 @docs encoder
 @docs codecIndexRecordEncoder
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
 import Dict exposing (Dict)
+import Index
+import Index.Model as Model exposing (Index(..))
 import Json.Encode as Encode
 import Set exposing (Set)
 import Trie exposing (Trie)
 import Trie.Json.Encoder as TrieEncoder
-import Index
-import Index.Model as Model exposing (Index(Index))
 
 
 {-| Encoder for Index a.
@@ -76,8 +79,7 @@ documentStoreEncoder dict =
         List.map
             (\( key, val ) ->
                 ( key
-                , Encode.list
-                    (List.map Encode.string (Set.toList val))
+                , Encode.list Encode.string (Set.toList val)
                 )
             )
             (Dict.toList dict)
@@ -85,8 +87,7 @@ documentStoreEncoder dict =
 
 corpusTokensEncoder : Set String -> Encode.Value
 corpusTokensEncoder setVal =
-    Encode.list (List.map Encode.string (Set.toList setVal))
-
+    Encode.list Encode.string (Set.toList setVal)
 
 tokenStore : Trie Float -> Encode.Value
 tokenStore =

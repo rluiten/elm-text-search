@@ -1,15 +1,14 @@
-module Index.Utils
-    exposing
-        ( createFuncCreator
-        , getTokens
-        , getTokensList
-        , processTokens
-        , applyTransform
-        , applyFilter
-        , idf
-        , refExists
-        , buildOrderIndex
-        )
+module Index.Utils exposing
+    ( createFuncCreator
+    , getTokens
+    , getTokensList
+    , processTokens
+    , applyTransform
+    , applyFilter
+    , idf
+    , refExists
+    , buildOrderIndex
+    )
 
 {-| Index Utilities
 
@@ -26,16 +25,16 @@ module Index.Utils
 @docs refExists
 @docs buildOrderIndex
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
 import Dict exposing (Dict)
+import Index.Model exposing (FilterFactory, FuncFactory, Index(..))
 import Maybe exposing (andThen, withDefault)
-import Trie exposing (Trie)
 import Set exposing (Set)
-import Index.Model exposing (Index(Index), FuncFactory, FilterFactory)
 import TokenProcessors
+import Trie exposing (Trie)
 
 
 {-| Create a function creator (FuncFactory)
@@ -75,7 +74,7 @@ processTokens index tokens =
         ( u2index, filterTokens ) =
             applyFilter u1index initialTransformTokens
     in
-        applyTransform u2index filterTokens
+    applyTransform u2index filterTokens
 
 
 {-| Apply the transforms to tokens.
@@ -88,12 +87,11 @@ applyTransform index strings =
         ( u1index, transformList ) =
             getOrSetTransformList index
     in
-        ( u1index
-        , (List.filter
-            (\val -> val /= "")
-            (List.map (applyTransformList transformList) strings)
-          )
-        )
+    ( u1index
+    , List.filter
+        (\val -> val /= "")
+        (List.map (applyTransformList transformList) strings)
+    )
 
 
 {-| Would prefer to past just accessors (eg .transforms) to
@@ -121,12 +119,11 @@ applyInitialTransform index strings =
         ( u1index, intitialTransformList ) =
             getOrSetInitialTransformList index
     in
-        ( u1index
-        , (List.filter
-            (\val -> val /= "")
-            (List.map (applyTransformList intitialTransformList) strings)
-          )
-        )
+    ( u1index
+    , List.filter
+        (\val -> val /= "")
+        (List.map (applyTransformList intitialTransformList) strings)
+    )
 
 
 getOrSetInitialTransformList : Index doc -> ( Index doc, List (String -> String) )
@@ -160,12 +157,12 @@ applyTransformList transforms token =
                 newToken =
                     transform token
             in
-                case newToken of
-                    "" ->
-                        ""
+            case newToken of
+                "" ->
+                    ""
 
-                    _ ->
-                        applyTransformList restTransforms newToken
+                _ ->
+                    applyTransformList restTransforms newToken
 
 
 {-| Apply index filters to tokens.
@@ -179,7 +176,7 @@ applyFilter index strings =
         ( u1index, filterList ) =
             getOrSetFilterList index
     in
-        ( u1index, List.filter (applyFilterList filterList) strings )
+    ( u1index, List.filter (applyFilterList filterList) strings )
 
 
 getOrSetFilterList : Index doc -> ( Index doc, List (String -> Bool) )
@@ -234,7 +231,7 @@ getOrSetIndexFuncList :
     -> Index doc
     -> ( Index doc, List func )
 getOrSetIndexFuncList getFuncs getFactoryFuncs setFuncs index =
-    case (getFuncs index) of
+    case getFuncs index of
         Just funcList ->
             ( index, funcList )
 
@@ -246,7 +243,7 @@ getOrSetIndexFuncList getFuncs getFactoryFuncs setFuncs index =
                 u2index =
                     setFuncs u1index newFuncList
             in
-                ( u2index, newFuncList )
+            ( u2index, newFuncList )
 
 
 {-| Run each of the function factories returning the list of functions.
@@ -257,9 +254,9 @@ runFactories factoryList index =
         (\factory ( u1index, funcList ) ->
             let
                 ( u2index, newFunc ) =
-                    (factory u1index)
+                    factory u1index
             in
-                ( u2index, newFunc :: funcList )
+            ( u2index, newFunc :: funcList )
         )
         ( index, [] )
         factoryList
@@ -272,12 +269,12 @@ Model will update if token has no cached value for idf.
 -}
 idf : Index doc -> String -> ( Index doc, Float )
 idf ((Index irec) as index) token =
-    case (Dict.get token irec.idfCache) of
+    case Dict.get token irec.idfCache of
         Nothing ->
             calcIdf index token
 
-        Just idf ->
-            ( index, idf )
+        Just idfValue ->
+            ( index, idfValue )
 
 
 calcIdf : Index doc -> String -> ( Index doc, Float )
@@ -287,16 +284,17 @@ calcIdf (Index irec) token =
         docFrequency =
             toFloat (Trie.valueCount token irec.tokenStore)
 
-        idf =
+        idfLocal =
             if docFrequency > 0 then
                 1
                     + logBase 10
                         (toFloat (Dict.size irec.documentStore) / docFrequency)
+
             else
                 toFloat 1
 
         updatedIdfCache =
-            Dict.insert token idf irec.idfCache
+            Dict.insert token idfLocal irec.idfCache
 
         u1index =
             Index
@@ -304,7 +302,7 @@ calcIdf (Index irec) token =
                     | idfCache = updatedIdfCache
                 }
     in
-        ( u1index, idf )
+    ( u1index, idfLocal )
 
 
 {-| Return True if document reference is indexed.
@@ -321,6 +319,6 @@ buildOrderIndex : Set String -> Dict String Int
 buildOrderIndex tokenSet =
     let
         withIndex =
-            List.indexedMap (,) (Set.toList tokenSet)
+            List.indexedMap Tuple.pair (Set.toList tokenSet)
     in
-        List.foldr (\( i, v ) d -> Dict.insert v i d) Dict.empty withIndex
+    List.foldr (\( i, v ) d -> Dict.insert v i d) Dict.empty withIndex

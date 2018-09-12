@@ -1,15 +1,14 @@
-module Index
-    exposing
-        ( Index
-        , new
-        , newWith
-        , add
-        , addDocs
-        , remove
-        , update
-        , search
-        , addOrUpdate
-        )
+module Index exposing
+    ( new
+    , newWith
+    , add
+    , addDocs
+    , remove
+    , update
+    , addOrUpdate
+    , search
+    , Index
+    )
 
 {-| Index module for full text indexer
 
@@ -38,19 +37,19 @@ module Index
 
 @docs Index
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Maybe
 import Dict exposing (Dict)
-import Set exposing (Set)
-import String
-import Trie exposing (Trie)
 import Index.Defaults as Defaults
 import Index.Model as Model exposing (Index(..))
 import Index.Utils
 import Index.Vector exposing (..)
+import Maybe
+import Set exposing (Set)
+import String
+import Trie exposing (Trie)
 import Utils
 
 
@@ -107,34 +106,37 @@ add doc ((Index irec) as index) =
         docRef =
             irec.ref doc
     in
-        if String.isEmpty docRef then
-            Err "Error document has an empty unique id (ref)."
-        else if Index.Utils.refExists docRef index then
-            Err "Error adding document that allready exists."
+    if String.isEmpty docRef then
+        Err "Error document has an empty unique id (ref)."
+
+    else if Index.Utils.refExists docRef index then
+        Err "Error adding document that allready exists."
+
+    else
+        let
+            ( u1index, fieldsWordList ) =
+                List.foldr
+                    (getWordsForField doc)
+                    ( index, [] )
+                    (List.map Tuple.first irec.fields)
+
+            ( u2index, u2fieldsWordList ) =
+                List.foldr
+                    (getWordsForFieldList doc)
+                    ( u1index, fieldsWordList )
+                    (List.map Tuple.first irec.listFields)
+
+            fieldsTokens =
+                List.map Set.fromList u2fieldsWordList
+
+            docTokens =
+                List.foldr Set.union Set.empty fieldsTokens
+        in
+        if Set.isEmpty docTokens then
+            Err "Error after tokenisation there are no terms to index."
+
         else
-            let
-                ( u1index, fieldsWordList ) =
-                    List.foldr
-                        (getWordsForField doc)
-                        ( index, [] )
-                        (List.map Tuple.first irec.fields)
-
-                ( u2index, u2fieldsWordList ) =
-                    List.foldr
-                        (getWordsForFieldList doc)
-                        ( u1index, fieldsWordList )
-                        (List.map Tuple.first irec.listFields)
-
-                fieldsTokens =
-                    List.map Set.fromList u2fieldsWordList
-
-                docTokens =
-                    List.foldr Set.union Set.empty fieldsTokens
-            in
-                if Set.isEmpty docTokens then
-                    Err "Error after tokenisation there are no terms to index."
-                else
-                    Ok (addDoc docRef fieldsTokens docTokens u2index)
+            Ok (addDoc docRef fieldsTokens docTokens u2index)
 
 
 {-| Add multiple documents. Tries to add all docs and collects errors..
@@ -183,7 +185,7 @@ getWordsForField doc getField ( index, fieldsLists ) =
         ( u1index, tokens ) =
             Index.Utils.getTokens index (getField doc)
     in
-        ( u1index, tokens :: fieldsLists )
+    ( u1index, tokens :: fieldsLists )
 
 
 {-| reducer to extract tokens from each field List String from doc
@@ -198,7 +200,7 @@ getWordsForFieldList doc getFieldList ( index, fieldsLists ) =
         ( u1index, tokens ) =
             Index.Utils.getTokensList index (getFieldList doc)
     in
-        ( u1index, tokens :: fieldsLists )
+    ( u1index, tokens :: fieldsLists )
 
 
 {-| Add the document to the index.
@@ -219,7 +221,7 @@ addDoc docRef fieldsTokens docTokens ((Index irec) as index) =
         -- _ = Debug.log "allBoosts" allBoosts
         -- fieldTokensAndBoosts : List (Set String, Float)
         fieldTokensAndBoosts =
-            List.map2 (,) fieldsTokens allBoosts
+            List.map2 Tuple.pair fieldsTokens allBoosts
 
         -- _ = Debug.log "fieldTokensAndBoosts" fieldTokensAndBoosts
         -- updatedDocumentStore : Dict String (Set String)
@@ -242,14 +244,14 @@ addDoc docRef fieldsTokens docTokens ((Index irec) as index) =
         updatedTokenStore =
             List.foldr addTokenScore irec.tokenStore tokenAndScores
     in
-        Index
-            { irec
-                | documentStore = updatedDocumentStore
-                , corpusTokens = updatedCorpusTokens
-                , corpusTokensIndex = updatedCorpusTokensIndex
-                , tokenStore = updatedTokenStore
-                , idfCache = Dict.empty
-            }
+    Index
+        { irec
+            | documentStore = updatedDocumentStore
+            , corpusTokens = updatedCorpusTokens
+            , corpusTokensIndex = updatedCorpusTokensIndex
+            , tokenStore = updatedTokenStore
+            , idfCache = Dict.empty
+        }
 
 
 {-| Return term frequency score for a token in document.
@@ -265,17 +267,19 @@ scoreToken fieldTokensAndBoost token =
         score ( tokenSet, fieldBoost ) scoreSum =
             if Set.isEmpty tokenSet then
                 scoreSum
+
             else
                 let
                     tokenBoost =
                         if Set.member token tokenSet then
-                            fieldBoost / (toFloat (Set.size tokenSet))
+                            fieldBoost / toFloat (Set.size tokenSet)
+
                         else
                             0
                 in
-                    scoreSum + tokenBoost
+                scoreSum + tokenBoost
     in
-        ( token, List.foldr score 0 fieldTokensAndBoost )
+    ( token, List.foldr score 0 fieldTokensAndBoost )
 
 
 {-| Remove document from an Index if no error result conditions encountered.
@@ -300,17 +304,19 @@ remove doc ((Index irec) as index) =
 
         -- can error without docid as well.
     in
-        if String.isEmpty docRef then
-            Err "Error document has an empty unique id (ref)."
-        else if not (Index.Utils.refExists docRef index) then
-            Err errorMessageNotIndex
-        else
-            Ok
-                (Maybe.withDefault index <|
-                    Maybe.map
-                        (removeDoc docRef index)
-                        (Dict.get docRef irec.documentStore)
-                )
+    if String.isEmpty docRef then
+        Err "Error document has an empty unique id (ref)."
+
+    else if not (Index.Utils.refExists docRef index) then
+        Err errorMessageNotIndex
+
+    else
+        Ok
+            (Maybe.withDefault index <|
+                Maybe.map
+                    (removeDoc docRef index)
+                    (Dict.get docRef irec.documentStore)
+            )
 
 
 errorMessageNotIndex : String
@@ -332,12 +338,12 @@ removeDoc docRef ((Index irec) as index) docTokens =
         updatedTokenStore =
             List.foldr removeToken irec.tokenStore (Set.toList docTokens)
     in
-        Index
-            { irec
-                | documentStore = updatedDocumentStore
-                , tokenStore = updatedTokenStore
-                , idfCache = Dict.empty
-            }
+    Index
+        { irec
+            | documentStore = updatedDocumentStore
+            , tokenStore = updatedTokenStore
+            , idfCache = Dict.empty
+        }
 
 
 {-| Update document in Index. Does a remove then add.
@@ -345,7 +351,7 @@ See ElmTextSearch documentation for `add` and `remove` to see error result condi
 -}
 update : doc -> Index doc -> Result String (Index doc)
 update doc index =
-    (remove doc index)
+    remove doc index
         |> Result.andThen (\u1index -> add doc index)
 
 
@@ -354,13 +360,14 @@ This does an add if document is not in index.
 -}
 addOrUpdate : doc -> Index doc -> Result String (Index doc)
 addOrUpdate doc index =
-    case (remove doc index) of
+    case remove doc index of
         Ok u1index ->
             add doc u1index
 
         Err msg ->
             if msg == errorMessageNotIndex then
                 add doc index
+
             else
                 Err msg
 
@@ -375,20 +382,24 @@ search query index =
             Index.Utils.getTokens index query
 
         tokenInStore token =
-            (Trie.getNode token i1irec.tokenStore) /= Nothing
+            Trie.getNode token i1irec.tokenStore /= Nothing
 
         -- _ = Debug.log "search d" (query, tokens, List.any tokenInStore tokens)
     in
-        if Dict.isEmpty i1irec.documentStore then
-            Err "Error there are no documents in index to search."
-        else if String.isEmpty (String.trim query) then
-            Err "Error query is empty."
-        else if List.isEmpty tokens then
-            Err "Error after tokenisation there are no terms to search for."
-        else if List.isEmpty tokens || not (List.any tokenInStore tokens) then
-            Ok ( i1index, [] )
-        else
-            Ok (searchTokens tokens i1index)
+    if Dict.isEmpty i1irec.documentStore then
+        Err "Error there are no documents in index to search."
+
+    else if String.isEmpty (String.trim query) then
+        Err "Error query is empty."
+
+    else if List.isEmpty tokens then
+        Err "Error after tokenisation there are no terms to search for."
+
+    else if List.isEmpty tokens || not (List.any tokenInStore tokens) then
+        Ok ( i1index, [] )
+
+    else
+        Ok (searchTokens tokens i1index)
 
 
 {-| Return list of document ref's with score, ordered by score descending.
@@ -417,4 +428,4 @@ searchTokens tokens ((Index irec) as index) =
 
         -- _ = Debug.log("searchTokens intersect") (Utils.intersectSets tokenDocSets)
     in
-        ( u2index, List.reverse (List.sortBy Tuple.second matchedDocs) )
+    ( u2index, List.reverse (List.sortBy Tuple.second matchedDocs) )

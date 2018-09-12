@@ -1,11 +1,11 @@
-module StopWordFilterTests exposing (..)
+module StopWordFilterTests exposing (ExampleDocType, newIndex, stopWordFilterTest, tests)
 
-import Expect
-import Stemmer
-import Test exposing (..)
 import ElmTextSearch
+import Expect
 import Index.Utils
+import Stemmer
 import StopWordFilter
+import Test exposing (..)
 
 
 type alias ExampleDocType =
@@ -27,12 +27,6 @@ newIndex =
         }
 
 
-{-| Instantiate stop word filter.
--}
-( testIndex1, stopWordFilter ) =
-    (StopWordFilter.createDefaultFilterFunc) newIndex
-
-
 tests : Test
 tests =
     describe "StopWordFilter tests"
@@ -42,7 +36,11 @@ tests =
 
 
 stopWordFilterTest word =
+    let
+        ( testIndex1, stopWordFilter ) =
+            StopWordFilter.createDefaultFilterFunc newIndex
+    in
     test ("This word \"" ++ word ++ "\" got past default stop word filter in error.") <|
         \() ->
-            (stopWordFilter word)
+            stopWordFilter word
                 |> Expect.false "These should all be stopped"

@@ -1,12 +1,12 @@
-module IndexUtilsTests exposing (..)
+module IndexUtilsTests exposing (MyDoc, getTokensCases, index0, index1removeLast3Transform, testApplyTransform, testGetTokens, tests)
 
 import Expect
-import Test exposing (..)
-import Index.Model
 import Index exposing (Index)
+import Index.Model
 import Index.Utils
-import TokenProcessors
 import Stemmer
+import Test exposing (..)
+import TokenProcessors
 
 
 type alias MyDoc =
@@ -78,21 +78,21 @@ index1removeLast3Transform =
         removeLastCharFuncCreator =
             Index.Utils.createFuncCreator (String.dropRight 1)
     in
-        Index.newWith
-            { indexType = "- IndexTest Type -"
-            , ref = .cid
-            , fields =
-                [ ( .title, 5 )
-                , ( .body, 1 )
-                ]
-            , listFields = []
-            , initialTransformFactories = []
-            , transformFactories =
-                [ removeLastCharFuncCreator
-                , removeLastCharFuncCreator
-                ]
-            , filterFactories = []
-            }
+    Index.newWith
+        { indexType = "- IndexTest Type -"
+        , ref = .cid
+        , fields =
+            [ ( .title, 5 )
+            , ( .body, 1 )
+            ]
+        , listFields = []
+        , initialTransformFactories = []
+        , transformFactories =
+            [ removeLastCharFuncCreator
+            , removeLastCharFuncCreator
+            ]
+        , filterFactories = []
+        }
 
 
 testApplyTransform =

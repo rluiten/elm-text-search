@@ -1,0 +1,27 @@
+{
+    "type": "package",
+    "name": "rluiten/elm-text-search",
+    "summary": "Full text index engine in Elm language inspired by lunr.js.",
+    "license": "BSD-3-Clause",
+    "version": "5.0.0",
+    "exposed-modules": [
+        "ElmTextSearch",
+        "Index.Defaults",
+        "StopWordFilter",
+        "ElmTextSearch.Json.Encoder",
+        "ElmTextSearch.Json.Decoder"
+    ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
+    "dependencies": {
+        "NoRedInk/elm-json-decode-pipeline": "1.0.0 <= v < 2.0.0",
+        "elm/core": "1.0.0 <= v < 2.0.0",
+        "elm/json": "1.0.0 <= v < 2.0.0",
+        "elm/regex": "1.0.0 <= v < 2.0.0",
+        "rluiten/sparsevector": "1.0.3 <= v < 2.0.0",
+        "rluiten/stemmer": "1.0.4 <= v < 2.0.0",
+        "rluiten/trie": "2.0.3 <= v < 3.0.0"
+    },
+    "test-dependencies": {
+        "elm-explorations/test": "1.0.0 <= v < 2.0.0"
+    }
+}

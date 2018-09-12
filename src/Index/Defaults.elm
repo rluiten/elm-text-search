@@ -1,16 +1,15 @@
-module Index.Defaults
-    exposing
-        ( indexVersion
-        , elmTextSearchIndexType
-        , defaultTransformFactories
-        , defaultFilterFactories
-        , defaultTokenTrimmerFuncCreator
-        , defaultStemmerFuncCreator
-        , defaultStopWordFilterFuncCreator
-        , getDefaultIndexConfig
-        , getIndexSimpleConfig
-        , defaultInitialTransformFactories
-        )
+module Index.Defaults exposing
+    ( indexVersion
+    , elmTextSearchIndexType
+    , defaultTransformFactories
+    , defaultFilterFactories
+    , defaultTokenTrimmerFuncCreator
+    , defaultStemmerFuncCreator
+    , defaultStopWordFilterFuncCreator
+    , defaultInitialTransformFactories
+    , getDefaultIndexConfig
+    , getIndexSimpleConfig
+    )
 
 {-| Defaults for indexes and configurations.
 
@@ -36,18 +35,18 @@ module Index.Defaults
 @docs getDefaultIndexConfig
 @docs getIndexSimpleConfig
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Stemmer
 import Index.Model as Model
     exposing
-        ( TransformFactory
-        , FilterFactory
+        ( FilterFactory
         , IndexSimpleConfig
+        , TransformFactory
         )
 import Index.Utils
+import Stemmer
 import StopWordFilter
 import TokenProcessors
 

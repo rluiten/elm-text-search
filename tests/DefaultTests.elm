@@ -1,14 +1,14 @@
-module DefaultTests exposing (..)
+module DefaultTests exposing (testDefaultIndexType, tests)
 
-import Index.Defaults
 import Expect
+import Index.Defaults
 import Test exposing (..)
 
 
 tests : Test
 tests =
     describe "Default tests"
-        [ testDefaultIndexType ()
+        [testDefaultIndexType ()
         ]
 
 
@@ -25,12 +25,12 @@ testDefaultIndexType _ =
                     ]
                 }
 
-        _ =
-            Debug.log "asdfasdfafsd" configDefault
+        -- _ =
+        --     Debug.log "asdfasdfafsd" configDefault
     in
-        test "Check Index Type" <|
-            \() ->
-                Expect.equal "-= ElmTextSearch Index Type 1 =-" configDefault.indexType
+    test "Check Index Type" <|
+        \() ->
+            Expect.equal "-= ElmTextSearch Index Type 1 =-" configDefault.indexType
 
 
 

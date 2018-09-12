@@ -1,19 +1,19 @@
-module Index.Load exposing (..)
+module Index.Load exposing (errorPrefix, loadIndex, loadIndexValue, loadIndexValueWith, loadIndexWith)
 
 {-| Load an index from Value or String
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
 import Dict exposing (Dict)
-import Json.Encode as Encode
-import Json.Decode as Decode
-import Stemmer
+import ElmTextSearch.Json.Decoder as IndexDecoder
 import Index.Defaults as Defaults
 import Index.Model exposing (..)
 import Index.Utils
-import ElmTextSearch.Json.Decoder as IndexDecoder
+import Json.Decode as Decode
+import Json.Encode as Encode
+import Stemmer
 import StopWordFilter
 import TokenProcessors
 
@@ -30,64 +30,61 @@ Try to use a supported index config first.
 Then try the default just in case.
 
 -}
-loadIndexWith : List (Config doc) -> String -> Result String (Index doc)
+loadIndexWith : List (Config doc) -> String -> Result Decode.Error (Index doc)
 loadIndexWith supportedIndexConfigs inputString =
-    (Decode.decodeString IndexDecoder.decoder inputString)
-        |> Result.andThen checkIndexVersion
-        |> Result.andThen (checkIndexType supportedIndexConfigs)
-        |> Result.andThen loadIndexFull
+    Decode.decodeString
+        (IndexDecoder.decoder
+            |> Decode.andThen (mapIndexConfig supportedIndexConfigs)
+            |> Decode.andThen createIndex
+        )
+        inputString
 
 
-loadIndexValueWith : List (Config doc) -> Decode.Value -> Result String (Index doc)
-loadIndexValueWith supportedIndexConfigs inputValue =
-    (Decode.decodeValue IndexDecoder.decoder inputValue)
-        |> Result.andThen checkIndexVersion
-        |> Result.andThen (checkIndexType supportedIndexConfigs)
-        |> Result.andThen loadIndexFull
-
-
-checkIndexVersion : CodecIndexRecord -> Result String CodecIndexRecord
-checkIndexVersion decodedIndex =
-    if Defaults.indexVersion == decodedIndex.indexVersion then
-        Ok decodedIndex
-    else
-        Err
+mapIndexConfig : List (Config doc) -> CodecIndexRecord -> Decode.Decoder ( Config doc, CodecIndexRecord )
+mapIndexConfig supportedIndexConfigs index =
+    if Defaults.indexVersion /= index.indexVersion then
+        Decode.fail <|
             (errorPrefix
                 ++ " Version supported is "
                 ++ Defaults.indexVersion
                 ++ ". Version tried to load is "
-                ++ decodedIndex.indexVersion
+                ++ index.indexVersion
                 ++ "."
             )
 
-
-checkIndexType :
-    List (Config doc)
-    -> CodecIndexRecord
-    -> Result String ( Config doc, CodecIndexRecord )
-checkIndexType supportedIndexConfigs decodedIndex =
-    let
-        config =
-            List.filter
-                (\cfg -> cfg.indexType == decodedIndex.indexType)
-                supportedIndexConfigs
-    in
+    else
+        let
+            config =
+                List.filter
+                    (\cfg -> cfg.indexType == index.indexType)
+                    supportedIndexConfigs
+        in
         case config of
             [] ->
-                Err
+                Decode.fail <|
                     (errorPrefix
                         ++ " Tried to load index of type \""
-                        ++ decodedIndex.indexType
+                        ++ index.indexType
                         ++ "\". It is not in supported index configurations."
                     )
 
             matchedConfig :: _ ->
-                Ok ( matchedConfig, decodedIndex )
+                Decode.succeed ( matchedConfig, index )
 
 
-loadIndexFull : ( Config doc, CodecIndexRecord ) -> Result String (Index doc)
-loadIndexFull ( config, decodedIndex ) =
-    Ok <|
+loadIndexValueWith : List (Config doc) -> Decode.Value -> Result Decode.Error (Index doc)
+loadIndexValueWith supportedIndexConfigs inputValue =
+    Decode.decodeValue
+        (IndexDecoder.decoder
+            |> Decode.andThen (mapIndexConfig supportedIndexConfigs)
+            |> Decode.andThen createIndex
+        )
+        inputValue
+
+
+createIndex : ( Config doc, CodecIndexRecord ) -> Decode.Decoder (Index doc)
+createIndex ( config, decodedIndex ) =
+    Decode.succeed <|
         Index
             { indexVersion = decodedIndex.indexVersion
             , indexType = decodedIndex.indexType
@@ -101,7 +98,7 @@ loadIndexFull ( config, decodedIndex ) =
             , corpusTokens = decodedIndex.corpusTokens
             , tokenStore = decodedIndex.tokenStore
             , corpusTokensIndex =
-                (Index.Utils.buildOrderIndex decodedIndex.corpusTokens)
+                Index.Utils.buildOrderIndex decodedIndex.corpusTokens
             , initialTransforms = Nothing
             , transforms = Nothing
             , filters = Nothing
@@ -109,14 +106,14 @@ loadIndexFull ( config, decodedIndex ) =
             }
 
 
-loadIndex : ModelSimpleConfig doc -> String -> Result String (Index doc)
+loadIndex : ModelSimpleConfig doc -> String -> Result Decode.Error (Index doc)
 loadIndex simpleConfig inputString =
     loadIndexWith
         [ Defaults.getDefaultIndexConfig simpleConfig ]
         inputString
 
 
-loadIndexValue : ModelSimpleConfig doc -> Decode.Value -> Result String (Index doc)
+loadIndexValue : ModelSimpleConfig doc -> Decode.Value -> Result Decode.Error (Index doc)
 loadIndexValue simpleConfig inputValue =
     loadIndexValueWith
         [ Defaults.getDefaultIndexConfig simpleConfig ]

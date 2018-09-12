@@ -6,23 +6,23 @@ It decodes to a CodecIndexRecord.
 
 @docs decoder
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
 import Dict exposing (Dict)
-import Json.Decode exposing (..)
-import Json.Decode.Pipeline exposing (required, decode)
+import Index.Model as Model
+import Json.Decode as Decode exposing (..)
+import Json.Decode.Pipeline exposing (required)
 import Set exposing (Set)
 import Trie.Json.Decoder as TrieDecoder
-import Index.Model as Model
 
 
 {-| CodecIndexRecord decoder.
 -}
 decoder : Decoder Model.CodecIndexRecord
 decoder =
-    decode Model.CodecIndexRecord
+    Decode.succeed Model.CodecIndexRecord
         |> required "indexVersion" string
         |> required "indexType" string
         |> required "documentStore" documentStoreDecoder

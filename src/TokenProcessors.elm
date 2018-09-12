@@ -1,13 +1,12 @@
-module TokenProcessors
-    exposing
-        ( tokenizer
-        , tokenizerList
-        , tokenizerWith
-        , tokenizerWithList
-        , tokenizerWithRegex
-        , tokenizerWithRegexList
-        , trimmer
-        )
+module TokenProcessors exposing
+    ( tokenizer
+    , tokenizerList
+    , tokenizerWith
+    , tokenizerWithRegex
+    , tokenizerWithRegexList
+    , trimmer
+    , tokenizerWithList
+    )
 
 {-| TokenProcessors for strings.
 
@@ -25,32 +24,35 @@ module TokenProcessors
 
 @docs trimmer
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
 import Regex
     exposing
         ( Regex
-        , HowMany(All)
-        , regex
-        , split
+          -- , HowMany(..)
+        , fromString
+        , never
         , replace
+        , split
         )
-import String exposing (trim, toLower)
+import String exposing (toLower, trim)
+
+
+forceRegex : String -> Regex
+forceRegex =
+    Maybe.withDefault never << fromString
 
 
 defaultSeparator : Regex
 defaultSeparator =
-    regex "[\\s\\-]+"
+    forceRegex "[\\s\\-]+"
 
 
 {-| Tokenize a String.
-
 Will not return any empty string tokens.
-
 By default this splits on whitespace and hyphens.
-
 -}
 tokenizer : String -> List String
 tokenizer =
@@ -74,18 +76,18 @@ tokenizerWithRegex : Regex -> String -> List String
 tokenizerWithRegex seperatorRegex data =
     let
         splitter =
-            (split All seperatorRegex) << toLower << trim
+            split seperatorRegex << toLower << trim
     in
-        List.filter
-            (\token -> (String.length token) > 0)
-            (splitter data)
+    List.filter
+        (\token -> String.length token > 0)
+        (splitter data)
 
 
 tokenizerWithRegexList : Regex -> List String -> List String
 tokenizerWithRegexList seperatorRegex listData =
     let
         splitter =
-            (split All seperatorRegex) << toLower << trim
+            split seperatorRegex << toLower << trim
 
         -- List.foldr (\set agg -> Set.intersect set agg) h tail
         -- tokens : List String
@@ -97,9 +99,9 @@ tokenizerWithRegexList seperatorRegex listData =
                 []
                 listData
     in
-        List.filter
-            (\token -> (String.length token) > 0)
-            tokens
+    List.filter
+        (\token -> String.length token > 0)
+        tokens
 
 
 {-| Tokenize a String.
@@ -108,7 +110,7 @@ Supply your own String which is turned into a regex for splitting the string.
 -}
 tokenizerWith : String -> String -> List String
 tokenizerWith seperatorPattern =
-    tokenizerWithRegex (regex seperatorPattern)
+    tokenizerWithRegex (forceRegex seperatorPattern)
 
 
 {-| Tokenize a List String.
@@ -117,18 +119,15 @@ Supply your own String which is turned into a regex for splitting the string.
 -}
 tokenizerWithList : String -> List String -> List String
 tokenizerWithList seperatorPattern =
-    tokenizerWithRegexList (regex seperatorPattern)
+    tokenizerWithRegexList (forceRegex seperatorPattern)
 
 
-
--- not sure want to do this here maybe it belongs elsewhere
--- deling with List (Maybe String) or something
--- tokenizerArray : List String -> List String
--- tokenizerArray = List.map toLower
+trimmerRegex =
+    forceRegex "^\\W+|\\W+$"
 
 
 {-| Remove non word characters from start and end of tokens
 -}
 trimmer : String -> String
 trimmer =
-    replace All (regex "^\\W+|\\W+$") (\_ -> "")
+    replace trimmerRegex (\_ -> "")

@@ -1,14 +1,13 @@
-module SaveLoadTests exposing (..)
-
-import Expect
-import Test exposing (..)
-
+module SaveLoadTests exposing (MyDoc, checkSearchResult1, checkSearchResult2, configElmTextSearchMyDoc, doc1, doc2, index0, index1, index2, result1AfterLoadSearch, result1FromString, result1Search, result1StoreToString, result2AfterLoadSearch, result2Search, saveAndLoadSame, tests)
 
 {- Save and Load index check search results same -}
 
 import ElmTextSearch
+import Expect
 import Index.Model exposing (Index(..))
-import TestUtils exposing (expectOk)
+import Json.Decode as Decode exposing (errorToString)
+import Test exposing (..)
+import TestUtils exposing (expectOk, mapDecodeErrorToString)
 
 
 tests : Test
@@ -103,10 +102,17 @@ result1StoreToString =
             )
 
 
+{-| result1StoreToString
+|> Result.andThen (ElmTextSearch.fromString configElmTextSearchMyDoc)
+-}
 result1FromString : Result String (Index MyDoc)
 result1FromString =
-    result1StoreToString
-        |> Result.andThen (ElmTextSearch.fromString configElmTextSearchMyDoc)
+    case result1StoreToString of
+        Err _ ->
+            Err "result1FromString error"
+
+        Ok value ->
+            mapDecodeErrorToString (ElmTextSearch.fromString configElmTextSearchMyDoc value)
 
 
 result1AfterLoadSearch : Result String ( Index MyDoc, List ( String, Float ) )
@@ -130,9 +136,9 @@ checkSearchResult1 _ =
 
         -- _ = Debug.log("checkSearchResult1") (result1)
     in
-        test "Search returns empty result." <|
-            \() ->
-                Expect.equal (Ok []) result1
+    test "Search returns empty result. 1" <|
+        \() ->
+            Expect.equal (Ok []) result1
 
 
 checkSearchResult2 _ =
@@ -144,9 +150,9 @@ checkSearchResult2 _ =
 
         -- _ = Debug.log("checkSearchResult2") (result2Search)
     in
-        test "Search returns empty result." <|
-            \() ->
-                Expect.equal (Ok [ ( "doc2", 0.1389834449709609 ) ]) result2
+    test "Search returns empty result. 2" <|
+        \() ->
+            Expect.equal (Ok [ ( "doc2", 0.1389834449709609 ) ]) result2
 
 
 saveAndLoadSame _ =
@@ -174,11 +180,11 @@ saveAndLoadSame _ =
 
         -- _ = Debug.log("saveAndLoadSame") (result2, result2AfterLoad)
     in
-        describe "results same before and after save and load index"
-            [ test "Search result of nothing for Index same as for Save and Loaded Index." <|
-                \() ->
-                    Expect.equal result1 result1AfterLoad
-            , test "Search result of something for Index same as for Save and Loaded Index." <|
-                \() ->
-                    Expect.equal result2 result2AfterLoad
-            ]
+    describe "results same before and after save and load index"
+        [ test "Search result of nothing for Index same as for Save and Loaded Index." <|
+            \() ->
+                Expect.equal result1 result1AfterLoad
+        , test "Search result of something for Index same as for Save and Loaded Index." <|
+            \() ->
+                Expect.equal result2 result2AfterLoad
+        ]

@@ -1,4 +1,8 @@
-module Index.Model exposing (..)
+module Index.Model exposing
+    ( Index(..)
+    , IndexSimpleConfig
+    , CodecIndexRecord, Config, FilterFactory, FuncFactory, ModelSimpleConfig, TransformFactory
+    )
 
 {-| Define the Index Model
 
@@ -6,7 +10,7 @@ module Index.Model exposing (..)
 @docs IndexSimpleConfig
 @docs IndexConfig
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
@@ -73,11 +77,11 @@ The internal data model of Index
 
   - transforms
       - the transforms in index token processing
-      - lazy populated from transformFactorys
+      - lazy populated from transformFactories
 
   - filters
       - the files in index token processing
-      - lazy populated from transformFactorys
+      - lazy populated from filterFactories
 
   - documentStore
       - contains dictionary of document ref to Set of document tokens

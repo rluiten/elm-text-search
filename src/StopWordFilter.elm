@@ -1,4 +1,9 @@
-module StopWordFilter exposing (..)
+module StopWordFilter exposing
+    ( createDefaultFilterFunc
+    , stopEnglishWordList
+    , createFilterFuncWith
+    , createFilterFunc
+    )
 
 {-| StopWordFilter is an English language stop word list filter, any words
 contained in the list are not stored in the index.
@@ -30,13 +35,13 @@ This is intended to be used in the ElmTextSearch token processing pipeline.
 @docs createFilterFuncWith
 @docs createFilterFunc
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Set exposing (Set)
-import Index.Model exposing (Index, FilterFactory)
+import Index.Model exposing (FilterFactory, Index)
 import Index.Utils
+import Set exposing (Set)
 import Stemmer
 
 
@@ -183,8 +188,8 @@ createFilterFuncWith extraWords index =
 
 {-| Create stop word filter for provided list of tokens suitable for ElmTextSearch.
 
-** This creates a stop world filter purely from your own word list, understand
-what you are doing and consequences if you use this. **
+\*\* This creates a stop world filter purely from your own word list, understand
+what you are doing and consequences if you use this. \*\*
 
 The FilterFunc created returns True to allow words into index.
 So words found in the stopWordList return False
@@ -196,4 +201,4 @@ createFilterFunc tokens index =
         tokenSet =
             Set.fromList tokens
     in
-        ( index, \word -> not (Set.member word tokenSet) )
+    ( index, \word -> not (Set.member word tokenSet) )

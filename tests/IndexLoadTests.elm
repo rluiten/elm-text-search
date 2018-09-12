@@ -1,19 +1,20 @@
-module IndexLoadTests exposing (..)
+module IndexLoadTests exposing (IndexAndListResult, IndexResult, MyDoc, config1, config2, createMyStopWordFilter, doc1, exampleJsonIndex100, exampleJsonIndex100default, exampleJsonIndex100somestring, exampleJsonIndex101, index0, indexfromString1, jsonIndexDefault, loadIndexWith1, loadIndexWithErr1, loadIndexWithErr2, myStopWords, tests)
 
-import Index.Defaults
 import Dict
-import Expect
-import Test exposing (..)
-import String
-import Stemmer
 import ElmTextSearch
+import Expect
 import Index
+import Index.Defaults
+import Index.Load
 import Index.Model exposing (Index(..))
 import Index.Utils
-import Index.Load
+import Json.Decode as Decode
+import Stemmer
 import StopWordFilter
+import String
+import Test exposing (..)
+import TestUtils exposing (expectErr, expectOk, expectResultFailureMessage, mapDecodeErrorToString)
 import TokenProcessors
-import TestUtils exposing (expectOk)
 
 
 tests : Test
@@ -137,44 +138,50 @@ jsonIndexDefault =
 
 
 loadIndexWithErr1 _ =
-    test "Fails to load an index with non indexVersion." <|
-        \() ->
-            Expect.equal (Err ("Error cannot load Index. Version supported is 1.1.0. Version tried to load is 1.0.1.")) <|
-                Index.Load.loadIndexWith
-                    [ config1 ]
-                    exampleJsonIndex101
+    expectResultFailureMessage
+        "Fails to load an index with wrong index version."
+        "Error cannot load Index. Version supported is 1.1.0. Version tried to load is 1.0.1."
+    <|
+        Index.Load.loadIndexWith
+            [ config1 ]
+            exampleJsonIndex101
 
 
 loadIndexWithErr2 _ =
-    test "Fails to load an index with an indexType not in configuration provided." <|
-        \() ->
-            Expect.equal (Err ("Error cannot load Index. Tried to load index of type \"__IndexTest Type -\". It is not in supported index configurations.")) <|
-                Index.Load.loadIndexWith
-                    [ config1 ]
-                    exampleJsonIndex100
+    expectResultFailureMessage
+        "Fails to load an index with an indexType not in configuration provided."
+        "Error cannot load Index. Tried to load index of type \"__IndexTest Type -\". It is not in supported index configurations."
+    <|
+        Index.Load.loadIndexWith
+            [ config1 ]
+            exampleJsonIndex100
 
 
 loadIndexWith1 _ =
     test "Load an index. really dumb check" <|
         \() ->
             expectOk <|
-                Index.Load.loadIndexWith
-                    [ config2
-                    , config1
-                    ]
-                    exampleJsonIndex100somestring
+                mapDecodeErrorToString
+                    (Index.Load.loadIndexWith
+                        [ config2
+                        , config1
+                        ]
+                        exampleJsonIndex100somestring
+                    )
 
 
 indexfromString1 _ =
     test "I can load index from string with ElmTextSearch.SimpleConfig." <|
         \() ->
             expectOk <|
-                ElmTextSearch.fromString
-                    { ref = .cid
-                    , fields =
-                        [ ( .title, 5 )
-                        , ( .body, 1 )
-                        ]
-                    , listFields = []
-                    }
-                    exampleJsonIndex100default
+                mapDecodeErrorToString
+                    (ElmTextSearch.fromString
+                        { ref = .cid
+                        , fields =
+                            [ ( .title, 5 )
+                            , ( .body, 1 )
+                            ]
+                        , listFields = []
+                        }
+                        exampleJsonIndex100default
+                    )
