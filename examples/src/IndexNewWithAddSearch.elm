@@ -1,12 +1,13 @@
-module Main exposing (..)
+module Main exposing (ExampleDocType, addDocToIndexExample, createMyStopWordFilter, createNewWithIndexExample, firstResultSearchIndex, main, secondResultSearchIndex)
 
 {-| Create an index with customized stop word filter using
 ElmTextSearch.newWith.
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
+import Browser
 import ElmTextSearch
 import Html exposing (Html, div, text)
 import Index.Defaults
@@ -101,6 +102,20 @@ secondResultSearchIndex =
 {-| Display search result.
 -}
 main =
+    Browser.sandbox { init = 0, update = update, view = view }
+
+
+type Msg
+    = DoNothing
+
+
+update msg model =
+    case msg of
+        DoNothing ->
+            model
+
+
+view model =
     let
         searchResults1 =
             Result.map Tuple.second firstResultSearchIndex
@@ -108,17 +123,17 @@ main =
         searchResults2 =
             Result.map Tuple.second secondResultSearchIndex
     in
-        div []
-            [ div []
-                [ text
-                    ("Expecting no matches (because explanation is in stop words). Result of first search for \"explanation\" is "
-                        ++ (toString searchResults1)
-                    )
-                ]
-            , div []
-                [ text
-                    ("Result of second search for \"examples\" is "
-                        ++ (toString searchResults2)
-                    )
-                ]
+    div []
+        [ div []
+            [ text
+                ("Expecting no matches (because explanation is in stop words). Result of first search for \"explanation\" is "
+                    ++ Debug.toString searchResults1
+                )
             ]
+        , div []
+            [ text
+                ("Result of second search for \"examples\" is "
+                    ++ Debug.toString searchResults2
+                )
+            ]
+        ]

@@ -1,11 +1,12 @@
-module Main exposing (..)
+module Main exposing (ExampleDocType, createNewIndexExample, documents, indexWithMulitpleDocumentsAdded, main, resultSearchIndex)
 
 {-| Create an index and add multiple documents.
 
-Copyright (c) 2016-2017 Robin Luiten
+Copyright (c) 2016 Robin Luiten
 
 -}
 
+import Browser
 import ElmTextSearch
 import Html exposing (Html, div, text)
 
@@ -78,14 +79,28 @@ resultSearchIndex =
 {-| Display search result.
 -}
 main =
+    Browser.sandbox { init = 0, update = update, view = view }
+
+
+type Msg
+    = DoNothing
+
+
+update msg model =
+    case msg of
+        DoNothing ->
+            model
+
+
+view model =
     let
         -- want only the search results not the returned index
         searchResults =
             Result.map Tuple.second resultSearchIndex
     in
-        div []
-            [ text
-                ("Result of searching for \"explanations\" is "
-                    ++ (toString searchResults)
-                )
-            ]
+    div []
+        [ text
+            ("Result of searching for \"explanations\" is "
+                ++ Debug.toString searchResults
+            )
+        ]

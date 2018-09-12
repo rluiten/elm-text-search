@@ -290,7 +290,7 @@ This does the following things
 
   - Remove the document tags from documentStore.
   - Remove all the document references in tokenStore.
-  - It does not modify corpusTokens - as this would required
+  - It does not modify corpusTokens - as this requires
     reprocessing tokens for all documents to recreate corpusTokens.
       - This may skew the results over time after many removes but not badly.
       - It appears lunr.js operates this way as well for remove.
