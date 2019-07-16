@@ -33,7 +33,6 @@ import Regex
         ( Regex
           -- , HowMany(..)
         , fromString
-        , never
         , replace
         , split
         )
@@ -42,7 +41,7 @@ import String exposing (toLower, trim)
 
 forceRegex : String -> Regex
 forceRegex =
-    Maybe.withDefault never << fromString
+    Maybe.withDefault Regex.never << fromString
 
 
 defaultSeparator : Regex
