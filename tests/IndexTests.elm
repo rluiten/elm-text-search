@@ -25,6 +25,7 @@ tests =
         , searchDocsTest ()
         , searchDocsTestList ()
         , searchDocsTestList2 ()
+        , searchDocsTestList3 ()
         , test_index3_add_doc3 ()
         , test_index3_addOrUpdate_doc3 ()
         , test_index2_addOrUpdate_doc3 ()
@@ -74,6 +75,20 @@ index0list =
         , fields =
             [ ( .title, 5 )
             ]
+        , listFields =
+            [ ( .body, 1 )
+            ]
+        }
+
+
+{-| example index with indexed List String field but fields set to []
+-}
+index1list : Index MyDoc2
+index1list =
+    Index.new
+        { indexType = "- IndexTest Type -"
+        , ref = .cid
+        , fields = []
         , listFields =
             [ ( .body, 1 )
             ]
@@ -466,6 +481,30 @@ searchDocsTestList2 _ =
             Expect.equal
                 [ "qdoc1", "qdoc2" ]
                 collapsedSearchResult
+
+
+{-| Configure to have some data in listFields body, match in listFields body, index whith fields set to []
+-}
+searchDocsTestList3 _ =
+    let
+        ( index1a, _ ) =
+            Index.addDocs [ docQ1list, docQ2list ] index1list
+
+        searchResult =
+            Index.search "green" index1a
+
+        searchScores =
+            case searchResult of
+                Ok ( index, results ) ->
+                    List.map Tuple.second results
+
+                Err msg ->
+                    []
+    in
+    test "search List String fields where match in body List String and title, check for NaN values in scores" <|
+        \() ->
+            Expect.true "Expect searchScores to not contain any NaN values"
+                (not (List.any Basics.isNaN searchScores))
 
 
 {-| verify add of existing document causes an error
