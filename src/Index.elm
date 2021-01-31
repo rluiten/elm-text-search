@@ -114,29 +114,27 @@ add doc ((Index irec) as index) =
 
     else
         let
-            ( u1index, fieldsWordList ) =
+            ( u1index, fieldsWordListAndBoost ) =
                 List.foldr
                     (getWordsForField doc)
                     ( index, [] )
-                    (List.map Tuple.first irec.fields)
+                    irec.fields
 
-            ( u2index, u2fieldsWordList ) =
+            ( u2index, u2fieldsWordListAndBoost ) =
                 List.foldr
                     (getWordsForFieldList doc)
-                    ( u1index, fieldsWordList )
-                    (List.map Tuple.first irec.listFields)
-
-            fieldsTokens =
-                List.map Set.fromList u2fieldsWordList
+                    ( u1index, fieldsWordListAndBoost )
+                    irec.listFields
 
             docTokens =
-                List.foldr Set.union Set.empty fieldsTokens
+                List.map Tuple.first u2fieldsWordListAndBoost
+                    |> List.foldr Set.union Set.empty
         in
         if Set.isEmpty docTokens then
             Err "Error after tokenisation there are no terms to index."
 
         else
-            Ok (addDoc docRef fieldsTokens docTokens u2index)
+            Ok (addDoc docRef u2fieldsWordListAndBoost docTokens u2index)
 
 
 {-| Add multiple documents. Tries to add all docs and collects errors..
@@ -173,58 +171,45 @@ addDocsCore docsI docs ((Index irec) as index) errors =
                     addDocsCore (docsI + 1) tailDocs index (errors ++ [ ( docsI, msg ) ])
 
 
-{-| reducer to extract tokens from each field String from doc
+{-| Reducer to extract tokens from each field String from doc.
 -}
 getWordsForField :
     doc
-    -> (doc -> String)
-    -> ( Index doc, List (List String) )
-    -> ( Index doc, List (List String) )
-getWordsForField doc getField ( index, fieldsLists ) =
+    -> ( doc -> String, Float )
+    -> ( Index doc, List ( Set String, Float ) )
+    -> ( Index doc, List ( Set String, Float ) )
+getWordsForField doc ( getField, fieldBoost ) ( index, fieldsLists ) =
+    -- GRR fieldBoost goes where? dammmit. it doesnt belong here :( its not part of aggregate
     let
         ( u1index, tokens ) =
             Index.Utils.getTokens index (getField doc)
     in
-    ( u1index, tokens :: fieldsLists )
+    ( u1index, ( Set.fromList tokens, fieldBoost ) :: fieldsLists )
 
 
-{-| reducer to extract tokens from each field List String from doc
+{-| Reducer to extract tokens from each field List String from doc.
 -}
 getWordsForFieldList :
     doc
-    -> (doc -> List String)
-    -> ( Index doc, List (List String) )
-    -> ( Index doc, List (List String) )
-getWordsForFieldList doc getFieldList ( index, fieldsLists ) =
+    -> ( doc -> List String, Float )
+    -> ( Index doc, List ( Set String, Float ) )
+    -> ( Index doc, List ( Set String, Float ) )
+getWordsForFieldList doc ( getFieldList, fieldBoost ) ( index, fieldsLists ) =
     let
         ( u1index, tokens ) =
             Index.Utils.getTokensList index (getFieldList doc)
     in
-    ( u1index, tokens :: fieldsLists )
+    ( u1index, ( Set.fromList tokens, fieldBoost ) :: fieldsLists )
 
 
 {-| Add the document to the index.
 -}
-addDoc : String -> List (Set String) -> Set String -> Index doc -> Index doc
-addDoc docRef fieldsTokens docTokens ((Index irec) as index) =
+addDoc : String -> List ( Set String, Float ) -> Set String -> Index doc -> Index doc
+addDoc docRef fieldTokensAndBoosts docTokens (Index irec) =
     let
         addTokenScore ( token, score ) trie =
             Trie.add ( docRef, score ) token trie
 
-        -- listFields is first in list because listFields tokens
-        -- pushed on front of fieldsTokens
-        allBoosts =
-            List.append
-                (List.map Tuple.second irec.listFields)
-                (List.map Tuple.second irec.fields)
-
-        -- _ = Debug.log "allBoosts" allBoosts
-        -- fieldTokensAndBoosts : List (Set String, Float)
-        fieldTokensAndBoosts =
-            List.map2 Tuple.pair fieldsTokens allBoosts
-
-        -- _ = Debug.log "fieldTokensAndBoosts" fieldTokensAndBoosts
-        -- updatedDocumentStore : Dict String (Set String)
         updatedDocumentStore =
             Dict.insert docRef docTokens irec.documentStore
 
@@ -235,7 +220,6 @@ addDoc docRef fieldsTokens docTokens ((Index irec) as index) =
         updatedCorpusTokensIndex =
             Index.Utils.buildOrderIndex updatedCorpusTokens
 
-        -- tokenAndScores : List (String, Float)
         tokenAndScores =
             List.map
                 (scoreToken fieldTokensAndBoosts)
