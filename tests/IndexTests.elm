@@ -1,9 +1,11 @@
 module IndexTests exposing (IndexAndListResult, IndexResult, MyDoc, MyDoc2, addDocsTest, addErr1, addErr2, addErr3, doc1, doc2, doc3, doc4, doc5, docQ1, docQ1list, docQ2, docQ2list, documentStoreStateTestMessage, idfCache1, idfCache2, idfCacheStateTestMessage, index0, index0list, index1, index2, index2_banana, index3, removeErr1, removeErr2, safeIndex, safeSearch, safeSearchIndex, safeSearchList, searchCases, searchDocsTest, searchDocsTestList, searchDocsTestList2, searchErr1, searchErr2, searchErr3, searchTest, test_index2_addOrUpdate_doc3, test_index3_addOrUpdate_doc3, test_index3_add_doc3, tests)
 
 import Dict
+import ElmTextSearch.Json.Encoder as IndexEncoder
 import Expect
 import Index
 import Index.Model exposing (Index(..))
+import Json.Encode as Encode
 import Test exposing (..)
 
 
@@ -29,6 +31,8 @@ tests =
         , test_index3_add_doc3 ()
         , test_index3_addOrUpdate_doc3 ()
         , test_index2_addOrUpdate_doc3 ()
+        , updateDocNotInIndexFails ()
+        , updateDocUsesNewDocIndexContent ()
         ]
 
 
@@ -555,3 +559,51 @@ test_index2_addOrUpdate_doc3 _ =
             Expect.equal
                 (Ok "Index")
                 (updated |> Result.andThen indexCreatedOk)
+
+
+{-| Updating a doc not in index fails.
+-}
+updateDocNotInIndexFails _ =
+    let
+        result =
+            Index.update (doc1 ()) index0
+    in
+    test "index update with a doc not in index fails" <|
+        \() ->
+            Expect.equal
+                (Err "Error document is not in index.")
+                (result |> Result.andThen (\_ -> Ok "Index"))
+
+
+{-| Updating a document removes old doc version and adds new doc version.
+
+This was a bug I noticed in code, writing test to confirm before fixing it.
+Not sure who might use this, but its broken anyway.
+
+-}
+updateDocUsesNewDocIndexContent _ =
+    let
+        ( index1a, _ ) =
+            Index.addDocs [ docQ1, docQ2 ] index0
+
+        index0Encoded =
+            Encode.encode 0 (IndexEncoder.encoder index1a)
+
+        docQ1aUpdate =
+            { docQ1
+                | title = "Yesterday"
+                , author = "New User"
+                , body = "Completely different document really"
+            }
+
+        updatedIndex =
+            Result.withDefault index1a (Index.update docQ1aUpdate index1a)
+
+        afterUpdateEncoded =
+            Encode.encode 0 (IndexEncoder.encoder updatedIndex)
+    in
+    test "updateDoc removes old doc and replaces it so index changes" <|
+        \() ->
+            Expect.notEqual
+                index0Encoded
+                afterUpdateEncoded
