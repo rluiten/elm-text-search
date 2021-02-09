@@ -1,10 +1,9 @@
 module IndexEncoderTests exposing (IndexResult, IndexResultList, MyDoc, MyDocList, doc1, doc1List, encodedIndex, encoder1, encoder1List, index0, index0List, index1, index1List, safeIndex, safeIndexList, tests)
 
-import Dict
 import ElmTextSearch.Json.Encoder as IndexEncoder
 import Expect
 import Index
-import Index.Model as Model exposing (..)
+import Index.Model exposing (..)
 import Json.Encode as Encode
 import Test exposing (..)
 

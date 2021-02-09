@@ -41,7 +41,7 @@ Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Dict exposing (Dict)
+import Dict
 import Index.Defaults as Defaults
 import Index.Model as Model exposing (Index(..))
 import Index.Utils
@@ -49,7 +49,7 @@ import Index.Vector exposing (..)
 import Maybe
 import Set exposing (Set)
 import String
-import Trie exposing (Trie)
+import Trie
 import Utils
 
 

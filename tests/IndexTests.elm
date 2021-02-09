@@ -256,7 +256,7 @@ searchTest { name, input, expect, indexResult } =
         \() ->
             Expect.equal expect <|
                 case Index.search input indexResult of
-                    Ok ( index, docs ) ->
+                    Ok ( _, docs ) ->
                         List.map Tuple.first docs
 
                     Err err ->
@@ -392,10 +392,6 @@ removeOnlyDocIndexReturnsIsEmpty _ =
                 Expect.false "oops its in document store" (Dict.member testDoc.cid storeB)
         , test "removes no values in trie for each token in doc (not testing trie) testing Index use of trie" <|
             \() ->
-                let
-                    a =
-                        1
-                in
                 Expect.true "Trie model is not empty" (Trie.isEmpty tokenStoreB)
         ]
 
@@ -445,10 +441,10 @@ searchDocsTest _ =
 
         collapsedSearchResult =
             case searchResult of
-                Ok ( index, results ) ->
+                Ok ( _, results ) ->
                     List.map Tuple.first results
 
-                Err msg ->
+                Err _ ->
                     []
     in
     test "search String fields results are" <|
@@ -494,10 +490,10 @@ searchDocsTestList _ =
 
         collapsedSearchResult =
             case searchResult of
-                Ok ( index, results ) ->
+                Ok ( _, results ) ->
                     List.map Tuple.first results
 
-                Err msg ->
+                Err _ ->
                     []
     in
     test "search List String fields where match in title results are" <|
@@ -519,10 +515,10 @@ searchDocsTestList2 _ =
 
         collapsedSearchResult =
             case searchResult of
-                Ok ( index, results ) ->
+                Ok ( _, results ) ->
                     List.map Tuple.first results
 
-                Err msg ->
+                Err _ ->
                     []
     in
     test "search List String fields where match in body List String and title" <|
@@ -544,10 +540,10 @@ searchDocsTestList3 _ =
 
         searchScores =
             case searchResult of
-                Ok ( index, results ) ->
+                Ok ( _, results ) ->
                     List.map Tuple.second results
 
-                Err msg ->
+                Err _ ->
                     []
     in
     test "search List String fields where match in body List String and title, check for NaN values in scores" <|

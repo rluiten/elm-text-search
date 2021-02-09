@@ -5,9 +5,8 @@ module SaveLoadTests exposing (MyDoc, checkSearchResult1, checkSearchResult2, co
 import ElmTextSearch
 import Expect
 import Index.Model exposing (Index(..))
-import Json.Decode as Decode exposing (errorToString)
 import Test exposing (..)
-import TestUtils exposing (expectOk, mapDecodeErrorToString)
+import TestUtils exposing (mapDecodeErrorToString)
 
 
 tests : Test

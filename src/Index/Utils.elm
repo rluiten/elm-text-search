@@ -30,11 +30,10 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import Dict exposing (Dict)
-import Index.Model exposing (FilterFactory, FuncFactory, Index(..))
-import Maybe exposing (andThen, withDefault)
+import Index.Model exposing (FuncFactory, Index(..), TransformFunc)
 import Set exposing (Set)
 import TokenProcessors
-import Trie exposing (Trie)
+import Trie
 
 
 {-| Create a function creator (FuncFactory)

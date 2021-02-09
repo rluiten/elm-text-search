@@ -39,10 +39,8 @@ Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Index.Model exposing (FilterFactory, Index)
-import Index.Utils
-import Set exposing (Set)
-import Stemmer
+import Index.Model exposing (FilterFactory)
+import Set
 
 
 {-| Default english stop word list to create filter.

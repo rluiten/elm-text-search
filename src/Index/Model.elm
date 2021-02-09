@@ -1,7 +1,7 @@
 module Index.Model exposing
     ( Index(..)
     , IndexSimpleConfig
-    , CodecIndexRecord, Config, FilterFactory, FuncFactory, ModelSimpleConfig, TransformFactory
+    , CodecIndexRecord, Config, FilterFactory, FuncFactory, ModelSimpleConfig, TransformFactory, TransformFunc, TransformFunc2
     )
 
 {-| Define the Index Model
@@ -27,6 +27,14 @@ type alias FuncFactory doc func =
 
 type alias TransformFunc =
     String -> String
+
+
+{-| Variant, making composition nicer in code
+The old version just isn't right was using "" as no token rather than Maybe.
+Makes composition lots better
+-}
+type alias TransformFunc2 =
+    String -> Maybe String
 
 
 type alias TransformFactory doc =
