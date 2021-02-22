@@ -78,12 +78,8 @@ import Index
 import Index.Defaults as Defaults
 import Index.Load
 import Index.Model as Model
-import Index.Utils
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Stemmer
-import StopWordFilter
-import TokenProcessors
 
 
 {-| An Index holds the data to be able search for added documents.

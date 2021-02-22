@@ -2,8 +2,6 @@ module StopWordFilterTests exposing (ExampleDocType, newIndex, stopWordFilterTes
 
 import ElmTextSearch
 import Expect
-import Index.Utils
-import Stemmer
 import StopWordFilter
 import Test exposing (..)
 
@@ -37,7 +35,7 @@ tests =
 
 stopWordFilterTest word =
     let
-        ( testIndex1, stopWordFilter ) =
+        ( _, stopWordFilter ) =
             StopWordFilter.createDefaultFilterFunc newIndex
     in
     test ("This word \"" ++ word ++ "\" got past default stop word filter in error.") <|

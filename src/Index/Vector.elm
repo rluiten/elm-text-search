@@ -6,14 +6,14 @@ Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Dict exposing (Dict)
+import Dict
 import Index.Model exposing (Index(..))
 import Index.Utils
 import Maybe
 import Set exposing (Set)
 import SparseVector exposing (SparseVector)
 import String
-import Trie exposing (Trie)
+import Trie
 
 
 {-| Build a query vector and the sets of candidate document matches

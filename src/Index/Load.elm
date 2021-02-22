@@ -6,18 +6,15 @@ Copyright (c) 2016 Robin Luiten
 
 -}
 
-import Dict exposing (Dict)
+import Dict
 import ElmTextSearch.Json.Decoder as IndexDecoder
 import Index.Defaults as Defaults
 import Index.Model exposing (..)
 import Index.Utils
 import Json.Decode as Decode
-import Json.Encode as Encode
-import Stemmer
-import StopWordFilter
-import TokenProcessors
 
 
+errorPrefix : String
 errorPrefix =
     "Error cannot load Index."
 

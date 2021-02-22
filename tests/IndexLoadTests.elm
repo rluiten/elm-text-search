@@ -1,19 +1,14 @@
 module IndexLoadTests exposing (IndexAndListResult, IndexResult, MyDoc, config1, config2, createMyStopWordFilter, doc1, exampleJsonIndex100, exampleJsonIndex100default, exampleJsonIndex100somestring, exampleJsonIndex101, index0, indexfromString1, jsonIndexDefault, loadIndexWith1, loadIndexWithErr1, loadIndexWithErr2, myStopWords, tests)
 
-import Dict
 import ElmTextSearch
-import Expect
 import Index
-import Index.Defaults
 import Index.Load
 import Index.Model exposing (Index(..))
 import Index.Utils
-import Json.Decode as Decode
 import Stemmer
 import StopWordFilter
-import String
 import Test exposing (..)
-import TestUtils exposing (expectErr, expectOk, expectResultFailureMessage, mapDecodeErrorToString)
+import TestUtils exposing (expectOk, expectResultFailureMessage, mapDecodeErrorToString)
 import TokenProcessors
 
 

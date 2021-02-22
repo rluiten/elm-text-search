@@ -1,15 +1,6 @@
 module TokenProcessorTests exposing (TokenArrayCase, TokenCase, tests, tokenCases, tokenizerTest, trimmerCases, trimmerTest)
 
 import Expect
-import Regex
-    exposing
-        ( Regex
-          -- , HowMany(..)
-        , fromString
-        , never
-        , replace
-        , split
-        )
 import Test exposing (..)
 import TokenProcessors
 

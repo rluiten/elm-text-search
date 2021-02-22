@@ -2,11 +2,8 @@ module IndexUtilsTests exposing (MyDoc, getTokensCases, index0, index1removeLast
 
 import Expect
 import Index exposing (Index)
-import Index.Model
 import Index.Utils
-import Stemmer
 import Test exposing (..)
-import TokenProcessors
 
 
 type alias MyDoc =
