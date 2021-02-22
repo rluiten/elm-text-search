@@ -9,10 +9,9 @@ module IndexUtilsTests exposing
 import Expect
 import Index exposing (Index)
 import Index.Model exposing (FilterFactory, TransformFactory)
-import Test exposing (..)
-import StopWordFilter exposing (createFilterFunc)
 import Index.Utils
-
+import StopWordFilter exposing (createFilterFunc)
+import Test exposing (..)
 
 type alias MyDoc =
     { cid : String

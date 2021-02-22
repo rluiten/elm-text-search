@@ -3,8 +3,6 @@ module Index.Utils exposing
     , getTokens
     , getTokensList
     , processTokens
-    , applyTransform
-    , applyFilter
     , idf
     , refExists
     , buildOrderIndex
@@ -19,8 +17,6 @@ module Index.Utils exposing
 @docs getTokens
 @docs getTokensList
 @docs processTokens
-@docs applyTransform
-@docs applyFilter
 @docs idf
 @docs refExists
 @docs buildOrderIndex
@@ -30,7 +26,14 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import Dict exposing (Dict)
-import Index.Model exposing (FuncFactory, Index(..), TransformFunc)
+import Index.Model
+    exposing
+        ( FilterFactory
+        , FuncFactory
+        , Index(..)
+        , TransformFunc
+        , TransformFunc2
+        )
 import Set exposing (Set)
 import TokenProcessors
 import Trie
@@ -83,22 +86,22 @@ are applied and the empty string is removed from the set of tokens.
 applyTransform : Index doc -> List String -> ( Index doc, List String )
 applyTransform index strings =
     let
-        ( u1index, transformList ) =
+        ( u1index, transformList2 ) =
             getOrSetTransformList index
     in
     ( u1index
-    , List.filter
-        (\val -> val /= "")
-        (List.map (applyTransformList transformList) strings)
+    , List.filterMap
+        (applyTransformList transformList2)
+        strings
     )
 
 
 {-| Would prefer to pass just accessors (eg .transforms) to
 getOrSetIndexFuncList but so far the types are beating me.
 -}
-getOrSetTransformList : Index doc -> ( Index doc, List TransformFunc )
+getOrSetTransformList : Index doc -> ( Index doc, List TransformFunc2 )
 getOrSetTransformList index =
-    getOrSetIndexFuncList
+    getOrSetIndexFuncListA
         (\(Index irec) -> irec.transforms)
         (\(Index irec) -> irec.transformFactories)
         setIndexTransforms
@@ -106,62 +109,84 @@ getOrSetTransformList index =
 
 
 {-| set Index transforms func field
+
+Added listFuncs2
+
 -}
-setIndexTransforms : Index doc -> List TransformFunc -> Index doc
-setIndexTransforms (Index irec) listFuncs =
-    Index { irec | transforms = Just listFuncs }
+setIndexTransforms : Index doc -> List TransformFunc2 -> Index doc
+setIndexTransforms (Index irec) listFuncs2 =
+    Index { irec | transforms = Just listFuncs2 }
 
 
 applyInitialTransform : Index doc -> List String -> ( Index doc, List String )
 applyInitialTransform index strings =
     let
-        ( u1index, intitialTransformList ) =
+        ( u1index, intitialTransformList2 ) =
             getOrSetInitialTransformList index
     in
     ( u1index
-    , List.filter
-        (\val -> val /= "")
-        (List.map (applyTransformList intitialTransformList) strings)
+    , List.filterMap
+        (applyTransformList intitialTransformList2)
+        strings
     )
 
 
-getOrSetInitialTransformList : Index doc -> ( Index doc, List TransformFunc )
+getOrSetInitialTransformList : Index doc -> ( Index doc, List TransformFunc2 )
 getOrSetInitialTransformList index =
-    getOrSetIndexFuncList
+    getOrSetIndexFuncListA
         (\(Index irec) -> irec.initialTransforms)
         (\(Index irec) -> irec.initialTransformFactories)
         setIndexInitialTransforms
         index
 
 
-setIndexInitialTransforms : Index doc -> List TransformFunc -> Index doc
-setIndexInitialTransforms (Index irec) listFuncs =
-    Index { irec | initialTransforms = Just listFuncs }
+setIndexInitialTransforms : Index doc -> List TransformFunc2 -> Index doc
+setIndexInitialTransforms (Index irec) listFuncs2 =
+    Index { irec | initialTransforms = Just listFuncs2 }
 
 
 {-| Apply all transforms in sequence to input token.
 
-If any transform returns an empty string then this will return
-the empty string without running further transforms.
+This works it came from reference learn-maybe/src/Transforms.elm my test project.
 
 -}
-applyTransformList : List TransformFunc -> String -> String
+applyTransformList : List TransformFunc2 -> String -> Maybe String
 applyTransformList transforms token =
-    case transforms of
-        [] ->
-            token
+    List.foldl (\t -> Maybe.andThen t) (Just token) transforms
 
-        transform :: restTransforms ->
-            let
-                newToken =
-                    transform token
-            in
-            case newToken of
-                "" ->
-                    ""
 
-                _ ->
-                    applyTransformList restTransforms newToken
+{-| Adapt function String -> String
+Into String -> Maybe String
+Where an empty string maps to Nothing.
+
+This is only exposed to test AUGH!
+-}
+adaptFuncStrA : a -> (String -> a) -> (String -> Maybe a)
+adaptFuncStrA aValue func =
+    \string ->
+        let
+            result =
+                func string
+        in
+        if result /= aValue then
+            Just result
+
+        else
+            Nothing
+
+
+adaptFuncStrB : (String -> Bool) -> (String -> Maybe String)
+adaptFuncStrB func =
+    \string ->
+        let
+            result =
+                func string
+        in
+        if result then
+            Just string
+
+        else
+            Nothing
 
 
 {-| Apply index filters to tokens.
@@ -172,15 +197,19 @@ If any token is an empty string it will be filtered out as well.
 applyFilter : Index doc -> List String -> ( Index doc, List String )
 applyFilter index strings =
     let
-        ( u1index, filterList ) =
+        ( u1index, filterList2 ) =
             getOrSetFilterList index
     in
-    ( u1index, List.filter (applyFilterList filterList) strings )
+    ( u1index
+    , List.filterMap
+        (applyTransformList filterList2)
+        strings
+    )
 
 
-getOrSetFilterList : Index doc -> ( Index doc, List (String -> Bool) )
+getOrSetFilterList : Index doc -> ( Index doc, List TransformFunc2 )
 getOrSetFilterList index =
-    getOrSetIndexFuncList
+    getOrSetIndexFuncListB
         (\(Index irec) -> irec.filters)
         (\(Index irec) -> irec.filterFactories)
         setIndexFilters
@@ -189,63 +218,81 @@ getOrSetFilterList index =
 
 {-| set Index filters func field
 -}
-setIndexFilters : Index doc -> List (String -> Bool) -> Index doc
-setIndexFilters (Index irec) listFuncs =
-    Index { irec | filters = Just listFuncs }
+setIndexFilters : Index doc -> List TransformFunc2 -> Index doc
+setIndexFilters (Index irec) listFuncs2 =
+    Index { irec | filters = Just listFuncs2 }
 
 
-{-| If any filter returns False then return False.
+{-| String TranformFunc source type variant.
 
-Place more descriminant filters as early as possible in filters
-list as they are run in order.
+See getOrSetIndexFuncListB for FilterFunc variant
+Generic type `a` isnt helping me here so splitting for specific types
+Dang and these two variants work.
 
 -}
-applyFilterList : List (String -> Bool) -> String -> Bool
-applyFilterList filters token =
-    case filters of
-        [] ->
-            True
-
-        filterFunc :: restFilters ->
-            case token of
-                "" ->
-                    False
-
-                _ ->
-                    case filterFunc token of
-                        False ->
-                            False
-
-                        True ->
-                            applyFilterList restFilters token
-
-
-{-| Get a list of functions from Index, if they have not been created
-they are created and set on Index.
--}
-getOrSetIndexFuncList :
-    (Index doc -> Maybe (List func))
-    -> (Index doc -> List (FuncFactory doc func))
-    -> (Index doc -> List func -> Index doc)
+getOrSetIndexFuncListA :
+    (Index doc -> Maybe (List TransformFunc2))
+    -> (Index doc -> List (FuncFactory doc TransformFunc))
+    -> (Index doc -> List TransformFunc2 -> Index doc)
     -> Index doc
-    -> ( Index doc, List func )
-getOrSetIndexFuncList getFuncs getFactoryFuncs setFuncs index =
-    case getFuncs index of
-        Just funcList ->
-            ( index, funcList )
+    -> ( Index doc, List TransformFunc2 )
+getOrSetIndexFuncListA getFuncs2 getFactoryFuncs setFuncs index =
+    case getFuncs2 index of
+        -- init allready run
+        Just funcList2 ->
+            ( index, funcList2 )
 
-        Nothing ->
+        -- rebuild function lists
+        _ ->
             let
                 ( u1index, newFuncList ) =
                     runFactories (getFactoryFuncs index) index
 
+                newFunc2List =
+                    List.map (adaptFuncStrA "") newFuncList
+
                 u2index =
-                    setFuncs u1index newFuncList
+                    setFuncs u1index newFunc2List
             in
-            ( u2index, newFuncList )
+            ( u2index, newFunc2List )
+
+
+{-| Variant for FilterFunc hydration
+
+If i switch FilterFunc to be TransformFunc instead i can share above code, just one less variation.
+
+-}
+getOrSetIndexFuncListB :
+    (Index doc -> Maybe (List TransformFunc2))
+    -> (Index doc -> List (FilterFactory doc))
+    -> (Index doc -> List TransformFunc2 -> Index doc)
+    -> Index doc
+    -> ( Index doc, List TransformFunc2 )
+getOrSetIndexFuncListB getFuncs2 getFactoryFuncs setFuncs index =
+    case getFuncs2 index of
+        -- init allready run
+        Just funcList2 ->
+            ( index, funcList2 )
+
+        -- rebuild function lists
+        _ ->
+            let
+                ( u1index, newFuncList ) =
+                    runFactories (getFactoryFuncs index) index
+
+                newFunc2List =
+                    List.map adaptFuncStrB newFuncList
+
+                u2index =
+                    setFuncs u1index newFunc2List
+            in
+            ( u2index, newFunc2List )
 
 
 {-| Run each of the function factories returning the list of functions.
+
+TODO use foldr?, probably dont mater here
+
 -}
 runFactories : List (FuncFactory doc func) -> Index doc -> ( Index doc, List func )
 runFactories factoryList index =

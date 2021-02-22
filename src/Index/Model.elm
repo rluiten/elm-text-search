@@ -1,7 +1,7 @@
 module Index.Model exposing
     ( Index(..)
     , IndexSimpleConfig
-    , CodecIndexRecord, Config, FilterFactory, FuncFactory, ModelSimpleConfig, TransformFactory, TransformFunc, TransformFunc2
+    , CodecIndexRecord, Config, FilterFactory, FilterFunc, FuncFactory, ModelSimpleConfig, TransformFactory, TransformFunc, TransformFunc2
     )
 
 {-| Define the Index Model
@@ -107,7 +107,7 @@ The internal data model of Index
 
   - idfCache
       - cached idf (inverse document frequency scores)
-      - these are cleared if a document is added removed or updated
+      - cache is reset (cleared) if any document is added removed or updated in index
 
 -}
 type Index doc
@@ -129,9 +129,9 @@ type alias IndexRecord doc =
     , corpusTokens : Set String
     , tokenStore : Trie Float
     , corpusTokensIndex : Dict String Int
-    , initialTransforms : Maybe (List TransformFunc)
-    , transforms : Maybe (List TransformFunc)
-    , filters : Maybe (List FilterFunc)
+    , initialTransforms : Maybe (List TransformFunc2)
+    , transforms : Maybe (List TransformFunc2)
+    , filters : Maybe (List TransformFunc2)
     , idfCache : Dict String Float
     }
 
