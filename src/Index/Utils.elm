@@ -96,7 +96,7 @@ applyTransform index strings =
 {-| Would prefer to pass just accessors (eg .transforms) to
 getOrSetIndexFuncList but so far the types are beating me.
 -}
-getOrSetTransformList : Index doc -> ( Index doc, List (String -> String) )
+getOrSetTransformList : Index doc -> ( Index doc, List TransformFunc )
 getOrSetTransformList index =
     getOrSetIndexFuncList
         (\(Index irec) -> irec.transforms)
@@ -107,7 +107,7 @@ getOrSetTransformList index =
 
 {-| set Index transforms func field
 -}
-setIndexTransforms : Index doc -> List (String -> String) -> Index doc
+setIndexTransforms : Index doc -> List TransformFunc -> Index doc
 setIndexTransforms (Index irec) listFuncs =
     Index { irec | transforms = Just listFuncs }
 
@@ -125,7 +125,7 @@ applyInitialTransform index strings =
     )
 
 
-getOrSetInitialTransformList : Index doc -> ( Index doc, List (String -> String) )
+getOrSetInitialTransformList : Index doc -> ( Index doc, List TransformFunc )
 getOrSetInitialTransformList index =
     getOrSetIndexFuncList
         (\(Index irec) -> irec.initialTransforms)
@@ -134,7 +134,7 @@ getOrSetInitialTransformList index =
         index
 
 
-setIndexInitialTransforms : Index doc -> List (String -> String) -> Index doc
+setIndexInitialTransforms : Index doc -> List TransformFunc -> Index doc
 setIndexInitialTransforms (Index irec) listFuncs =
     Index { irec | initialTransforms = Just listFuncs }
 
@@ -145,7 +145,7 @@ If any transform returns an empty string then this will return
 the empty string without running further transforms.
 
 -}
-applyTransformList : List (String -> String) -> String -> String
+applyTransformList : List TransformFunc -> String -> String
 applyTransformList transforms token =
     case transforms of
         [] ->
