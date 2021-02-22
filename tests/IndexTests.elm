@@ -7,6 +7,7 @@ import Index
 import Index.Model exposing (Index(..))
 import Json.Encode as Encode
 import Test exposing (..)
+import Trie
 
 
 tests : Test
@@ -33,6 +34,7 @@ tests =
         , test_index2_addOrUpdate_doc3 ()
         , updateDocNotInIndexFails ()
         , updateDocUsesNewDocIndexContent ()
+        , removeOnlyDocIndexReturnsIsEmpty ()
         ]
 
 
@@ -353,6 +355,49 @@ removeErr2 _ =
         \() ->
             Expect.equal (Err "Error document has an empty unique id (ref).") <|
                 Index.remove (doc5 ()) (safeIndex index2)
+
+
+
+-- update : doc -> Index doc -> Result String (Index doc)
+-- remove : doc -> Index doc -> Result String (Index doc)
+
+{-| Test to verify removing only document reports
+-}
+removeOnlyDocIndexReturnsIsEmpty _ =
+    let
+        testIndex =
+            safeIndex index1
+
+        testDoc =
+            doc1 ()
+
+        updatedResultX =
+            Index.remove testDoc testIndex
+
+        updatedIndex =
+            Result.withDefault testIndex updatedResultX
+
+        ( storeB, tokenStoreB ) =
+            case updatedIndex of
+                Index { documentStore, tokenStore } ->
+                    ( documentStore, tokenStore )
+
+        -- b1 = Trie.get tokenStoreB
+        -- _ =
+        --     Debug.log "doc1 cid" testDoc.cid
+    in
+    describe "removing a doc"
+        [ test "removes it from document store" <|
+            \() ->
+                Expect.false "oops its in document store" (Dict.member testDoc.cid storeB)
+        , test "removes no values in trie for each token in doc (not testing trie) testing Index use of trie" <|
+            \() ->
+                let
+                    a =
+                        1
+                in
+                Expect.true "Trie model is not empty" (Trie.isEmpty tokenStoreB)
+        ]
 
 
 addDocsTest _ =
