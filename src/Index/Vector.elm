@@ -26,13 +26,12 @@ of all the query tokens)
 
 -}
 getQueryVector :
-    Float
-    -> List String
+    List String
     -> Index doc
     -> ( List (Set String), SparseVector, Index doc )
-getQueryVector fieldBoosts tokens index =
+getQueryVector tokens index =
     List.foldr
-        (buildDocVector (List.length tokens) fieldBoosts)
+        (buildDocVector (List.length tokens))
         ( [], SparseVector.empty, index )
         tokens
 
@@ -42,17 +41,13 @@ Update the list of documents that match for each query token (baseToken).
 -}
 buildDocVector :
     Int
-    -> Float
     -> String
     -> ( List (Set String), SparseVector, Index doc )
     -> ( List (Set String), SparseVector, Index doc )
-buildDocVector tokensLength fieldBoosts baseToken ( docSets, vec, (Index irec) as index ) =
+buildDocVector tokensLength baseToken ( docSets, vec, (Index irec) as index ) =
     let
         termFrequency =
-            1
-                / toFloat tokensLength
-                * toFloat (List.length irec.fields)
-                * fieldBoosts
+            1 / toFloat tokensLength
 
         expandedTokens =
             Trie.expand baseToken irec.tokenStore

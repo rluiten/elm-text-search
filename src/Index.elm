@@ -387,20 +387,24 @@ search query index =
 
 
 {-| Return list of document ref's with score, ordered by score descending.
+
+This had a bug it used "fields" boosts but did not use "listFields" for all fields indexed.
+This meant that if you only indexed with listFields that fieldsBoosts would be zero and
+resultant score would end up NaN.
+
+In addition a second problem was that it makes little to no sense to scale query veoctyr
+by average of all fields boost as it does not change the relative score document matches.
+So removing boost on queries is a simpler solution than including "listFields" into boosts.
+
 -}
 searchTokens :
     List String
     -> Index doc
     -> ( Index doc, List ( String, Float ) )
-searchTokens tokens ((Index irec) as index) =
+searchTokens tokens index =
     let
-        fieldBoosts =
-            List.sum (List.map Tuple.second irec.fields)
-
-        -- _ = Debug.log("searchTokens") (tokens, fieldBoosts)
         ( tokenDocSets, queryVector, u1index ) =
             Index.Vector.getQueryVector
-                fieldBoosts
                 tokens
                 index
 
