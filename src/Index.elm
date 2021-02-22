@@ -336,7 +336,7 @@ See ElmTextSearch documentation for `add` and `remove` to see error result condi
 update : doc -> Index doc -> Result String (Index doc)
 update doc index =
     remove doc index
-        |> Result.andThen (\u1index -> add doc index)
+        |> Result.andThen (add doc)
 
 
 {-| Add or Update document in Index.
