@@ -62,7 +62,7 @@ getTokensList index listString =
 Applies filters and transformers configured in index.
 
 Applies filters first then tokenizers.
-So filtesr applie to untokenized words from document.
+So filters apply to untokenized words from document.
 
 -}
 processTokens : Index doc -> List String -> ( Index doc, List String )
@@ -94,7 +94,7 @@ applyTransform index strings =
     )
 
 
-{-| Would prefer to past just accessors (eg .transforms) to
+{-| Would prefer to pass just accessors (eg .transforms) to
 getOrSetIndexFuncList but so far the types are beating me.
 -}
 getOrSetTransformList : Index doc -> ( Index doc, List (String -> String) )
