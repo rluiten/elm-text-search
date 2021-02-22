@@ -100,7 +100,7 @@ view model =
     in
     div []
         [ text
-            ("Result of searching for \"explanations\" is "
+            ("Result of searching for \"title\" is "
                 ++ Debug.toString searchResults
             )
         ]
