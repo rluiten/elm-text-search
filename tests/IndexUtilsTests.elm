@@ -1,7 +1,6 @@
 module IndexUtilsTests exposing
     ( testDefaultTransforms
     , testGetTokens
-    , test_adapted_helperDropRight1
     , test_processTokens_filterFactories
     , test_processTokens_initialTransformFactories
     , test_processTokens_transformFactories
@@ -10,9 +9,9 @@ module IndexUtilsTests exposing
 import Expect
 import Index exposing (Index)
 import Index.Model exposing (FilterFactory, TransformFactory)
-import Index.Utils exposing (adaptFuncStrA)
 import Test exposing (..)
 import StopWordFilter exposing (createFilterFunc)
+import Index.Utils
 
 
 type alias MyDoc =
@@ -138,12 +137,3 @@ test_processTokens_filterFactories =
                 |> Tuple.second
                 |> Expect.equal
                     [ "word", "puzzle" ]
-
-
-{-| Found bug in adaptFuncStrStr, with this.
--}
-test_adapted_helperDropRight1 : Test
-test_adapted_helperDropRight1 =
-    test "test adapted function on \"bc\"" <|
-        \() ->
-            Expect.equal (Just "b") (adaptFuncStrA "" (String.dropRight 1) "bc")
