@@ -25,6 +25,10 @@ for loading and saving of older version and types of default index confgurations
 
 Result types from loading indexes are now Decode.Error not String.
 
+### v5.0.2
+
+New functions addT for add, searchT for search and removeT for remove.
+These replace the error type of result with a type.
 
 ### Packages
 
