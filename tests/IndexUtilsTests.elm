@@ -1,9 +1,17 @@
-module IndexUtilsTests exposing (MyDoc, getTokensCases, index0, index1removeLast3Transform, testApplyTransform, testGetTokens, tests)
+module IndexUtilsTests exposing
+    ( testDefaultTransforms
+    , testGetTokens
+    , test_processTokens_filterFactories
+    , test_processTokens_initialTransformFactories
+    , test_processTokens_transformFactories
+    )
 
 import Expect
 import Index exposing (Index)
-import Index.Utils
+import Index.Model exposing (FilterFactory, TransformFactory)
 import Test exposing (..)
+import StopWordFilter exposing (createFilterFunc)
+import Index.Utils
 
 
 type alias MyDoc =
@@ -14,67 +22,62 @@ type alias MyDoc =
     }
 
 
-{-| example index
--}
-index0 : Index MyDoc
-index0 =
-    Index.new
-        { indexType = "- IndexTest Type -"
-        , ref = .cid
-        , fields =
-            [ ( .title, 5 )
-            , ( .body, 1 )
+testDefaultTransforms : Test
+testDefaultTransforms =
+    describe "apply default transform tests"
+        (List.map testGetTokens
+            [ ( "words of only non word chars removed"
+              , "engineering ???"
+              , [ "engin" ]
+              )
+            , ( "stemmer and non word chars removed"
+              , ".This was very large.-"
+              , [ "veri", "larg" ]
+              )
+            , ( "stop words removed"
+              , "however among the dear .- -"
+              , []
+              )
+
+            -- Bug https://github.com/rluiten/elm-text-search/issues/10
+            , ( "\"on\" in the stop word list should not filter \"one\""
+              , "one two three"
+                -- note that "one" is transformed to "on" by stemmer
+              , [ "on", "two", "three" ]
+              )
             ]
-        , listFields = []
-        }
+        )
 
 
-tests : Test
-tests =
-    describe "Index.Utils tests"
-        [ describe "apply default transform tests"
-            (List.map testGetTokens getTokensCases)
-        , testApplyTransform
-        ]
-
-
-getTokensCases =
-    [ ( "words of only non word chars removed"
-      , "engineering ???"
-      , [ "engin" ]
-      )
-    , ( "stemmer and non word chars removed"
-      , ".This was very large.-"
-      , [ "veri", "larg" ]
-      )
-    , ( "stop words removed"
-      , "however among the dear .- -"
-      , []
-      )
-    , ( "\"on\" in the stop word list should not filter \"one\" (https://github.com/rluiten/elm-text-search/issues/10)"
-      , "one two three"
-        -- note that "one" is transformed to "on" by stemmer
-      , [ "on", "two", "three" ]
-      )
-    ]
-
-
+testGetTokens : ( String, String, List String ) -> Test
 testGetTokens ( name, input, expected ) =
     test ("getTokens \"" ++ input ++ "\" " ++ name) <|
         \() ->
-            Expect.equal
-                expected
-                (Tuple.second (Index.Utils.getTokens index0 input))
+            let
+                testMyDocIndex =
+                    Index.new
+                        { indexType = "- IndexTest Type -"
+                        , ref = .cid
+                        , fields =
+                            [ ( .title, 5 )
+                            , ( .body, 1 )
+                            ]
+                        , listFields = []
+                        }
+            in
+            Index.Utils.getTokens
+                testMyDocIndex
+                input
+                |> Tuple.second
+                |> Expect.equal expected
 
 
-{-| A test index, to ensure all transform factories are applied.
--}
-index1removeLast3Transform : Index MyDoc
-index1removeLast3Transform =
-    let
-        removeLastCharFuncCreator =
-            Index.Utils.createFuncCreator (String.dropRight 1)
-    in
+createTestIndex1 :
+    List (TransformFactory MyDoc)
+    -> List (TransformFactory MyDoc)
+    -> List (FilterFactory MyDoc)
+    -> Index MyDoc
+createTestIndex1 initialTransformFactories transformFactories filterFactories =
     Index.newWith
         { indexType = "- IndexTest Type -"
         , ref = .cid
@@ -83,21 +86,54 @@ index1removeLast3Transform =
             , ( .body, 1 )
             ]
         , listFields = []
-        , initialTransformFactories = []
-        , transformFactories =
-            [ removeLastCharFuncCreator
-            , removeLastCharFuncCreator
-            ]
-        , filterFactories = []
+        , initialTransformFactories = initialTransformFactories
+        , transformFactories = transformFactories
+        , filterFactories = filterFactories
         }
 
 
-testApplyTransform =
-    test "test applyTransform applies all to words input" <|
+test_processTokens_transformFactories : Test
+test_processTokens_transformFactories =
+    test "test processTokens transformFactories list" <|
         \() ->
-            Expect.equal
-                [ "wor", "testi" ]
-                (Tuple.second <|
-                    Index.Utils.applyTransform index1removeLast3Transform
-                        [ "words", "testing", "a" ]
+            Index.Utils.processTokens
+                (createTestIndex1
+                    []
+                    [ Index.Utils.createFuncCreator (String.dropRight 1), Index.Utils.createFuncCreator (String.dropRight 1) ]
+                    []
                 )
+                [ "awords", "btesting", "ca" ]
+                |> Tuple.second
+                |> Expect.equal [ "awor", "btesti" ]
+
+
+test_processTokens_initialTransformFactories : Test
+test_processTokens_initialTransformFactories =
+    test "test processTokens initialTransformFactories list" <|
+        \() ->
+            Index.Utils.processTokens
+                (createTestIndex1
+                    [ Index.Utils.createFuncCreator (String.dropLeft 1), Index.Utils.createFuncCreator (String.dropRight 1) ]
+                    []
+                    []
+                )
+                [ "pwords", "qtesting", "ra" ]
+                |> Tuple.second
+                |> Expect.equal
+                    [ "word", "testin" ]
+
+
+test_processTokens_filterFactories : Test
+test_processTokens_filterFactories =
+    test "test processTokens filterFactories list" <|
+        \() ->
+            Index.Utils.processTokens
+                (createTestIndex1
+                    []
+                    []
+                    [ createFilterFunc [ "special" ], createFilterFunc [ "swimming" ] ]
+                )
+                [ "word", "special", "puzzle", "swimming" ]
+                |> Tuple.second
+                |> Expect.equal
+                    [ "word", "puzzle" ]

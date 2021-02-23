@@ -1,4 +1,4 @@
-module StopWordFilterTests exposing (ExampleDocType, newIndex, stopWordFilterTest, tests)
+module StopWordFilterTests exposing (newIndex, stopWordFilterTest, tests)
 
 import ElmTextSearch
 import Expect
@@ -14,6 +14,7 @@ type alias ExampleDocType =
     }
 
 
+newIndex : ElmTextSearch.Index ExampleDocType
 newIndex =
     ElmTextSearch.new
         { ref = .cid
@@ -27,12 +28,11 @@ newIndex =
 
 tests : Test
 tests =
-    describe "StopWordFilter tests"
-        [ describe "check stopEnglishWordList against default token processing"
-            (List.map stopWordFilterTest StopWordFilter.stopEnglishWordList)
-        ]
+    describe "check stopEnglishWordList against default token processing"
+        (List.map stopWordFilterTest StopWordFilter.stopEnglishWordList)
 
 
+stopWordFilterTest : String -> Test
 stopWordFilterTest word =
     let
         ( _, stopWordFilter ) =

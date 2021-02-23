@@ -1,52 +1,83 @@
-module TestUtils exposing (expectErr, expectOk, expectResultFailureMessage, mapDecodeErrorToString)
+module TestUtils exposing
+    ( expectOkWithGoodFailMessage
+    , getDecodeErrorFailureMessage
+    , getErrorIgnoreResult
+    , getResultIgnoreError
+    , isErr
+    , isOk
+    )
+
+{-| Utilities to make test cases simpler.
+-}
 
 import Expect
-import Json.Decode as Decode exposing (errorToString, Error(..))
+import Index
+import Index.Model exposing (Index(..))
+import Json.Decode exposing (Error(..))
 import Test exposing (..)
 
 
-expectOk : Result String a -> Expect.Expectation
-expectOk result =
+expectOkWithGoodFailMessage : Result Error a -> Expect.Expectation
+expectOkWithGoodFailMessage result =
     case result of
         Ok _ ->
             Expect.true "Result Ok as expected" True
 
-        Err _ ->
-            Expect.false "Result Err not expected" False
+        Err error ->
+            Expect.false
+                (String.concat
+                    [ "Result Err not expected: "
+                    , getDecodeErrorFailureMessage error
+                    ]
+                )
+                True
 
 
-expectErr : Result String a -> Expect.Expectation
-expectErr result =
-    case result of
-        Ok _ ->
-            Expect.true "Result Ok not expected" False
-
-        Err _ ->
-            Expect.false "Result Err as expected" True
-
-
-{-| Map a Decoder Error to a string for our usage, useful ? put in Decoder or ElmTextSearch?
-to maintain backward compatibility with interface ? hmm ?
--}
-mapDecodeErrorToString : Result Decode.Error a -> Result String a
-mapDecodeErrorToString result =
+getResultIgnoreError : Result error a -> a
+getResultIgnoreError result =
     case result of
         Ok value ->
-            Ok value
+            value
+
+        Err _ ->
+            Debug.todo "Ignoring failure for testing"
+
+
+getErrorIgnoreResult : Result error a -> error
+getErrorIgnoreResult result =
+    case result of
+        Ok _ ->
+            Debug.todo "Ignoring value for testing"
 
         Err error ->
-            Err (errorToString error)
+            error
 
 
-expectResultFailureMessage : String -> String -> Result Decode.Error x -> Test
-expectResultFailureMessage name expectedMessage result =
-    test name <|
-        \() ->
-            Expect.equal expectedMessage
-                (case result of
-                    Err (Failure description _) ->
-                        description
+getDecodeErrorFailureMessage : Error -> String
+getDecodeErrorFailureMessage error =
+    case error of
+        Failure message _ ->
+            message
 
-                    _ ->
-                        "-= Unexpected Value =- in test " ++ name
-                )
+        _ ->
+            Debug.todo "Ignoring all but Feailures of Decode Error"
+
+
+isOk : Result e a -> Bool
+isOk x =
+    case x of
+        Ok _ ->
+            True
+
+        Err _ ->
+            False
+
+
+isErr : Result e a -> Bool
+isErr x =
+    case x of
+        Ok _ ->
+            False
+
+        Err _ ->
+            True

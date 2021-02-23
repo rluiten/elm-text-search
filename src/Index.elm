@@ -157,7 +157,7 @@ addDocsCore :
     -> Index doc
     -> List ( Int, String )
     -> ( Index doc, List ( Int, String ) )
-addDocsCore docsI docs ((Index irec) as index) errors =
+addDocsCore docsI docs index errors =
     case docs of
         [] ->
             ( index, errors )
@@ -311,7 +311,7 @@ errorMessageNotIndex =
 {-| Remove the doc by docRef id from the index.
 -}
 removeDoc : String -> Index doc -> Set String -> Index doc
-removeDoc docRef ((Index irec) as index) docTokens =
+removeDoc docRef (Index irec) docTokens =
     let
         removeToken token trie =
             Trie.remove token docRef trie

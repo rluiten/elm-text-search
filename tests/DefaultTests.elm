@@ -1,20 +1,14 @@
-module DefaultTests exposing (testDefaultIndexType, tests)
+module DefaultTests exposing (testDefaultIndexType)
 
 import Expect
 import Index.Defaults
 import Test exposing (..)
 
 
-tests : Test
-tests =
-    describe "Default tests"
-        [testDefaultIndexType ()
-        ]
-
-
-testDefaultIndexType _ =
-    let
-        configDefault =
+testDefaultIndexType : Test
+testDefaultIndexType =
+    test "Check Index Type" <|
+        \() ->
             Index.Defaults.getIndexSimpleConfig
                 { ref = .cid
                 , fields =
@@ -24,17 +18,5 @@ testDefaultIndexType _ =
                     [ ( .body, 1.0 )
                     ]
                 }
-
-        -- _ =
-        --     Debug.log "asdfasdfafsd" configDefault
-    in
-    test "Check Index Type" <|
-        \() ->
-            Expect.equal "-= ElmTextSearch Index Type 1 =-" configDefault.indexType
-
-
-
--- testDefaultIndexVersion _ =
---     test "Check Index Version" <|
---         \() ->
---             Expect.equal "-= ElmTextSearch Index Type 2 =-" configDefault.indexType
+                |> .indexType
+                |> Expect.equal "-= ElmTextSearch Index Type 1 =-"
