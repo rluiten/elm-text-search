@@ -86,7 +86,7 @@ searchReturnsValidResult =
                 |> ElmTextSearch.search "exile"
                 |> TestUtils.getResultIgnoreError
                 |> Tuple.second
-                |> Expect.equal [ ( "doc2", 0.1389834449709609 ) ]
+                |> Expect.equal [ ( "doc2", 0.13898344497096093 ) ]
 
 
 {-| helper to save and load an index. and run a search in original index and loaded index.
