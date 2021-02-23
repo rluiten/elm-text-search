@@ -2,16 +2,21 @@ module Index exposing
     ( new
     , newWith
     , add
+    , addT
     , addDocs
     , remove
+    , removeT
     , update
     , addOrUpdate
     , search
+    , searchT
     , Index
     )
 
 {-| Index module for full text indexer
 
+Added addT, removeT and searchT functions that provide
+a strong type for Error in the Result.
 
 ## Create Index
 
@@ -22,8 +27,10 @@ module Index exposing
 ## Update Index
 
 @docs add
+@docs addT
 @docs addDocs
 @docs remove
+@docs removeT
 @docs update
 @docs addOrUpdate
 
@@ -31,6 +38,7 @@ module Index exposing
 ## Query Index
 
 @docs search
+@docs searchT
 
 
 ## Types
@@ -63,6 +71,23 @@ type alias Config doc =
 
 type alias SimpleConfig doc =
     Model.ModelSimpleConfig doc
+
+
+type AddError
+    = AddErrorUniqueRefIsEmpty
+    | NoTermsToIndexAfterTokenisation
+    | DocAlreadyExists
+
+
+type RemoveError
+    = RemoveErrorUniqueRefIsEmpty
+    | DocIsNotInIndex
+
+
+type SearchError
+    = IndexIsEmpty
+    | QueryIsEmpty
+    | NoTermsToSearchAfterTokenisation
 
 
 {-| Create new index.
@@ -99,18 +124,46 @@ newWith { indexType, ref, fields, listFields, initialTransformFactories, transfo
 
 {-| Add document to an Index if no error conditions found.
 See ElmTextSearch documentation for `add` to see error conditions.
+
+Original function signature retained for backward compatible.
+
 -}
 add : doc -> Index doc -> Result String (Index doc)
-add doc ((Index irec) as index) =
+add doc index =
+    case addT doc index of
+        Ok resultValue ->
+            Ok resultValue
+
+        Err error ->
+            case error of
+                AddErrorUniqueRefIsEmpty ->
+                    Err "Error document has an empty unique id (ref)."
+
+                DocAlreadyExists ->
+                    Err "Error adding document that allready exists."
+
+                NoTermsToIndexAfterTokenisation ->
+                    Err "Error after tokenisation there are no terms to index."
+
+
+{-| Add document to an Index if no error conditions found.
+
+Variant that supports AddError type for Result
+
+See ElmTextSearch documentation for `add` to see error conditions.
+
+-}
+addT : doc -> Index doc -> Result AddError (Index doc)
+addT doc ((Index irec) as index) =
     let
         docRef =
             irec.ref doc
     in
     if String.isEmpty docRef then
-        Err "Error document has an empty unique id (ref)."
+        Err AddErrorUniqueRefIsEmpty
 
     else if Index.Utils.refExists docRef index then
-        Err "Error adding document that allready exists."
+        Err DocAlreadyExists
 
     else
         let
@@ -131,7 +184,7 @@ add doc ((Index irec) as index) =
                     |> List.foldr Set.union Set.empty
         in
         if Set.isEmpty docTokens then
-            Err "Error after tokenisation there are no terms to index."
+            Err NoTermsToIndexAfterTokenisation
 
         else
             Ok (addDoc docRef u2fieldsWordListAndBoost docTokens u2index)
@@ -268,6 +321,8 @@ scoreToken fieldTokensAndBoost token =
 
 {-| Remove document from an Index if no error result conditions encountered.
 
+Original function signature retained for backward compatible.
+
 See ElmTextSearch documentation for `remove` to see error result conditions.
 
 This does the following things
@@ -281,7 +336,38 @@ This does the following things
 
 -}
 remove : doc -> Index doc -> Result String (Index doc)
-remove doc ((Index irec) as index) =
+remove doc index =
+    case removeT doc index of
+        Ok value ->
+            Ok value
+
+        Err err ->
+            case err of
+                DocIsNotInIndex ->
+                    Err "Error document is not in index."
+
+                RemoveErrorUniqueRefIsEmpty ->
+                    Err "Error document has an empty unique id (ref)."
+
+
+{-| Remove document from an Index if no error result conditions encountered.
+
+Variant that supports RemoveError type for Result
+
+See ElmTextSearch documentation for `remove` to see error result conditions.
+
+This does the following things
+
+  - Remove the document tags from documentStore.
+  - Remove all the document references in tokenStore.
+  - It does not modify corpusTokens - as this requires
+    reprocessing tokens for all documents to recreate corpusTokens.
+      - This may skew the results over time after many removes but not badly.
+      - It appears lunr.js operates this way as well for remove.
+
+-}
+removeT : doc -> Index doc -> Result RemoveError (Index doc)
+removeT doc ((Index irec) as index) =
     let
         docRef =
             irec.ref doc
@@ -289,10 +375,10 @@ remove doc ((Index irec) as index) =
         -- can error without docid as well.
     in
     if String.isEmpty docRef then
-        Err "Error document has an empty unique id (ref)."
+        Err RemoveErrorUniqueRefIsEmpty
 
     else if not (Index.Utils.refExists docRef index) then
-        Err errorMessageNotIndex
+        Err DocIsNotInIndex
 
     else
         Ok
@@ -358,26 +444,52 @@ addOrUpdate doc index =
 
 {-| Search index with query.
 See ElmTextSearch documentation for `search` to see error result conditions.
+
+Original function signature retained for backward compatible.
+
 -}
 search : String -> Index doc -> Result String ( Index doc, List ( String, Float ) )
 search query index =
+    case searchT query index of
+        Ok value ->
+            Ok value
+
+        Err error ->
+            Err <|
+                case error of
+                    IndexIsEmpty ->
+                        "Error there are no documents in index to search."
+
+                    QueryIsEmpty ->
+                        "Error query is empty."
+
+                    NoTermsToSearchAfterTokenisation ->
+                        "Error after tokenisation there are no terms to search for."
+
+
+{-| Search index with query.
+See ElmTextSearch documentation for `search` to see error result conditions.
+
+Variant that supports RemoveError type for Result
+
+-}
+searchT : String -> Index doc -> Result SearchError ( Index doc, List ( String, Float ) )
+searchT query index =
     let
         ( (Index i1irec) as i1index, tokens ) =
             Index.Utils.getTokens index query
 
         tokenInStore token =
             Trie.getNode token i1irec.tokenStore /= Nothing
-
-        -- _ = Debug.log "search d" (query, tokens, List.any tokenInStore tokens)
     in
     if Dict.isEmpty i1irec.documentStore then
-        Err "Error there are no documents in index to search."
+        Err IndexIsEmpty
 
     else if String.isEmpty (String.trim query) then
-        Err "Error query is empty."
+        Err QueryIsEmpty
 
     else if List.isEmpty tokens then
-        Err "Error after tokenisation there are no terms to search for."
+        Err NoTermsToSearchAfterTokenisation
 
     else if List.isEmpty tokens || not (List.any tokenInStore tokens) then
         Ok ( i1index, [] )
