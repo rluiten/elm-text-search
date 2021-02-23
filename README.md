@@ -7,32 +7,33 @@ See http://lunrjs.com/ for lunr.js
 
 I am happy to hear about users of this package.
 
-I am happy to receive contributions be they bug reports, pull requests, documention updates or examples.
+I am happy to receive contributions be they bug reports, pull requests, documentation updates or examples.
 
 ### v4.0.0 will not load indexes saved with old version.
 
 If you do not use `storeToValue` `storeToString` `fromString` `fromValue` in ElmTextSearch this update is not likely to introduce issues.
 
 The way that filters and transforms are applied to the content of documents has changed.
-This is to properly fix a bug reported see https://github.com/rluiten/elm-text-search/issues/10 where stop word filters were not correctly applied. This means saved indexes from prevoius version of ElmTextSearch will not load in this version.
+This is to properly fix a bug reported see https://github.com/rluiten/elm-text-search/issues/10 where stop word filters were not correctly applied. This means saved indexes from previous version of ElmTextSearch will not load in this version.
 
 * `Defaults.indexVersion` has changed value.
 
 The reason this is a Major version bump is some generalisation was done to enable future support
-for loading and saving of older version and types of default index confgurations.
+for loading and saving of older version and types of default index configurations.
 
 ### v5.0.0 updates for Elm 0.19
 
 Result types from loading indexes are now Decode.Error not String.
 
-### v5.0.2
+### v5.0.2, v5.1.0 
 
 New functions addT for add, searchT for search and removeT for remove.
 These replace the error type of result with a type.
+v5.0.2 was a goof on my part i forgot to expose new functions correctly.
 
 ### Packages
 
-Several packages were created for this project and published seperately for this package to depend on.
+Several packages were created for this project and published separately for this package to depend on.
 
 * trie
  * http://package.elm-lang.org/packages/rluiten/trie/latest
@@ -49,7 +50,7 @@ Several packages were created for this project and published seperately for this
 ### Notes captured along way writing this.
 
 * lunr.js
- * tokenStore.remove does not decrement length, but it doesnt use length really only save/load
+ * tokenStore.remove does not decrement length, but it doesn't use length really only save/load
  * stemmer "lay" -> "lay" "try" -> "tri" is opposite to porter stemmer
 * porter stemmer erlang implementation
  * step5b does not use endsWithDoubleCons which is required afaik to pass the voc.txt output.txt cases

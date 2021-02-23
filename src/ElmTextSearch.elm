@@ -2,11 +2,14 @@ module ElmTextSearch exposing
     ( new
     , newWith
     , add
+    , addT
     , addDocs
     , remove
+    , removeT
     , update
     , addOrUpdate
     , search
+    , searchT
     , Index
     , Config
     , SimpleConfig
@@ -33,8 +36,10 @@ A useful article about lunr.js
 ## Modify Index
 
 @docs add
+@docs addT
 @docs addDocs
 @docs remove
+@docs removeT
 @docs update
 @docs addOrUpdate
 
@@ -42,6 +47,7 @@ A useful article about lunr.js
 ## Query Index
 
 @docs search
+@docs searchT
 
 
 ## Types
@@ -74,6 +80,7 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import ElmTextSearch.Json.Encoder as IndexEncoder
+import ElmTextSearchErrors
 import Index
 import Index.Defaults as Defaults
 import Index.Load
@@ -217,10 +224,22 @@ Conditions that cause a result Err with message.
   - Error after tokenisation there are no terms to index.
   - Error adding document that allready exists.
 
+Original function signature retained for backward compatible.
+
 -}
 add : doc -> Index doc -> Result String (Index doc)
 add =
     Index.add
+
+
+{-| Add document to an Index if no error conditions found.
+
+Variant of `add` that provides AddError type for error Results.
+
+-}
+addT : doc -> Index doc -> Result ElmTextSearchErrors.AddError (Index doc)
+addT =
+    Index.addT
 
 
 {-| Add multiple documents. Tries to add all docs and collects errors..
@@ -255,10 +274,22 @@ Conditions that cause a result Err with message.
   - Error document has an empty unique id (ref).
   - Error document is not in index.
 
+Original function signature retained for backward compatible.
+
 -}
 remove : doc -> Index doc -> Result String (Index doc)
 remove =
     Index.remove
+
+
+{-| Add document to an Index if no error conditions found.
+
+Variant of `remove` that provides RemoveError type for error Results.
+
+-}
+removeT : doc -> Index doc -> Result ElmTextSearchErrors.RemoveError (Index doc)
+removeT =
+    Index.removeT
 
 
 {-| Update a document in an index.
@@ -323,6 +354,8 @@ Conditions that cause a result Err with message.
   - Error query is empty.
   - Error after tokenisation there are no terms to search for.
 
+Original function signature retained for backward compatible.
+
 -}
 search :
     String
@@ -330,6 +363,19 @@ search :
     -> Result String ( Index doc, List ( String, Float ) )
 search =
     Index.search
+
+
+{-| Add document to an Index if no error conditions found.
+
+Variant of `search` that provides SearchError type for error Results.
+
+-}
+searchT :
+    String
+    -> Index doc
+    -> Result ElmTextSearchErrors.SearchError ( Index doc, List ( String, Float ) )
+searchT =
+    Index.searchT
 
 
 {-| Store an index to a Value.

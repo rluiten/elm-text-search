@@ -3,9 +3,10 @@
     "name": "rluiten/elm-text-search",
     "summary": "Full text index engine in Elm language inspired by lunr.js.",
     "license": "BSD-3-Clause",
-    "version": "5.0.2",
+    "version": "5.1.0",
     "exposed-modules": [
         "ElmTextSearch",
+        "ElmTextSearchErrors",
         "Index.Defaults",
         "StopWordFilter",
         "ElmTextSearch.Json.Encoder",

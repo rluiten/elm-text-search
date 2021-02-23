@@ -18,6 +18,7 @@ module Index exposing
 Added addT, removeT and searchT functions that provide
 a strong type for Error in the Result.
 
+
 ## Create Index
 
 @docs new
@@ -50,6 +51,7 @@ Copyright (c) 2016 Robin Luiten
 -}
 
 import Dict
+import ElmTextSearchErrors exposing (AddError(..), RemoveError(..), SearchError(..))
 import Index.Defaults as Defaults
 import Index.Model as Model exposing (Index(..))
 import Index.Utils
@@ -71,23 +73,6 @@ type alias Config doc =
 
 type alias SimpleConfig doc =
     Model.ModelSimpleConfig doc
-
-
-type AddError
-    = AddErrorUniqueRefIsEmpty
-    | NoTermsToIndexAfterTokenisation
-    | DocAlreadyExists
-
-
-type RemoveError
-    = RemoveErrorUniqueRefIsEmpty
-    | DocIsNotInIndex
-
-
-type SearchError
-    = IndexIsEmpty
-    | QueryIsEmpty
-    | NoTermsToSearchAfterTokenisation
 
 
 {-| Create new index.
