@@ -10,8 +10,8 @@ module IndexTests exposing
     , idfCacheIsClearedAfterSuccessfulRemove
     , removeDocRefNotIndexReturnsError
     , removeDocWithEmptyIdFieldReturnsError
-    , removeOnlyDocIndexReturnsIsEmpty
     , removeDoesNotBreakSearchResults
+    , removeOnlyDocIndexReturnsIsEmpty
     , searchCasesTest
     , searchEmptyIndexReturnsError
     , searchListFieldsSingleLetterWithLetterInBody
@@ -323,6 +323,7 @@ removeDocWithEmptyIdFieldReturnsError =
                 |> Index.remove doc5_idEmpty
                 |> Expect.equal (Err "Error document has an empty unique id (ref).")
 
+
 removeDoesNotBreakSearchResults : Test
 removeDoesNotBreakSearchResults =
     test "Remove does not break searching" <|
@@ -334,7 +335,8 @@ removeDoesNotBreakSearchResults =
                 |> TestUtils.getResultIgnoreError
                 |> Tuple.second
                 |> List.map Tuple.first
-                |> Expect.equal [doc1_.cid]
+                |> Expect.equal [ doc1_.cid ]
+
 
 {-| Test to verify removing only document reports
 -}
