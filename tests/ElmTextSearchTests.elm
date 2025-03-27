@@ -51,4 +51,5 @@ test_searchT_CanUseErrorResultConstructors =
                                     _ ->
                                         False
                    )
-                |> Expect.true "Result should be an error"
+                |> Expect.equal True
+                >> Expect.onFail "Result should be an error"
