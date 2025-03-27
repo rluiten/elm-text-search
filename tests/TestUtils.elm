@@ -21,16 +21,15 @@ expectOkWithGoodFailMessage : Result Error a -> Expect.Expectation
 expectOkWithGoodFailMessage result =
     case result of
         Ok _ ->
-            Expect.true "Result Ok as expected" True
+            Expect.pass |> Expect.onFail "Result OK as expected"
 
         Err error ->
-            Expect.false
+            Expect.fail
                 (String.concat
                     [ "Result Err not expected: "
                     , getDecodeErrorFailureMessage error
                     ]
                 )
-                True
 
 
 getResultIgnoreError : Result error a -> a
@@ -60,7 +59,7 @@ getDecodeErrorFailureMessage error =
             message
 
         _ ->
-            Debug.todo "Ignoring all but Feailures of Decode Error"
+            Debug.todo "Ignoring all but Failures of Decode Error"
 
 
 isOk : Result e a -> Bool

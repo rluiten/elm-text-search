@@ -7,7 +7,6 @@ module IndexLoadTests exposing
 
 import ElmTextSearch
 import Expect
-import Index
 import Index.Load
 import Index.Model exposing (Index(..))
 import Json.Decode exposing (Error(..))

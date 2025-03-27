@@ -252,7 +252,12 @@ idfCacheIsClearedAfterSuccessfulRemove =
                 |> TestUtils.getResultIgnoreError
                 |> getIdfCache
                 |> Dict.isEmpty
-                |> Expect.true "IdfCache should be cleared after document remove"
+                |> Expect.equal True
+                |> Expect.onFail "IdfCache should be cleared after document remove"
+
+
+
+-- |> Expect.pass |> Expect.onFail "IdfCache should be cleared after document remove"
 
 
 idfCacheIsClearedAfterASuccessfulAdd : Test
@@ -267,7 +272,8 @@ idfCacheIsClearedAfterASuccessfulAdd =
                 |> TestUtils.getResultIgnoreError
                 |> getIdfCache
                 |> Dict.isEmpty
-                |> Expect.true "IdfCache should be cleared after document add"
+                |> Expect.equal True
+                |> Expect.onFail "IdfCache should be cleared after document remove"
 
 
 addDocWithIndexFieldsEmptyReturnsError : Test
@@ -342,11 +348,13 @@ removeOnlyDocIndexReturnsIsEmpty =
         [ test "removes it from document store" <|
             \() ->
                 Dict.member "doc1" storeB
-                    |> Expect.false "oops its in document store"
+                    |> Expect.equal False
+                    |> Expect.onFail "oops its in document store"
         , test "removes trie nodes not leading to a reference. This is not testing trie, testing Index use of trie" <|
             \() ->
                 Trie.isEmpty tokenStoreB
-                    |> Expect.true "Trie model is not empty"
+                    |> Expect.equal True
+                    |> Expect.onFail "Trie model is not empty"
         ]
 
 
@@ -459,7 +467,8 @@ searchWithOnlyListFieldsIndexReturnsValidScores =
                     ]
                 |> List.map Tuple.second
                 |> List.any Basics.isNaN
-                |> Expect.false "Expect searchScores to not contain any NaN values"
+                |> Expect.equal False
+                |> Expect.onFail "Expect searchScores to not contain any NaN values"
 
 
 addDocumentWithSameIdAsExistingReturnsError : Test
@@ -479,7 +488,8 @@ addOrUpdateDocWithSameIdReturnsSuccess =
             getIndexDoc1 ()
                 |> Index.addOrUpdate doc1_
                 |> TestUtils.isOk
-                |> Expect.true "Expect Ok result to addOrUpdate if doc in index"
+                |> Expect.equal True
+                |> Expect.onFail "Expect Ok result to addOrUpdate if doc in index"
 
 
 addOrUpdateDocNotInIndexReturnsSuccess : Test
@@ -489,7 +499,8 @@ addOrUpdateDocNotInIndexReturnsSuccess =
             getEmptyIndex ()
                 |> Index.addOrUpdate doc1_
                 |> TestUtils.isOk
-                |> Expect.true "Expect Ok result to addOrUpdate if doc is new"
+                |> Expect.equal True
+                |> Expect.onFail "Expect Ok result to addOrUpdate if doc is new"
 
 
 updateDocNotInIndexReturnsError : Test
@@ -499,7 +510,8 @@ updateDocNotInIndexReturnsError =
             getEmptyIndex ()
                 |> Index.update doc1_
                 |> TestUtils.isOk
-                |> Expect.false "Updating a doc not in index fails"
+                |> Expect.equal False
+                |> Expect.onFail "Updating a doc not in index fails"
 
 
 {-| Updating a document removes old doc version and adds new doc version.

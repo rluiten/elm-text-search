@@ -41,4 +41,5 @@ stopWordFilterTest word =
     test ("This word \"" ++ word ++ "\" got past default stop word filter in error.") <|
         \() ->
             stopWordFilter word
-                |> Expect.false "These should all be stopped"
+                |> Expect.equal False
+                >> Expect.onFail "These should all be stopped"
