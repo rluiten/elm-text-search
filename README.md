@@ -1,6 +1,6 @@
 # ElmTextSearch full text indexer
 
-Copyright (c) 2016 Robin Luiten
+Copyright (c) 2025 Robin Luiten
 
 This is a full text indexing engine inspired by lunr.js and written in Elm language.
 See http://lunrjs.com/ for lunr.js
@@ -30,6 +30,11 @@ Result types from loading indexes are now Decode.Error not String.
 New functions addT for add, searchT for search and removeT for remove.
 These replace the error type of result with a type.
 v5.0.2 was a goof on my part i forgot to expose new functions correctly.
+
+### v5.1.1
+
+Fixed a bug in Trie that affect this when removing documents quite seriously.
+New version of Trie, a few extra tests created.
 
 ### Packages
 
@@ -69,7 +74,7 @@ module Main exposing (ExampleDocType, createNewIndexExample, main, resultSearchI
 
 {-| Create an index and add a document, search a document
 
-Copyright (c) 2016 Robin Luiten
+Copyright (c) 2025 Robin Luiten
 
 -}
 
