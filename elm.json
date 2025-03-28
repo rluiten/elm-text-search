@@ -20,7 +20,7 @@
         "elm/regex": "1.0.0 <= v < 2.0.0",
         "rluiten/sparsevector": "1.0.3 <= v < 2.0.0",
         "rluiten/stemmer": "1.0.4 <= v < 2.0.0",
-        "rluiten/trie": "2.1.0 <= v < 3.0.0"
+        "rluiten/trie": "2.1.1 <= v < 3.0.0"
     },
     "test-dependencies": {
         "elm-explorations/test": "2.0.0 <= v <= 2.2.0"

@@ -356,8 +356,6 @@ removeT doc ((Index irec) as index) =
     let
         docRef =
             irec.ref doc
-
-        -- can error without docid as well.
     in
     if String.isEmpty docRef then
         Err RemoveErrorUniqueRefIsEmpty
@@ -489,7 +487,7 @@ This had a bug it used "fields" boosts but did not use "listFields" for all fiel
 This meant that if you only indexed with listFields that fieldsBoosts would be zero and
 resultant score would end up NaN.
 
-In addition a second problem was that it makes little to no sense to scale query veoctyr
+In addition a second problem was that it makes little to no sense to scale query vector
 by average of all fields boost as it does not change the relative score document matches.
 So removing boost on queries is a simpler solution than including "listFields" into boosts.
 
@@ -511,6 +509,6 @@ searchTokens tokens index =
                 ( u1index, [] )
                 (Set.toList (Utils.intersectSets tokenDocSets))
 
-        -- _ = Debug.log("searchTokens intersect") (Utils.intersectSets tokenDocSets)
+        -- _ = Debug.log "searchTokens intersect" (Utils.intersectSets tokenDocSets)
     in
     ( u2index, List.reverse (List.sortBy Tuple.second matchedDocs) )

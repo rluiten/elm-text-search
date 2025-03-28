@@ -10,9 +10,12 @@ module IndexTests exposing
     , idfCacheIsClearedAfterSuccessfulRemove
     , removeDocRefNotIndexReturnsError
     , removeDocWithEmptyIdFieldReturnsError
+    , removeDoesNotBreakSearchResults
     , removeOnlyDocIndexReturnsIsEmpty
     , searchCasesTest
     , searchEmptyIndexReturnsError
+    , searchIndexAfter2DocRemovedErrors
+    , searchIndexAfterDocRemovedErrors
     , searchListFieldsSingleLetterWithLetterInBody
     , searchSingleLetterWithLetterInTitles
     , searchUsingEmptyQueryReturnsError
@@ -327,6 +330,46 @@ removeDocWithEmptyIdFieldReturnsError =
             getEmptyIndex ()
                 |> Index.remove doc5_idEmpty
                 |> Expect.equal (Err "Error document has an empty unique id (ref).")
+
+
+searchIndexAfterDocRemovedErrors : Test
+searchIndexAfterDocRemovedErrors =
+    test "Search index where 1 doc from index was removed fails" <|
+        \() ->
+            getIndexDoc1 ()
+                |> Index.remove doc1_
+                |> TestUtils.getResultIgnoreError
+                |> Index.search "Sally"
+                |> TestUtils.getErrorIgnoreResult
+                |> Expect.equal "Error there are no documents in index to search."
+
+
+searchIndexAfter2DocRemovedErrors : Test
+searchIndexAfter2DocRemovedErrors =
+    test "Search Index where 2 docs from index removed fails" <|
+        \() ->
+            getIndexDoc1Doc2 ()
+                |> Index.remove doc1_
+                |> TestUtils.getResultIgnoreError
+                |> Index.remove doc2_
+                |> TestUtils.getResultIgnoreError
+                |> Index.search "Sally"
+                |> TestUtils.getErrorIgnoreResult
+                |> Expect.equal "Error there are no documents in index to search."
+
+
+removeDoesNotBreakSearchResults : Test
+removeDoesNotBreakSearchResults =
+    test "Remove does not break searching" <|
+        \() ->
+            getIndexDoc1Doc2 ()
+                |> Index.remove doc2_
+                |> TestUtils.getResultIgnoreError
+                |> Index.search "Sally"
+                |> TestUtils.getResultIgnoreError
+                |> Tuple.second
+                |> List.map Tuple.first
+                |> Expect.equal [ doc1_.cid ]
 
 
 {-| Test to verify removing only document reports
